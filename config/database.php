@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Str;
 
-//$DATABASE_URL=parse_url('postgres://bnbkbrgbjigemq:4a2f49700da70de9c5cfdf712363cd008cc5005d66e9bec7fd0e3c21d36c2126@ec2-184-72-235-80.compute-1.amazonaws.com:5432/d6sejhtpbg6tmu');
+$DATABASE_URL=parse_url('postgres://fmlzikbnnchafi:294cb9d5d02d8f312fb8d07d2f90675cf1ee0c4872f9538daac78ed13f310f7a@ec2-184-72-235-159.compute-1.amazonaws.com:5432/d75bvcfvqj3bve');
 
 return [
 
@@ -17,7 +17,8 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'mysql'),
+    //'default' => env('DB_CONNECTION', 'mysql'),
+    'default' => env('DB_CONNECTION', 'pgsql'),
     /*
     |--------------------------------------------------------------------------
     | Database Connections
@@ -64,20 +65,20 @@ return [
             ]) : [],
         ],
 
-        // 'pgsql' => [
-        //     'driver' => 'pgsql',
-        //     'url' =>  env('DATABASE_URL'),
-        //     'host' => $DATABASE_URL["host"],
-        //     'port' => $DATABASE_URL["port"],
-        //     'database' => ltrim($DATABASE_URL["path"],"/"),
-        //     'username' => $DATABASE_URL["user"],
-        //     'password' => $DATABASE_URL["pass"],
-        //     'charset' => 'utf8',
-        //     'prefix' => '',
-        //     'prefix_indexes' => true,
-        //     'schema' => 'public',
-        //     'sslmode' => 'prefer',
-        // ],
+        'pgsql' => [
+            'driver' => 'pgsql',
+            'url' =>  env('DATABASE_URL'),
+            'host' => $DATABASE_URL["host"],
+            'port' => $DATABASE_URL["port"],
+            'database' => ltrim($DATABASE_URL["path"],"/"),
+            'username' => $DATABASE_URL["user"],
+            'password' => $DATABASE_URL["pass"],
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'schema' => 'public',
+            'sslmode' => 'prefer',
+        ],
 
         // 'pgsql' => [
         //     'driver' => 'pgsql',
