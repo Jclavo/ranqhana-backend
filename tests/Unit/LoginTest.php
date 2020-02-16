@@ -350,7 +350,7 @@ class LoginTest extends TestCase
     public function test_login_response_api_token()
     {
         // Generate an user object
-        $user = factory(User::class)->create(['country_code' => '55']);
+        $user = factory(User::class)->create(['country_code' => '55', 'email' => '']);
         
         $this->assertDatabaseHas('users', $user->toArray());
         
@@ -368,7 +368,7 @@ class LoginTest extends TestCase
     public function test_unauthenticated_user()
     {
         // Generate an user object
-        $user = factory(User::class)->create(['country_code' => '55']);
+        $user = factory(User::class)->create(['country_code' => '55', 'email' => '']);
        
         $user->password = 'secret';
         
@@ -388,7 +388,7 @@ class LoginTest extends TestCase
     public function test_only_user_logged()
     {
         // Generate an user object
-        $user = factory(User::class)->create(['country_code' => '55']);
+        $user = factory(User::class)->create(['country_code' => '55', 'email' => '']);
         
         $user->password = 'secret';
         
