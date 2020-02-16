@@ -85,7 +85,7 @@ class LoginController extends ResponseController
                 return $this->sendError('Unknow country');
         }
         
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        if (!Auth::attempt($request->only('country_code', 'identification',  'password'))) {
             return $this->sendError('Invalid credentials');
         }
         
