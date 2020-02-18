@@ -3,6 +3,7 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 use App\User;
 use App\Country;
+use App\Store;
 use Faker\Generator as Faker;
 use Illuminate\Support\Str;
 
@@ -20,14 +21,15 @@ use Illuminate\Support\Str;
 $factory->define(User::class, function (Faker $faker) {
     return [
         'name' => $faker->name,
-         'email' => $faker->unique()->safeEmail,
+        'email' => $faker->unique()->safeEmail,
         'email_verified_at' => now(),
-        // 'identification' => $faker->numberBetween($min = 1000, $max = 9000),
         'identification' => $faker->unique()->randomNumber($nbDigits = 9, $strict = true) . $faker->unique()->randomNumber($nbDigits = 2, $strict = true),
-        //'identification' => '12312312312',
         'password' => bcrypt('secret'),
-         'country_code' => function () {
+        'country_code' => function () {
              return factory(Country::class)->create()->country_code;
-         }
+        },
+        'store_id' => function () {
+            return factory(Store::class)->create()->id;
+        }
     ];
 });
