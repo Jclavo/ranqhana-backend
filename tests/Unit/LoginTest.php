@@ -120,6 +120,26 @@ class LoginTest extends TestCase
         $response->assertJson(['message' => 'The c password and password must match.']);
     }
 
+    public function test_register_store_id_is_required()
+    {
+        // Generate an user object
+        $user = factory(User::class)->make(['store_id' => '']);
+              
+        //Submit post request to create an user endpoint
+        $response = $this->post('api/register', $user->toArray());
+        
+        
+        //Verify in the database
+        $this->assertDatabaseMissing('users', $user->toArray());
+        
+        // Verify status 200
+        $response->assertStatus(200);
+        
+        // Verify values in response
+        $response->assertJson(['status' => false]);
+        $response->assertJson(['message' => 'The c password field is required.']);
+    }
+
     public function test_register_identification_from_brazil_is_required()
     {
 
