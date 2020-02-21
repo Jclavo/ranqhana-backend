@@ -19,5 +19,13 @@ Route::post('login', 'API\LoginController@login');
 Route::get('country', 'API\CountryController@index');
 
 
-Route::middleware('auth:api')->get('getUserInformation', 'API\LoginController@getUserInformation');
+// Route::middleware('auth:api')->get('getUserInformation', 'API\LoginController@getUserInformation');
+
+Route::middleware(['auth:api'])->group(function () {
+
+    Route::get('getUserInformation', 'API\LoginController@getUserInformation');
+
+    Route::resource('products', 'API\ProductController');
+
+});
 
