@@ -18,7 +18,8 @@ class LoginController extends ResponseController
             'email' => 'email|unique:users',
             'name' => 'required',
             'password' => 'required',
-            'c_password' => 'required|same:password'
+            'c_password' => 'required|same:password',
+            'store_id' => 'required'
         ]);
         
         if ($validator->fails()) {
@@ -49,6 +50,7 @@ class LoginController extends ResponseController
         $user->email = $request->email;
         $user->password = bcrypt($request->password);
         $user->country_code = $request->country_code;
+        $user->store_id = $request->store_id;
         
         $user->save();
         
