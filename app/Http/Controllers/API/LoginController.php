@@ -54,7 +54,7 @@ class LoginController extends ResponseController
         
         $user->save();
         
-        return $this->sendResponse($user, 'User created successfully.');  
+        return $this->sendResponse($user->toArray(), 'User created successfully.');  
         
         
     }
@@ -95,7 +95,7 @@ class LoginController extends ResponseController
         Auth::user()->save();
         
         //return response()->json(['user' => Auth::user(),'token' => Auth::user()->api_token]);
-        return $this->sendResponse(Auth::user(), 'User logged successfully.');  
+        return $this->sendResponse(Auth::user()->toArray(), 'User logged successfully.');  
     }
     
     public function getUserInformation() {
