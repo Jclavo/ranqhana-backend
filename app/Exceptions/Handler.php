@@ -50,7 +50,7 @@ class Handler extends ExceptionHandler
         
         $response = ['status' => false, 'message' => $exception->getMessage()];
         
-        return response()->json($response, 404);
+        return response()->json($response, 200);
             
         /*if($exception instanceof \Illuminate\Auth\AuthenticationException)
         {
