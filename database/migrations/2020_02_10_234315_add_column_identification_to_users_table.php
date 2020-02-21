@@ -15,7 +15,7 @@ class AddColumnIdentificationToUsersTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('identification', 15)
-            ->after('api_token');
+            ->before('api_token');
         });
     }
 
