@@ -109,6 +109,7 @@ class ProductController extends ResponseController
         $product = Product::find($id);
         
         $product->name = $request->name;
+        $product->description = $request->description;
                 
         $product->save();
         
