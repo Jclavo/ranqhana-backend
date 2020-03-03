@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddStoresToUsersTable extends Migration
+class CreateItemsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,12 @@ class AddStoresToUsersTable extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->unsignedBigInteger('store_id')->before('api_token')->nullable(true);;
-            $table->foreign('store_id')->references('id')->on('stores');
+        Schema::create('items', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('name');
+            $table->string('description')->nullable(true);
+            $table->integer('quantity')->default(0);
+            $table->timestamps();
         });
     }
 
@@ -26,8 +29,6 @@ class AddStoresToUsersTable extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('products');
     }
 }
