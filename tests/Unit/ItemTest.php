@@ -2,22 +2,29 @@
 
 namespace Tests\Unit;
 
-use App\Product;
+use App\Item;
 use App\User;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+// use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class ProductTest extends TestCase
+class ItemTest extends TestCase
 { 
     use RefreshDatabase;
+    //use DatabaseMigrations;
 
     public function setUp(): void
     {
         parent::setUp();
         // Seed database
         $this->seed();
+        // Artisan::call('db:seed');
        
+    }
+
+    public function test_999()
+    {
+
     }
 
     public function get_api_token()
@@ -36,10 +43,10 @@ class ProductTest extends TestCase
         return json_decode($response->content(),true)['result']['api_token'];
     }
 
-    public function test_product_unauthenticated_user()
+    public function test_item_unauthenticated_user()
     {       
         //Submit post request with autorizathion header
-        $response = $this->get('api/products');
+        $response = $this->get('api/items');
         
         // Verify status 200 
         $response->assertStatus(200);
@@ -52,7 +59,7 @@ class ProductTest extends TestCase
 
     //TEST FUNCTION index
 
-    public function test_product_get_all()
+    public function test_item_get_all()
     {
         // get api token from authenticate user
         $api_token = $this->get_api_token();
@@ -61,7 +68,7 @@ class ProductTest extends TestCase
         $response = 
         
         $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->get('api/products');
+              ->get('api/items');
         
         
         // Verify status 200 
@@ -74,28 +81,28 @@ class ProductTest extends TestCase
             'result' => []
           ]);
         $response->assertJson(['status' => true]);
-        $response->assertJson(['message' => 'Products retrieved successfully.']);
+        $response->assertJson(['message' => 'Items retrieved successfully.']);
          
     }
 
     //TEST FUNCTION create/store
 
-    public function test_product_create_name_is_required()
+    public function test_item_create_name_is_required()
     {
         // get api token from authenticate user
         $api_token = $this->get_api_token();
         
-         // Generate a product object
-        $product = factory(Product::class)->make(['name' => '']);
+         // Generate a item object
+        $item = factory(Item::class)->make(['name' => '']);
 
         //Submit post request with autorizathion header
         $response = 
         
         $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->post('api/products', $product->toArray());
+              ->post('api/items', $item->toArray());
         
         //Verify in the database
-        $this->assertDatabaseMissing('products', $product->toArray());
+        $this->assertDatabaseMissing('items', $item->toArray());
 
         // Verify status 200 
         $response->assertStatus(200);
@@ -106,22 +113,22 @@ class ProductTest extends TestCase
          
     }
 
-    public function test_product_create_store_id_is_required()
+    public function test_item_create_store_id_is_required()
     {
         // get api token from authenticate user
         $api_token = $this->get_api_token();
         
-         // Generate a product object
-        $product = factory(Product::class)->make(['store_id' => '']);
+         // Generate a item object
+        $item = factory(Item::class)->make(['store_id' => '']);
 
         //Submit post request with autorizathion header
         $response = 
         
         $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->post('api/products', $product->toArray());
+              ->post('api/items', $item->toArray());
         
         //Verify in the database
-        $this->assertDatabaseMissing('products', $product->toArray());
+        $this->assertDatabaseMissing('items', $item->toArray());
 
         // Verify status 200 
         $response->assertStatus(200);
@@ -132,22 +139,22 @@ class ProductTest extends TestCase
          
     }
 
-    public function test_product_create()
+    public function test_item_create()
     {
         // get api token from authenticate user
         $api_token = $this->get_api_token();
         
-         // Generate a product object
-        $product = factory(Product::class)->make();
+         // Generate a item object
+        $item = factory(Item::class)->make();
 
         //Submit post request with autorizathion header
         $response = 
         
         $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->post('api/products', $product->toArray());
+              ->post('api/items', $item->toArray());
         
         //Verify in the database
-        $this->assertDatabaseHas('products', $product->toArray());
+        $this->assertDatabaseHas('items', $item->toArray());
 
         // Verify status 200 
         $response->assertStatus(200);
@@ -159,13 +166,13 @@ class ProductTest extends TestCase
             'result' => []
             ]);
         $response->assertJson(['status' => true]);
-        $response->assertJson(['message' => 'Products created successfully.']);
+        $response->assertJson(['message' => 'Items created successfully.']);
          
     }
 
     //TEST FUNCTION show
 
-    public function test_product_not_found()
+    public function test_item_not_found()
     {
         // get api token from authenticate user
         $api_token = $this->get_api_token();
@@ -174,33 +181,33 @@ class ProductTest extends TestCase
         $response = 
         
         $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->get('api/products/' . '0');
+              ->get('api/items/' . '0');
         
         // Verify status 200 
         $response->assertStatus(200);
         
         // Verify values in response
         $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'Product not found.']);
+        $response->assertJson(['message' => 'Item not found.']);
          
     }
 
-    public function test_product_show_by_id()
+    public function test_item_show_by_id()
     {
         // get api token from authenticate user
         $api_token = $this->get_api_token();
         
-         // Generate a product object
-        $product = factory(Product::class)->create();
+         // Generate a item object
+        $item = factory(Item::class)->create();
 
         //Verify in the database
-        $this->assertDatabaseHas('products', $product->toArray());
+        $this->assertDatabaseHas('items', $item->toArray());
 
         //Submit post request with autorizathion header
         $response = 
         
         $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-             ->get('api/products/' . $product->id);
+             ->get('api/items/' . $item->id);
         
         // Verify status 200 
         $response->assertStatus(200);
@@ -212,34 +219,34 @@ class ProductTest extends TestCase
             'result' => []
             ]);
         $response->assertJson(['status' => true]);
-        $response->assertJson(['message' => 'Product retrieved successfully.']);
+        $response->assertJson(['message' => 'Item retrieved successfully.']);
          
     }
 
     //TEST FUNCTION update
 
-    public function test_product_update_name_is_required()
+    public function test_item_update_name_is_required()
     {
         // get api token from authenticate user
         $api_token = $this->get_api_token();
         
-         // Generate a product object
-        $product = factory(Product::class)->create();
+         // Generate a item object
+        $item = factory(Item::class)->create();
 
         //Verify in the database
-        $this->assertDatabaseHas('products', $product->toArray());
+        $this->assertDatabaseHas('items', $item->toArray());
 
         // Set values to Update
-        $product->name = '';
+        $item->name = '';
 
         //Submit post request with autorizathion header
         $response = 
         
         $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->put('api/products/' . $product->id ,  $product->toArray());
+              ->put('api/items/' . $item->id ,  $item->toArray());
         
         //Verify in the database
-        $this->assertDatabaseMissing('products', $product->toArray());
+        $this->assertDatabaseMissing('items', $item->toArray());
 
         // Verify status 200 
         $response->assertStatus(200);
@@ -250,43 +257,43 @@ class ProductTest extends TestCase
          
     }
 
-    public function test_product_update_name()
+    public function test_item_update_name()
     {
         // get api token from authenticate user
         $api_token = $this->get_api_token();
         
-         // Generate a product object
-        $product = factory(Product::class)->create();
+         // Generate a item object
+        $item = factory(Item::class)->create();
 
         //Verify in the database
-        $this->assertDatabaseHas('products', $product->toArray());
+        $this->assertDatabaseHas('items', $item->toArray());
 
         // Set values to Update
-        $newProduct = factory(Product::class)->make();
+        $newItem = factory(Item::class)->make();
 
-        $product->name = $newProduct->name;
+        $item->name = $newItem->name;
 
         //Submit post request with autorizathion header
         $response = 
         
         $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->put('api/products/' . $product->id ,  $product->toArray());
+              ->put('api/items/' . $item->id ,  $item->toArray());
         
         //Verify in the database
-        $this->assertDatabaseHas('products', $product->toArray());
+        $this->assertDatabaseHas('items', $item->toArray());
 
         // Verify status 200 
         $response->assertStatus(200);
         
         // Verify values in response
         $response->assertJson(['status' => true]);
-        $response->assertJson(['message' => 'Product updated successfully.']);
+        $response->assertJson(['message' => 'Item updated successfully.']);
          
     }
 
     //TEST FUNCTION update
 
-    public function test_product_delete_id_not_found()
+    public function test_item_delete_id_not_found()
     {
         // get api token from authenticate user
         $api_token = $this->get_api_token();
@@ -295,37 +302,37 @@ class ProductTest extends TestCase
         $response = 
         
         $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->delete('api/products/' . '0');
+              ->delete('api/items/' . '0');
         
         // Verify status 200 
         $response->assertStatus(200);
         
         // Verify values in response
         $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'Product not found.']);
+        $response->assertJson(['message' => 'Item not found.']);
          
     }
 
-    public function test_product_delete()
+    public function test_item_delete()
     {
         // get api token from authenticate user
         $api_token = $this->get_api_token();
 
-        // Generate a product 
-        $product = factory(Product::class)->create();
+        // Generate a item 
+        $item = factory(Item::class)->create();
         
         //Submit post request with autorizathion header
         $response = 
         
         $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->delete('api/products/' . $product->id);
+              ->delete('api/items/' . $item->id);
         
         // Verify status 200 
         $response->assertStatus(200);
         
         // Verify values in response
         $response->assertJson(['status' => true]);
-        $response->assertJson(['message' => 'Product deleted successfully.']);
+        $response->assertJson(['message' => 'Item deleted successfully.']);
          
     }
 }

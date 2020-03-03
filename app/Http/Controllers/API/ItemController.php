@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Product;
+use App\Item;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ResponseController;
 use Illuminate\Support\Facades\Validator;
 
-class ProductController extends ResponseController
+class ItemController extends ResponseController
 {
     /**
      * Display a listing of the resource.
@@ -16,9 +16,9 @@ class ProductController extends ResponseController
      */ 
     public function index()
     {
-        $product = Product::all();
+        $item = Item::all();
             
-        return $this->sendResponse($product->toArray(), 'Products retrieved successfully.');
+        return $this->sendResponse($item->toArray(), 'Items retrieved successfully.');
     }
 
     /**
@@ -49,41 +49,41 @@ class ProductController extends ResponseController
             return $this->sendError($validator->errors()->first());
         }
 
-        $product = new Product();
+        $item = new Item();
         
-        $product->name = $request->name;
-        $product->description = $request->description;
-        $product->store_id = $request->store_id;
+        $item->name = $request->name;
+        $item->description = $request->description;
+        $item->store_id = $request->store_id;
         
-        $product->save();
+        $item->save();
         
-        return $this->sendResponse($product->toArray(), 'Products created successfully.');  
+        return $this->sendResponse($item->toArray(), 'Items created successfully.');  
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Product  $product
+     * @param  \App\Item  $item
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
-        $product = Product::find($id);
+        $item = Item::find($id);
         
-        if (is_null($product)) {
-            return $this->sendError('Product not found.');
+        if (is_null($item)) {
+            return $this->sendError('Item not found.');
         }
         
-        return $this->sendResponse($product->toArray(), 'Product retrieved successfully.');
+        return $this->sendResponse($item->toArray(), 'Item retrieved successfully.');
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Product  $product
+     * @param  \App\Item  $item
      * @return \Illuminate\Http\Response
      */
-    public function edit(Product $product)
+    public function edit(Item $item)
     {
         //
     }
@@ -92,7 +92,7 @@ class ProductController extends ResponseController
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Product  $product
+     * @param  \App\Item  $item
      * @return \Illuminate\Http\Response
      */
     public function update(int $id, Request $request)
@@ -106,32 +106,32 @@ class ProductController extends ResponseController
             return $this->sendError($validator->errors()->first());
         }
 
-        $product = Product::find($id);
+        $item = Item::find($id);
         
-        $product->name = $request->name;
-        $product->description = $request->description;
+        $item->name = $request->name;
+        $item->description = $request->description;
                 
-        $product->save();
+        $item->save();
         
-        return $this->sendResponse($product->toArray(), 'Product updated successfully.');
+        return $this->sendResponse($item->toArray(), 'Item updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Product  $product
+     * @param  \App\Item  $item
      * @return \Illuminate\Http\Response
      */
     public function destroy(int $id)
     {
-        $product = Product::find($id);
+        $item = Item::find($id);
 
-        if (is_null($product)) {
-            return $this->sendError('Product not found.');
+        if (is_null($item)) {
+            return $this->sendError('Item not found.');
         }
         
-        $product->delete();
+        $item->delete();
 
-        return $this->sendResponse($product->toArray(), 'Product deleted successfully.');
+        return $this->sendResponse($item->toArray(), 'Item deleted successfully.');
     }
 }

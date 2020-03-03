@@ -2,11 +2,11 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Product;
+use App\Item;
 use App\Store;
 use Faker\Generator as Faker;
 
-$factory->define(Product::class, function (Faker $faker) {
+$factory->define(Item::class, function (Faker $faker) {
     return [
         'name' => $faker->name,
         'description' => $faker->name,

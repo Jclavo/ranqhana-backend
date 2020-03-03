@@ -25,7 +25,7 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::get('getUserInformation', 'API\LoginController@getUserInformation');
 
-    Route::resource('products', 'API\ProductController');
+    Route::resource('items', 'API\ItemController');
 
 });
 
