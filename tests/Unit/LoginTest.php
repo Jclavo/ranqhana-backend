@@ -2,12 +2,12 @@
 
 namespace Tests\Unit;
 
-use App\User;
-use App\Country;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+use App\User;
+use App\Country;
+// use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class LoginTest extends TestCase
 {
@@ -18,7 +18,7 @@ class LoginTest extends TestCase
     {
         parent::setUp();
         // Seed database
-        $this->seed();
+        //$this->seed();
        
     }
 

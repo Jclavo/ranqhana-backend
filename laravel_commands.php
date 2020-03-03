@@ -23,6 +23,8 @@ php artisan make:factory PostFactory --model=Post
 
 php artisan make:seeder UsersTableSeeder
 
+php artisan db:seed --class=UsersTableSeeder
+
 - CREATE TEST
 
 php artisan make:test UserTest --unit

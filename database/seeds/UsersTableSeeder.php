@@ -26,8 +26,8 @@ class UsersTableSeeder extends Seeder
             'email' => 'jc@gmail.com',
             'password' => bcrypt('123'),
             'identification' => '10210210210',
-            'country_code' => 55,
-            'store_id' => 1,
+            'country_code' => '55',
+            'store_id' => '1',
         ]);
     }
 }
