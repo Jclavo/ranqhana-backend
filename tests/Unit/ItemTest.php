@@ -22,11 +22,6 @@ class ItemTest extends TestCase
        
     }
 
-    public function test_999()
-    {
-
-    }
-
     public function get_api_token()
     {
         // Generate an user object
