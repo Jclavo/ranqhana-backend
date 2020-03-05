@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 class ResponseController extends Controller
 {
-    public function sendResponse($result, $message)
+    public function sendResponse($result, $message, $records = 0)
     {
-        $response = [ 'status' => true, 'result' => $result, 'message' => $message ];
+        $response = ['status' => true, 'result' => $result, 'message' => $message, 'records' => $records];
         
         return response()->json($response, 200);
     }
