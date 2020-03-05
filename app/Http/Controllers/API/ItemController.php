@@ -6,6 +6,7 @@ use App\Item;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ResponseController;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Schema;
 
 class ItemController extends ResponseController
 {
@@ -133,5 +134,42 @@ class ItemController extends ResponseController
         $item->delete();
 
         return $this->sendResponse($item->toArray(), 'Item deleted successfully.');
+    }
+
+
+    /**
+     * 
+     */
+    public function pagination(Request $request)
+    {
+        $sortArray = array("asc", "ASC", "desc", "DESC");
+
+        $per_page = $request->per_page;
+        $sortColumn = $request->sortColumn;
+        $sortDirection = $request->sortDirection;
+        $searchValue = $request->searchValue;
+
+        // Initialize values if they are empty.
+        if (empty($per_page)) {
+            $per_page = 20;
+        }
+
+        if (!in_array($sortDirection, $sortArray)) {
+            $sortDirection = "ASC";
+        }
+
+        //if(Schema::hasColumn('items', $sortColumn ) === false) ;
+        if (empty($sortColumn)) {
+              $sortColumn = "id";
+        }
+
+        $results = Item::
+                where('name', 'like', '%'. $searchValue .'%')
+                ->orWhere('name', 'like', '%'. $searchValue .'%')
+                ->orderBy($sortColumn, $sortDirection)
+                ->paginate($per_page);
+            
+        return $this->sendResponse($results->items(), 'Items retrieved successfully.', $results->total() );
+
     }
 }

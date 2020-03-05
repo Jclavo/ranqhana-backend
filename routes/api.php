@@ -25,7 +25,8 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::get('getUserInformation', 'API\LoginController@getUserInformation');
 
+    Route::post('items/pagination', 'API\ItemController@pagination');
     Route::resource('items', 'API\ItemController');
-
+   
 });
 
