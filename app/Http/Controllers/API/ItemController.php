@@ -142,12 +142,17 @@ class ItemController extends ResponseController
      */
     public function pagination(Request $request)
     {
+      // return $this->sendResponse($request->store_id, 'Items retrieved successfully.' );
+
         $sortArray = array("asc", "ASC", "desc", "DESC");
 
-        $per_page = $request->per_page;
-        $sortColumn = $request->sortColumn;
-        $sortDirection = $request->sortDirection;
-        $searchValue = $request->searchValue;
+
+        $store_id = $request->store_id;
+        // SearchOptions values
+        $per_page = $request->searchOption['per_page'];
+        $sortColumn = $request->searchOption['sortColumn'];
+        $sortDirection = $request->searchOption['sortDirection'];
+        $searchValue = $request->searchOption['searchValue'];
 
         // Initialize values if they are empty.
         if (empty($per_page)) {
@@ -164,9 +169,15 @@ class ItemController extends ResponseController
         }
 
         $results = Item::
-                where('name', 'like', '%'. $searchValue .'%')
-                ->orWhere('name', 'like', '%'. $searchValue .'%')
-                ->orderBy($sortColumn, $sortDirection)
+                select('items.*')
+                ->join('stores', function ($join) use($store_id){
+                    $join->on('stores.id', '=', 'items.store_id')
+                         ->where('items.store_id', '=', $store_id);
+                })
+
+                ->where('items.name', 'like', '%'. $searchValue .'%')
+                ->orWhere('items.name', 'like', '%'. $searchValue .'%')
+                ->orderBy('items.'.$sortColumn, $sortDirection)
                 ->paginate($per_page);
             
         return $this->sendResponse($results->items(), 'Items retrieved successfully.', $results->total() );
