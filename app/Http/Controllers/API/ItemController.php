@@ -160,12 +160,14 @@ class ItemController extends ResponseController
         }
 
         if (!in_array($sortDirection, $sortArray)) {
-            $sortDirection = "ASC";
+            $sortDirection = "DESC";
+            $sortColumn = "updated_at";
         }
+        
 
         //if(Schema::hasColumn('items', $sortColumn ) === false) ;
         if (empty($sortColumn)) {
-              $sortColumn = "id";
+               $sortColumn = "updated_at";
         }
 
         $results = Item::
@@ -178,7 +180,6 @@ class ItemController extends ResponseController
                 ->where('items.name', 'like', '%'. $searchValue .'%')
                 ->orWhere('items.name', 'like', '%'. $searchValue .'%')
                 ->orderBy('items.'.$sortColumn, $sortDirection)
-                ->orderBy('items.updated_at', 'DESC')
                 ->paginate($per_page);
             
         return $this->sendResponse($results->items(), 'Items retrieved successfully.', $results->total() );
