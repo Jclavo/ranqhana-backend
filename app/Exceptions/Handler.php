@@ -49,15 +49,14 @@ class Handler extends ExceptionHandler
         //return parent::render($request, $exception);
         
         $response = ['status' => false, 'message' => $exception->getMessage()];
-        
-        return response()->json($response, 200);
-            
-        /*if($exception instanceof \Illuminate\Auth\AuthenticationException)
+    
+        if($exception instanceof \Illuminate\Auth\AuthenticationException)
         {
-            return response('unauthorized', 401);
+            return response()->json($response, 401);
         }
+        return response()->json($response, 404);
+        // $exception->getMessage()
+        // return parent::render($request, $exception);
         
-        return parent::render($request, $exception);
-        */
     }
 }
