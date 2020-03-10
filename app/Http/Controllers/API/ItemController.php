@@ -178,6 +178,7 @@ class ItemController extends ResponseController
                 ->where('items.name', 'like', '%'. $searchValue .'%')
                 ->orWhere('items.name', 'like', '%'. $searchValue .'%')
                 ->orderBy('items.'.$sortColumn, $sortDirection)
+                ->orderBy('items.updated_at', 'DESC')
                 ->paginate($per_page);
             
         return $this->sendResponse($results->items(), 'Items retrieved successfully.', $results->total() );
