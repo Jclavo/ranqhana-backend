@@ -19,6 +19,8 @@ php artisan make:migration add_votes_to_users_table --table=users
 
 php artisan make:controller PhotoController --resource --model=Photo
 
+php artisan make:controller API/PriceController --resource --model=Price
+
 - CREATE FACTORY
 
 php artisan make:factory PostFactory --model=Post
