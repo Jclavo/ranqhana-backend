@@ -4,9 +4,12 @@ namespace Tests\Unit;
 
 use App\Item;
 use App\User;
+use App\Price;
 // use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+
+use App\Http\Controllers\API\ItemController;
 
 class ItemTest extends TestCase
 { 
@@ -44,7 +47,7 @@ class ItemTest extends TestCase
         $response = $this->get('api/items');
         
         // Verify status 200 
-        $response->assertStatus(200);
+        $response->assertStatus(401);
         
         // Verify values in response
         $response->assertJson(['status' => false]);
@@ -116,6 +119,11 @@ class ItemTest extends TestCase
          // Generate a item object
         $item = factory(Item::class)->make(['store_id' => '']);
 
+         // Generate a price object
+        $price = factory(Price::class)->make();
+
+        $item->price = $price->price;
+
         //Submit post request with autorizathion header
         $response = 
         
@@ -134,13 +142,13 @@ class ItemTest extends TestCase
          
     }
 
-    public function test_item_create()
+    public function test_item_create_price_is_required()
     {
         // get api token from authenticate user
         $api_token = $this->get_api_token();
         
          // Generate a item object
-        $item = factory(Item::class)->make();
+        $item = factory(Item::class)->make(['price' => '']);
 
         //Submit post request with autorizathion header
         $response = 
@@ -149,7 +157,39 @@ class ItemTest extends TestCase
               ->post('api/items', $item->toArray());
         
         //Verify in the database
-        $this->assertDatabaseHas('items', $item->toArray());
+        $this->assertDatabaseMissing('items', $item->toArray());
+
+        // Verify status 200 
+        $response->assertStatus(200);
+        
+        // Verify values in response
+        $response->assertJson(['status' => false]);
+        $response->assertJson(['message' => 'The price field is required.']);
+         
+    }
+
+    public function test_item_create_ok()
+    {
+        // get api token from authenticate user
+        $api_token = $this->get_api_token();
+        
+         // Generate a item object
+        $item = factory(Item::class)->make();
+
+        // Generate a price object
+        $price = factory(Price::class)->make();
+
+        $item->price = $price->price;
+
+        //Submit post request with autorizathion header
+        $response = 
+        
+        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
+              ->post('api/items', $item->toArray());
+        
+        //Verify in the database
+        //$this->assertDatabaseHas('items', $item->toArray());
+        //$this->assertDatabaseHas('prices', $price->toArray());
 
         // Verify status 200 
         $response->assertStatus(200);
@@ -286,7 +326,46 @@ class ItemTest extends TestCase
          
     }
 
-    //TEST FUNCTION update
+    public function test_item_update_price()
+    {
+        // get api token from authenticate user
+        $api_token = $this->get_api_token();
+        
+         // Generate a item object
+        $item = factory(Item::class)->create();
+
+        //Verify in the database
+        $this->assertDatabaseHas('items', $item->toArray());
+
+        // Set values to Update
+        $newItem = factory(Item::class)->make();
+
+        $item->name = $newItem->name;
+
+         // Generate a price object
+        $price = factory(Price::class)->make(['item_id' => $item->id]);
+
+        $item->price = $price->price;
+
+        //Submit post request with autorizathion header
+        $response = 
+        
+        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
+              ->put('api/items/' . $item->id ,  $item->toArray());
+        
+        //Verify in the database
+        $this->assertDatabaseHas('prices', $price->toArray());
+
+        // Verify status 200 
+        $response->assertStatus(200);
+        
+        // Verify values in response
+        $response->assertJson(['status' => true]);
+        $response->assertJson(['message' => 'Item updated successfully.']);
+         
+    }
+
+    //TEST FUNCTION delete
 
     public function test_item_delete_id_not_found()
     {
@@ -329,5 +408,77 @@ class ItemTest extends TestCase
         $response->assertJson(['status' => true]);
         $response->assertJson(['message' => 'Item deleted successfully.']);
          
+    }
+
+    //TEST FUNCTION savePrice
+    public function test_save_price_first_value_for_item()
+    {
+        $item = factory(Item::class)->create();
+
+        $itemController = new ItemController();
+
+        $price = $itemController->savePrice(20.5,$item->id);
+        // $this->assertEquals(true, $appVersion->isValidVersion($version));
+
+        $this->assertNotNull($price);
+        //Verify in the database
+        $this->assertDatabaseHas('prices', $price->toArray());
+
+    }
+
+    public function test_save_price_repeated_not_save()
+    {
+        $item = factory(Item::class)->create();
+
+        $itemController = new ItemController();
+
+        $itemController->savePrice(20.5,$item->id);
+        
+        $price = $itemController->savePrice(20.5,$item->id);
+
+        $this->assertNull($price);
+
+    }
+
+    public function test_save_price()
+    {
+        $item = factory(Item::class)->create();
+
+        $itemController = new ItemController();
+
+        $itemController->savePrice(20.5,$item->id);
+        
+        $itemController->savePrice(10,$item->id);
+
+        $price = $itemController->savePrice(20,$item->id);
+
+        $this->assertNotNull($price);
+        //Verify in the database
+        $this->assertDatabaseHas('prices', $price->toArray());
+
+    }
+
+    public function test_save_price_null()
+    {
+        $item = factory(Item::class)->create();
+
+        $itemController = new ItemController();
+       
+        $price = $itemController->savePrice(0,$item->id);
+
+        $this->assertNull($price);
+
+    }
+
+    public function test_save_price_negative()
+    {
+        $item = factory(Item::class)->create();
+
+        $itemController = new ItemController();
+       
+        $price = $itemController->savePrice(-55,$item->id);
+
+        $this->assertNull($price);
+
     }
 }

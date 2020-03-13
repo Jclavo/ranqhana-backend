@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Item;
+use App\Price;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ResponseController;
 use Illuminate\Support\Facades\Validator;
@@ -43,6 +44,7 @@ class ItemController extends ResponseController
         
         $validator = Validator::make($request->all(), [
             'name' => 'required',
+            'price' => 'required:decimal',
             'store_id' => 'required',
         ]);
         
@@ -57,7 +59,11 @@ class ItemController extends ResponseController
         $item->store_id = $request->store_id;
         
         $item->save();
-        
+
+        //Add price
+
+        $this->savePrice($request->price,$item->id);
+
         return $this->sendResponse($item->toArray(), 'Items created successfully.');  
     }
 
@@ -100,7 +106,7 @@ class ItemController extends ResponseController
     {
         $validator = Validator::make($request->all(), [
             'id' => 'required',
-            'name' => 'required'
+            'name' => 'required',
         ]);
         
         if ($validator->fails()) {
@@ -113,6 +119,13 @@ class ItemController extends ResponseController
         $item->description = $request->description;
                 
         $item->save();
+
+        //Add price
+        $price = 0;
+        if ($request->price) {
+           $price = $request->price;
+        }
+        $this->savePrice($price,$item->id);
         
         return $this->sendResponse($item->toArray(), 'Item updated successfully.');
     }
@@ -184,5 +197,38 @@ class ItemController extends ResponseController
             
         return $this->sendResponse($results->items(), 'Items retrieved successfully.', $results->total() );
 
+    }
+
+    public function savePrice($price_item, $item_id){
+
+        $addFlag = false;
+
+        $lastPrice = Price::where('item_id', $item_id)
+                            ->orderBy('created_at', 'DESC')
+                            ->first();
+
+
+        
+        if(empty($lastPrice)){
+            $addFlag = true;
+        }
+        else if($lastPrice->price != $price_item ){
+            $addFlag = true;
+        }
+        
+        if($price_item <= 0){
+            $addFlag = false;
+        }
+
+        $price = null;
+        if($addFlag){
+
+            $price = new Price();
+            $price->price = $price_item;
+            $price->item_id = $item_id;
+            
+            $price->save();
+        }
+        return $price;
     }
 }
