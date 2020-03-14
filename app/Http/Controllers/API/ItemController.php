@@ -75,11 +75,17 @@ class ItemController extends ResponseController
      */
     public function show($id)
     {
-        $item = Item::find($id);
+        //$item = Item::find($id);
         
-        if (is_null($item)) {
-            return $this->sendError('Item not found.');
-        }
+        $item = Item::
+                select('items.*','prices.price')
+                ->leftJoin('prices', 'items.id', '=', 'prices.item_id')
+                ->where('items.id', '=', $id)
+                ->get();
+
+        // if (is_empty($item)) {
+        //     return $this->sendError('Item not found.');
+        // }
         
         return $this->sendResponse($item->toArray(), 'Item retrieved successfully.');
     }
