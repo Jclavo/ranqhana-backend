@@ -81,7 +81,8 @@ class ItemController extends ResponseController
                 select('items.*','prices.price')
                 ->leftJoin('prices', 'items.id', '=', 'prices.item_id')
                 ->where('items.id', '=', $id)
-                ->get();
+                ->orderBy('prices.created_at', 'DESC')
+                ->first();
 
         // if (is_empty($item)) {
         //     return $this->sendError('Item not found.');
