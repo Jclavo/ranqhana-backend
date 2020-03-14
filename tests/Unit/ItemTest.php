@@ -207,25 +207,25 @@ class ItemTest extends TestCase
 
     //TEST FUNCTION show
 
-    public function test_item_not_found()
-    {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
+    // public function test_item_not_found()
+    // {
+    //     // get api token from authenticate user
+    //     $api_token = $this->get_api_token();
         
-        //Submit post request with autorizathion header
-        $response = 
+    //     //Submit post request with autorizathion header
+    //     $response = 
         
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->get('api/items/' . '0');
+    //     $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
+    //           ->get('api/items/' . '0');
         
-        // Verify status 200 
-        $response->assertStatus(200);
+    //     // Verify status 200 
+    //     $response->assertStatus(200);
         
-        // Verify values in response
-        $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'Item not found.']);
+    //     // Verify values in response
+    //     $response->assertJson(['status' => false]);
+    //     $response->assertJson(['message' => 'Item not found.']);
          
-    }
+    // }
 
     public function test_item_show_by_id()
     {
