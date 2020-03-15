@@ -10,6 +10,7 @@ $factory->define(Item::class, function (Faker $faker) {
     return [
         'name' => $faker->name,
         'description' => $faker->name,
+        'price' => $faker->randomNumber(3),
         //'quantity' => $faker->randomNumber(4),
         'store_id' => function () {
             return factory(Store::class)->create()->id;
