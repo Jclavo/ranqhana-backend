@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\ResponseController;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 class ItemController extends ResponseController
 {
@@ -41,10 +42,10 @@ class ItemController extends ResponseController
      */
     public function store(Request $request)
     {
-        
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'price' => 'required:decimal',
+            // 'price' => 'required:decimal',
+            'price' => 'required|numeric|between:0.00,99999.99',
             'store_id' => 'required',
         ]);
         
@@ -56,13 +57,14 @@ class ItemController extends ResponseController
         
         $item->name = $request->name;
         $item->description = $request->description;
+        $item->price = $request->price;
         $item->store_id = $request->store_id;
         
         $item->save();
 
         //Add price
 
-        $this->savePrice($request->price,$item->id);
+        $this->savePrice($item->price,$item->id);
 
         return $this->sendResponse($item->toArray(), 'Items created successfully.');  
     }
@@ -75,18 +77,18 @@ class ItemController extends ResponseController
      */
     public function show($id)
     {
-        //$item = Item::find($id);
+        $item = Item::find($id);
         
-        $item = Item::
-                select('items.*','prices.price')
-                ->leftJoin('prices', 'items.id', '=', 'prices.item_id')
-                ->where('items.id', '=', $id)
-                ->orderBy('prices.created_at', 'DESC')
-                ->first();
+        // $item = Item::
+        //         select('items.*','prices.price')
+        //         ->leftJoin('prices', 'items.id', '=', 'prices.item_id')
+        //         ->where('items.id', '=', $id)
+        //         ->orderBy('prices.created_at', 'DESC')
+        //         ->first();
 
-        // if (is_empty($item)) {
-        //     return $this->sendError('Item not found.');
-        // }
+        if (is_null($item)) {
+            return $this->sendError('Item not found.');
+        }
         
         return $this->sendResponse($item->toArray(), 'Item retrieved successfully.');
     }
@@ -114,6 +116,7 @@ class ItemController extends ResponseController
         $validator = Validator::make($request->all(), [
             'id' => 'required',
             'name' => 'required',
+            'price' => 'required|numeric|between:0.00,99999.99',
         ]);
         
         if ($validator->fails()) {
@@ -124,15 +127,16 @@ class ItemController extends ResponseController
         
         $item->name = $request->name;
         $item->description = $request->description;
+        $item->price = $request->price;
                 
         $item->save();
 
         //Add price
-        $price = 0;
-        if ($request->price) {
-           $price = $request->price;
-        }
-        $this->savePrice($price,$item->id);
+        // $price = 0;
+        // if ($request->price) {
+        //    $price = $request->price;
+        // }
+        $this->savePrice($item->price,$item->id);
         
         return $this->sendResponse($item->toArray(), 'Item updated successfully.');
     }
@@ -191,16 +195,32 @@ class ItemController extends ResponseController
         }
 
         $results = Item::
-                select('items.*')
-                ->join('stores', function ($join) use($store_id){
+                select('items.*',
+                DB::raw('(select price from prices where item_id  = items.id order by created_at desc limit 1) as price')  
+                )->join('stores', function ($join) use($store_id){
                     $join->on('stores.id', '=', 'items.store_id')
                          ->where('items.store_id', '=', $store_id);
                 })
+                // ->leftJoin('prices', function ($join){
+                //     $join->on('items.id', '=', 'prices.item_id')
+                //          ->latest();
+                //         //  ->orderBy('prices.created_at', 'DESC')
+                //         //  ->take(1);
+                //         //  ->first();
+                // })
 
                 ->where('items.name', 'like', '%'. $searchValue .'%')
                 ->orWhere('items.name', 'like', '%'. $searchValue .'%')
                 ->orderBy('items.'.$sortColumn, $sortDirection)
+                // ->distinct()
                 ->paginate($per_page);
+
+                // $item = Item::
+                // select('items.*','prices.price')
+                // ->leftJoin('prices', 'items.id', '=', 'prices.item_id')
+                // ->where('items.id', '=', $id)
+                // ->orderBy('prices.created_at', 'DESC')
+                // ->first();
             
         return $this->sendResponse($results->items(), 'Items retrieved successfully.', $results->total() );
 

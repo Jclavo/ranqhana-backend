@@ -168,6 +168,58 @@ class ItemTest extends TestCase
          
     }
 
+    public function test_item_create_price_must_be_a_number()
+    {
+        // get api token from authenticate user
+        $api_token = $this->get_api_token();
+        
+         // Generate a item object
+        $item = factory(Item::class)->make(['price' => 'abc']);
+
+        //Submit post request with autorizathion header
+        $response = 
+        
+        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
+              ->post('api/items', $item->toArray());
+        
+        //Verify in the database
+        $this->assertDatabaseMissing('items', $item->toArray());
+
+        // Verify status 200 
+        $response->assertStatus(200);
+        
+        // Verify values in response
+        $response->assertJson(['status' => false]);
+        $response->assertJson(['message' => 'The price must be a number.']);
+         
+    }
+
+    public function test_item_create_price_must_be_a_positive_number()
+    {
+        // get api token from authenticate user
+        $api_token = $this->get_api_token();
+        
+         // Generate a item object
+        $item = factory(Item::class)->make(['price' => -4]);
+
+        //Submit post request with autorizathion header
+        $response = 
+        
+        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
+              ->post('api/items', $item->toArray());
+        
+        //Verify in the database
+        $this->assertDatabaseMissing('items', $item->toArray());
+
+        // Verify status 200 
+        $response->assertStatus(200);
+        
+        // Verify values in response
+        $response->assertJson(['status' => false]);
+        $response->assertJson(['message' => 'The price must be between 0.00 and 99999.99.']);
+         
+    }
+
     public function test_item_create_ok()
     {
         // get api token from authenticate user
@@ -177,18 +229,17 @@ class ItemTest extends TestCase
         $item = factory(Item::class)->make();
 
         // Generate a price object
-        $price = factory(Price::class)->make();
-
-        $item->price = $price->price;
-
+        // $price = factory(Price::class)->make(['price' => $item->price,
+        //                                       'item_id' => $item->id]);
+       
         //Submit post request with autorizathion header
         $response = 
         
         $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
               ->post('api/items', $item->toArray());
-        
+
         //Verify in the database
-        //$this->assertDatabaseHas('items', $item->toArray());
+        $this->assertDatabaseHas('items', $item->toArray());
         //$this->assertDatabaseHas('prices', $price->toArray());
 
         // Verify status 200 
@@ -207,25 +258,25 @@ class ItemTest extends TestCase
 
     //TEST FUNCTION show
 
-    // public function test_item_not_found()
-    // {
-    //     // get api token from authenticate user
-    //     $api_token = $this->get_api_token();
+    public function test_item_not_found()
+    {
+        // get api token from authenticate user
+        $api_token = $this->get_api_token();
         
-    //     //Submit post request with autorizathion header
-    //     $response = 
+        //Submit post request with autorizathion header
+        $response = 
         
-    //     $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-    //           ->get('api/items/' . '0');
+        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
+              ->get('api/items/' . '0');
         
-    //     // Verify status 200 
-    //     $response->assertStatus(200);
+        // Verify status 200 
+        $response->assertStatus(200);
         
-    //     // Verify values in response
-    //     $response->assertJson(['status' => false]);
-    //     $response->assertJson(['message' => 'Item not found.']);
+        // Verify values in response
+        $response->assertJson(['status' => false]);
+        $response->assertJson(['message' => 'Item not found.']);
          
-    // }
+    }
 
     public function test_item_show_by_id()
     {
@@ -235,6 +286,10 @@ class ItemTest extends TestCase
          // Generate a item object
         $item = factory(Item::class)->create();
 
+        // Generate a price object
+        $price = factory(Price::class)->create(['price' => $item->price,
+                                              'item_id' => $item->id]);
+       
         //Verify in the database
         $this->assertDatabaseHas('items', $item->toArray());
 
@@ -246,6 +301,11 @@ class ItemTest extends TestCase
         
         // Verify status 200 
         $response->assertStatus(200);
+
+        //Verify in the database
+        $this->assertDatabaseHas('items', $item->toArray());
+        $this->assertDatabaseHas('prices', $price->toArray());
+ 
         
         //Verify values in response
         $response->assertJsonStructure([
@@ -268,8 +328,13 @@ class ItemTest extends TestCase
          // Generate a item object
         $item = factory(Item::class)->create();
 
+        // Generate a price object
+        $price = factory(Price::class)->create(['price' => $item->price,
+                                              'item_id' => $item->id]);
+
         //Verify in the database
         $this->assertDatabaseHas('items', $item->toArray());
+        $this->assertDatabaseHas('prices', $price->toArray());
 
         // Set values to Update
         $item->name = '';
@@ -300,8 +365,13 @@ class ItemTest extends TestCase
          // Generate a item object
         $item = factory(Item::class)->create();
 
+        // Generate a price object
+        $price = factory(Price::class)->create(['price' => $item->price,
+                                              'item_id' => $item->id]);
+
         //Verify in the database
         $this->assertDatabaseHas('items', $item->toArray());
+        $this->assertDatabaseHas('prices', $price->toArray());
 
         // Set values to Update
         $newItem = factory(Item::class)->make();
@@ -334,18 +404,22 @@ class ItemTest extends TestCase
          // Generate a item object
         $item = factory(Item::class)->create();
 
+        // Generate a price object
+        $price = factory(Price::class)->create(['price' => $item->price,
+                                                'item_id' => $item->id]);
+
         //Verify in the database
         $this->assertDatabaseHas('items', $item->toArray());
+        $this->assertDatabaseHas('prices', $price->toArray());
 
         // Set values to Update
         $newItem = factory(Item::class)->make();
 
-        $item->name = $newItem->name;
+        $item->price = $newItem->price;
 
          // Generate a price object
-        $price = factory(Price::class)->make(['item_id' => $item->id]);
-
-        $item->price = $price->price;
+        $price = factory(Price::class)->make(['price' => $item->price,
+                                              'item_id' => $item->id]);
 
         //Submit post request with autorizathion header
         $response = 
@@ -354,6 +428,7 @@ class ItemTest extends TestCase
               ->put('api/items/' . $item->id ,  $item->toArray());
         
         //Verify in the database
+        $this->assertDatabaseHas('items', $item->toArray());
         $this->assertDatabaseHas('prices', $price->toArray());
 
         // Verify status 200 
@@ -411,7 +486,7 @@ class ItemTest extends TestCase
     }
 
     //TEST FUNCTION savePrice
-    public function test_save_price_first_value_for_item()
+    public function test_item_save_price_first_value_for_item()
     {
         $item = factory(Item::class)->create();
 
@@ -426,7 +501,7 @@ class ItemTest extends TestCase
 
     }
 
-    public function test_save_price_repeated_not_save()
+    public function test_item_save_price_repeated_not_save()
     {
         $item = factory(Item::class)->create();
 
@@ -440,7 +515,7 @@ class ItemTest extends TestCase
 
     }
 
-    public function test_save_price()
+    public function test_item_save_price()
     {
         $item = factory(Item::class)->create();
 
@@ -458,7 +533,7 @@ class ItemTest extends TestCase
 
     }
 
-    public function test_save_price_null()
+    public function test_item_save_price_null()
     {
         $item = factory(Item::class)->create();
 
@@ -470,7 +545,7 @@ class ItemTest extends TestCase
 
     }
 
-    public function test_save_price_negative()
+    public function test_item_save_price_negative()
     {
         $item = factory(Item::class)->create();
 
