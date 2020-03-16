@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\ResponseController;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
+// use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class ItemController extends ResponseController
 {
@@ -149,12 +150,22 @@ class ItemController extends ResponseController
      */
     public function destroy(int $id)
     {
+        
         $item = Item::find($id);
 
         if (is_null($item)) {
             return $this->sendError('Item not found.');
         }
+
+        $belongs = Item::where('id','=',$id)
+                        ->where('store_id','=',Auth::user()->store_id)
+                        ->get();
         
+        
+        if(count($belongs) == 0) {
+            return $this->sendError('Item does not belongs to the logged user.');
+        }
+
         $item->delete();
 
         return $this->sendResponse($item->toArray(), 'Item deleted successfully.');
@@ -195,9 +206,9 @@ class ItemController extends ResponseController
         }
 
         $results = Item::
-                select('items.*',
-                DB::raw('(select price from prices where item_id  = items.id order by created_at desc limit 1) as price')  
-                )->join('stores', function ($join) use($store_id){
+                select('items.*')
+                // DB::raw('(select price from prices where item_id  = items.id order by created_at desc limit 1) as price')  
+                >join('stores', function ($join) use($store_id){
                     $join->on('stores.id', '=', 'items.store_id')
                          ->where('items.store_id', '=', $store_id);
                 })
