@@ -208,7 +208,7 @@ class ItemController extends ResponseController
         $results = Item::
                 select('items.*')
                 // DB::raw('(select price from prices where item_id  = items.id order by created_at desc limit 1) as price')  
-                >join('stores', function ($join) use($store_id){
+                ->join('stores', function ($join) use($store_id){
                     $join->on('stores.id', '=', 'items.store_id')
                          ->where('items.store_id', '=', $store_id);
                 })
