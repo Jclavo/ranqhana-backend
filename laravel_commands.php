@@ -25,6 +25,12 @@ php artisan make:controller API/PriceController --resource --model=Price
 
 php artisan make:factory PostFactory --model=Post
 
+- RUN FACTORY
+
+php artisan tinker
+
+factory(App\User::class, 500)->create();
+
 - CREATE SEEDER
 
 php artisan make:seeder UsersTableSeeder
@@ -43,5 +49,8 @@ php artisan make:test UserTest --unit
 ./vendor/bin/phpunit
 
 ./vendor/bin/phpunit --filter=xxx
+
+
+
 
 
