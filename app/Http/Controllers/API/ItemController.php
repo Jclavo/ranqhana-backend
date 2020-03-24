@@ -221,7 +221,9 @@ class ItemController extends ResponseController
                 // })
 
                 ->where('items.name', 'like', '%'. $searchValue .'%')
-                ->orWhere('items.name', 'like', '%'. $searchValue .'%')
+                ->orWhere('items.description', 'like', '%'. $searchValue .'%')
+                ->orWhere('items.price', 'like', $searchValue .'%')
+                ->orWhere('items.stock', 'like', $searchValue .'%')
                 ->orderBy('items.'.$sortColumn, $sortDirection)
                 // ->distinct()
                 ->paginate($per_page);
