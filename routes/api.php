@@ -30,6 +30,7 @@ Route::middleware(['auth:api'])->group(function () {
 
     // sell invoice
     Route::post('sellInvoices', 'API\InvoiceController@createSellInvoice');
+    Route::post('invoiceDetails', 'API\InvoiceController@createInvoiceDetail');
 
    
 });
