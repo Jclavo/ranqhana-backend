@@ -235,4 +235,70 @@ class InvoiceTest extends TestCase
         $response->assertJson(['status' => true]);
         $response->assertJson(['message' => 'Invoice detail created successfully.']);
     }
+
+
+    // FUNCTION: update
+
+    public function test_invoice_updated_invoice_id_not_found()
+    {
+        // get api token from authenticate user
+        $api_token = $this->get_api_token();
+
+        // Generate a invoice detail object
+        $sellInvoice = factory(Invoice::class)->create(['serie' => '', 'type' => 'S']);
+
+        //Verify in the database
+        $this->assertDatabaseHas('invoices', $sellInvoice->toArray());
+
+         // Set values to Update
+        $sellInvoice->serie = 'AB-123';
+
+        //Submit post request with autorizathion header
+        $response = $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
+                         ->put('api/invoices/0',  $sellInvoice->toArray());
+
+        //Verify in the database
+        $this->assertDatabaseMissing('invoices', $sellInvoice->toArray());
+
+        // Verify status 200 
+        $response->assertStatus(200);
+    
+        // Verify values in response
+        $response->assertJson(['status' => false]);
+        $response->assertJson(['message' => 'Invoice not found.']);
+    }
+
+    public function test_invoice_updated_ok()
+    {
+        // get api token from authenticate user
+        $api_token = $this->get_api_token();
+
+        // Generate a invoice detail object
+        $sellInvoice = factory(Invoice::class)->create(['serie' => '', 'type' => 'S']);
+
+        //Verify in the database
+        $this->assertDatabaseHas('invoices', $sellInvoice->toArray());
+
+         // Set values to Update
+
+        // Set values to Update
+        $newSellInvoice     = factory(Invoice::class)->make();
+        $sellInvoice->serie = $newSellInvoice->serie;
+
+        //Submit post request with autorizathion header
+        $response = $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
+                         ->put('api/invoices/' . $sellInvoice->id,  $sellInvoice->toArray());
+
+        //Verify in the database
+        $this->assertDatabaseHas('invoices', $sellInvoice->toArray());
+
+        // Verify status 200 
+        $response->assertStatus(200);
+    
+        // Verify values in response
+        $response->assertJson(['status' => true]);
+        $response->assertJson(['message' => 'Sell invoice updated successfully.']);
+    }
+
+
 }

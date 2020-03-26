@@ -74,9 +74,28 @@ class InvoiceController extends ResponseController
      * @param  \App\Invoice  $invoice
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Invoice $invoice)
+    public function update(int $id, Request $request)
     {
-        //
+        // $validator = Validator::make($request->all(), [
+        //     'invoice_id' => 'required|integer',
+        // ]);
+
+        // if ($validator->fails()) {
+        //     return $this->sendError($validator->errors()->first());
+        // }
+
+        $sellInvoice = Invoice::find($id);
+
+        if (is_null($sellInvoice)) {
+            return $this->sendError('Invoice not found.');
+        }
+
+        $sellInvoice->serie    = $request->serie;
+        // $sellInvoice->client   = $request->client;
+
+        $sellInvoice->save();
+
+        return $this->sendResponse($sellInvoice->toArray(), 'Sell invoice updated successfully.');  
     }
 
     /**
@@ -87,7 +106,7 @@ class InvoiceController extends ResponseController
      */
     public function destroy(Invoice $invoice)
     {
-        //
+
     }
 
 
@@ -108,7 +127,7 @@ class InvoiceController extends ResponseController
 
         $sellInvoice = new Invoice();
         
-        $sellInvoice->serie    = $request->serie;
+        // $sellInvoice->serie    = $request->serie;
         $sellInvoice->subtotal = $request->subtotal;
         $sellInvoice->taxes    = $request->taxes;
         $sellInvoice->discount = $request->discount;
