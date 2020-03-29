@@ -111,6 +111,71 @@ class InvoiceController extends ResponseController
 
     }
 
+    /**
+     * 
+     */
+
+    public function pagination(Request $request)
+    {
+        $sortArray = array("asc", "ASC", "desc", "DESC");
+
+        $store_id = $request->store_id;
+        // SearchOptions values
+        $per_page = $request->searchOption['per_page'];
+        $sortColumn = $request->searchOption['sortColumn'];
+        $sortDirection = $request->searchOption['sortDirection'];
+        $searchValue = $request->searchOption['searchValue'];
+
+        // Initialize values if they are empty.
+        if (empty($per_page)) {
+            $per_page = 20;
+        }
+
+        if (!in_array($sortDirection, $sortArray)) {
+            $sortDirection = "DESC";
+            $sortColumn = "updated_at";
+        }
+        
+        if (empty($sortColumn)) {
+               $sortColumn = "updated_at";
+        }
+
+        $results = Invoice::
+                select('invoices.*')
+                // ->join('stores', function ($join) use($store_id){
+                //     $join->on('stores.id', '=', 'items.store_id')
+                //          ->where('items.store_id', '=', $store_id);
+                // })
+                // ->leftJoin('prices', function ($join){
+                //     $join->on('items.id', '=', 'prices.item_id')
+                //          ->latest();
+                //         //  ->orderBy('prices.created_at', 'DESC')
+                //         //  ->take(1);
+                //         //  ->first();
+                // })
+
+                ->where('invoices.serie', 'like', '%'. $searchValue .'%')
+                // ->orWhere('invoices.description', 'like', '%'. $searchValue .'%')
+                // ->orWhere('invoices.price', 'like', $searchValue .'%')
+                // ->orWhere('invoices.stock', 'like', $searchValue .'%')
+                ->orderBy('invoices.'.$sortColumn, $sortDirection)
+                // ->distinct()
+                ->paginate($per_page);
+
+                // $item = Item::
+                // select('items.*','prices.price')
+                // ->leftJoin('prices', 'items.id', '=', 'prices.item_id')
+                // ->where('items.id', '=', $id)
+                // ->orderBy('prices.created_at', 'DESC')
+                // ->first();
+            
+        return $this->sendResponse($results->items(), 'Invoices retrieved successfully.', $results->total() );
+
+    }
+     
+
+
+
 
     /**
      * 
