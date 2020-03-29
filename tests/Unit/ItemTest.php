@@ -556,4 +556,50 @@ class ItemTest extends TestCase
         $this->assertNull($price);
 
     }
+
+    //FUNCTION: updateStock
+
+    public function test_item_update_stock_item_not_found(){
+
+        $item = factory(Item::class)->create();
+
+        $itemController = new ItemController();
+
+        $stock = $itemController->updateStock(0, 10);
+
+        $this->assertFalse(json_decode($stock->content(),true)['status']);
+        $this->assertEquals(json_decode($stock->content(),true)['message'], 'Item not found.');
+    }
+
+    public function test_item_update_stock_without_stock(){
+
+        $item = factory(Item::class)->create();
+
+        $itemController = new ItemController();
+
+        $stock = $itemController->updateStock($item->id, 10);
+
+        $this->assertFalse(json_decode($stock->content(),true)['status']);
+        $this->assertEquals(json_decode($stock->content(),true)['message'], 'There is not stock for product '. $item->id);
+        // $this->assertTrue($stock);
+    }
+
+    public function test_item_update_stock_ok(){
+
+        $item = factory(Item::class)->create(['stock' => 100]);
+
+        $itemController = new ItemController();
+
+        $quantitySold = 10;
+        $stock = $itemController->updateStock($item->id, $quantitySold);
+
+        $item->stock = $item->stock - $quantitySold;
+
+        //Verify in the database
+        $this->assertDatabaseHas('items', $item->toArray());
+
+        $this->assertTrue(json_decode($stock->content(),true)['status']);
+        $this->assertEquals(json_decode($stock->content(),true)['message'], 'Stock updated.');
+        // $this->assertTrue($stock);
+    }
 }

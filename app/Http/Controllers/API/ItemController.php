@@ -271,4 +271,26 @@ class ItemController extends ResponseController
         }
         return $price;
     }
+
+    public function updateStock($id, $quantity){
+
+        $item = Item::find($id);
+
+        if (is_null($item)) {
+            return $this->sendError('Item not found.');
+            // return false;
+        }
+
+        if($quantity > $item->stock){
+            return $this->sendError('There is not stock for product ' . $id);
+            // return false;
+        }
+
+        $item->stock = $item->stock - $quantity;
+        $item->save();
+        
+        // return true;
+        return $this->sendResponse($item->toArray(), 'Stock updated.');
+
+    }
 }

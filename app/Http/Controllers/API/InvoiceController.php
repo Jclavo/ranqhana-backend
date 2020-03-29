@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 // use Illuminate\Support\Facades\Schema;
 // use Illuminate\Support\Facades\DB;
 
+use App\Http\Controllers\API\ItemController;
+
 class InvoiceController extends ResponseController
 {
     /**
@@ -155,17 +157,28 @@ class InvoiceController extends ResponseController
             return $this->sendError($validator->errors()->first());
         }
 
-        $invoiceDetail = new InvoiceDetail();
-        
-        $invoiceDetail->item_id    = $request->item_id;
-        $invoiceDetail->quantity   = $request->quantity;
-        $invoiceDetail->price      = $request->price;
-        $invoiceDetail->total      = $invoiceDetail->quantity * $invoiceDetail->price;
-        $invoiceDetail->invoice_id = $request->invoice_id;
-        
-        $invoiceDetail->save();
+        // update stock
+        $itemController = new ItemController();
+        $stockResponse = $itemController->updateStock($request->item_id, $request->quantity);
 
-        return $this->sendResponse($invoiceDetail->toArray(), 'Invoice detail created successfully.');  
+        if(json_decode($stockResponse->content(),true)['status']){
+            
+            $invoiceDetail = new InvoiceDetail();
+        
+            $invoiceDetail->item_id    = $request->item_id;
+            $invoiceDetail->quantity   = $request->quantity;
+            $invoiceDetail->price      = $request->price;
+            $invoiceDetail->total      = $invoiceDetail->quantity * $invoiceDetail->price;
+            $invoiceDetail->invoice_id = $request->invoice_id;
+            
+            $invoiceDetail->save();
 
+            return $this->sendResponse($invoiceDetail->toArray(), 'Invoice detail created successfully.');
+        }
+        else{
+            return $this->sendError(json_decode($stockResponse->content(),true)['message']);
+        }
     }
+
+    
 }
