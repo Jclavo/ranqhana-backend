@@ -23,7 +23,6 @@ class InvoiceController extends ResponseController
      */
     public function index()
     {
-        //
     }
 
     /**
@@ -121,10 +120,12 @@ class InvoiceController extends ResponseController
 
         $store_id = $request->store_id;
         // SearchOptions values
-        $per_page = $request->searchOption['per_page'];
-        $sortColumn = $request->searchOption['sortColumn'];
+        $per_page      = $request->searchOption['per_page'];
+        $sortColumn    = $request->searchOption['sortColumn'];
         $sortDirection = $request->searchOption['sortDirection'];
-        $searchValue = $request->searchOption['searchValue'];
+        $searchValue   = $request->searchOption['searchValue'];
+        $fromDate      = $request->searchOption['fromDate'];
+        $toDate        = $request->searchOption['toDate'];
 
         // Initialize values if they are empty.
         if (empty($per_page)) {
@@ -133,50 +134,34 @@ class InvoiceController extends ResponseController
 
         if (!in_array($sortDirection, $sortArray)) {
             $sortDirection = "DESC";
-            $sortColumn = "updated_at";
+            $sortColumn = "created_at";
         }
         
         if (empty($sortColumn)) {
-               $sortColumn = "updated_at";
+               $sortColumn = "created_at";
         }
 
-        $results = Invoice::
-                select('invoices.*')
-                // ->join('stores', function ($join) use($store_id){
-                //     $join->on('stores.id', '=', 'items.store_id')
-                //          ->where('items.store_id', '=', $store_id);
-                // })
-                // ->leftJoin('prices', function ($join){
-                //     $join->on('items.id', '=', 'prices.item_id')
-                //          ->latest();
-                //         //  ->orderBy('prices.created_at', 'DESC')
-                //         //  ->take(1);
-                //         //  ->first();
-                // })
+        $query = Invoice::query();
 
-                ->where('invoices.serie', 'like', '%'. $searchValue .'%')
-                // ->orWhere('invoices.description', 'like', '%'. $searchValue .'%')
-                // ->orWhere('invoices.price', 'like', $searchValue .'%')
-                // ->orWhere('invoices.stock', 'like', $searchValue .'%')
-                ->orderBy('invoices.'.$sortColumn, $sortDirection)
-                // ->distinct()
-                ->paginate($per_page);
+        $query->select('invoices.*');
 
-                // $item = Item::
-                // select('items.*','prices.price')
-                // ->leftJoin('prices', 'items.id', '=', 'prices.item_id')
-                // ->where('items.id', '=', $id)
-                // ->orderBy('prices.created_at', 'DESC')
-                // ->first();
-            
+        $query->when((!empty($searchValue)), function ($q) use($searchValue) {
+            return $q->where('invoices.serie', 'like', '%'. $searchValue .'%')
+                     ->orWhere('invoices.total', 'like', '%'. $searchValue .'%');
+        });
+
+        $query->when((!empty($fromDate)) && (!empty($toDate)) , function ($q) use($fromDate,$toDate) {
+            // return $q->whereBetween('created_at', [$fromDate,$toDate]);
+            return $q->whereBetween('created_at',[ $fromDate." 00:00:00", $toDate." 23:59:59"]);
+        });
+
+        $results = $query->orderBy('invoices.'.$sortColumn, $sortDirection)
+                         ->paginate($per_page);
+ 
         return $this->sendResponse($results->items(), 'Invoices retrieved successfully.', $results->total() );
 
     }
      
-
-
-
-
     /**
      * 
      */
