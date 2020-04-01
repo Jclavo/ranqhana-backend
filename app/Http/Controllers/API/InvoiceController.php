@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Invoice;
 use App\InvoiceDetail;
+use App\User;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ResponseController;
 use Illuminate\Http\Request;
@@ -105,9 +106,26 @@ class InvoiceController extends ResponseController
      * @param  \App\Invoice  $invoice
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Invoice $invoice)
+    public function destroy(int $id)
     {
+        $invoice = Invoice::find($id);
 
+        if (is_null($invoice)) {
+            return $this->sendError('Invoice not found.');
+        }
+
+        $belongs = User::where('id','=',Auth::user()->id)
+                        ->where('store_id','=',Auth::user()->store_id)
+                        ->get();
+        
+        
+        if(count($belongs) == 0) {
+            return $this->sendError('Invoice does not belongs to the logged user.');
+        }
+
+        $invoice->delete();
+
+        return $this->sendResponse($invoice->toArray(), 'Invoice Anulled/Canceled successfully.');
     }
 
     /**

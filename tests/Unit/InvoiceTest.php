@@ -336,5 +336,52 @@ class InvoiceTest extends TestCase
         $response->assertJson(['message' => 'Sell invoice updated successfully.']);
     }
 
+    //FUNCTION delete/anul
+    public function test_invoice_anull_id_not_found()
+    {
+        // get api token from authenticate user
+        $api_token = $this->get_api_token();
+        
+        //Submit post request with autorizathion header
+        $response = 
+        
+        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
+              ->delete('api/invoices/' . '0');
+        
+        // Verify status 200 
+        $response->assertStatus(200);
+        
+        // Verify values in response
+        $response->assertJson(['status' => false]);
+        $response->assertJson(['message' => 'Invoice not found.']);
+         
+    }
+
+    public function test_invoice_anull_ok()
+    {
+        // get api token from authenticate user
+        $api_token = $this->get_api_token();
+
+        // Generate a item 
+        $invoice = factory(Invoice::class)->create(['type' => 'S']);
+        
+        //Verify in the database
+        $this->assertDatabaseHas('invoices', $invoice->toArray());
+
+        //Submit post request with autorizathion header
+        $response = 
+        
+        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
+              ->delete('api/invoices/' . $invoice->id);
+        
+        // Verify status 200 
+        $response->assertStatus(200);
+        
+        // Verify values in response
+        $response->assertJson(['status' => true]);
+        $response->assertJson(['message' => 'Invoice Anulled/Canceled successfully.']);
+         
+    }
+
 
 }
