@@ -35,6 +35,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('sellInvoices', 'API\InvoiceController@createSellInvoice');
     Route::post('invoiceDetails', 'API\InvoiceController@createInvoiceDetail');
 
+    //Unit
+    Route::resource('units', 'API\UnitController');
+
    
 });
 
