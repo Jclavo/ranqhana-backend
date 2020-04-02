@@ -5,8 +5,9 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Unit;
 use Illuminate\Http\Request;
+use App\Http\Controllers\ResponseController;
 
-class UnitController extends Controller
+class UnitController extends ResponseController
 {
     /**
      * Display a listing of the resource.
@@ -15,7 +16,9 @@ class UnitController extends Controller
      */
     public function index()
     {
-        //
+        $units = Unit::all();
+            
+        return $this->sendResponse($units->toArray(), 'Units retrieved successfully.');
     }
 
     /**
