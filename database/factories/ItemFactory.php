@@ -4,6 +4,7 @@
 
 use App\Item;
 use App\Store;
+use App\Unit;
 use Faker\Generator as Faker;
 
 $factory->define(Item::class, function (Faker $faker) {
@@ -12,6 +13,9 @@ $factory->define(Item::class, function (Faker $faker) {
         'description' => $faker->name,
         'price' => $faker->randomNumber(3),
         'stock' => 0,
+        'unit' => function () {
+            return factory(Unit::class)->create()->code;
+        },
         'store_id' => function () {
             return factory(Store::class)->create()->id;
         }

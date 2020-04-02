@@ -216,8 +216,32 @@ class ItemTest extends TestCase
         
         // Verify values in response
         $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'The price must be between 0.00 and 99999.99.']);
-         
+        $response->assertJson(['message' => 'The price must be between 0.00 and 99999.99.']); 
+    }
+
+    public function test_item_create_unit_not_found()
+    {
+        // get api token from authenticate user
+        $api_token = $this->get_api_token();
+        
+         // Generate a item object
+        $item = factory(Item::class)->make(['unit' => 'AB']);
+
+        //Submit post request with autorizathion header
+        $response = 
+        
+        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
+              ->post('api/items', $item->toArray());
+        
+        //Verify in the database
+        $this->assertDatabaseMissing('items', $item->toArray());
+
+        // Verify status 200 
+        $response->assertStatus(200);
+        
+        // Verify values in response
+        $response->assertJson(['status' => false]);
+        $response->assertJson(['message' => 'Unit not found.']); 
     }
 
     public function test_item_create_ok()

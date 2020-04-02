@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Item;
 use App\Price;
+use App\Unit;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ResponseController;
 use Illuminate\Support\Facades\Validator;
@@ -54,11 +55,23 @@ class ItemController extends ResponseController
             return $this->sendError($validator->errors()->first());
         }
 
+        //Validate Unit
+        if (!empty($request->unit)) {
+
+            $unit = Unit::where('code', '=', $request->unit)->get();
+        
+            if (count($unit) == 0) {
+                return $this->sendError('Unit not found.');
+            }
+        }
+
+
         $item = new Item();
         
         $item->name = $request->name;
         $item->description = $request->description;
         $item->price = $request->price;
+        $item->unit = $request->unit;
         $item->store_id = $request->store_id;
         
         $item->save();
