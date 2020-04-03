@@ -142,6 +142,7 @@ class ItemController extends ResponseController
         $item->name = $request->name;
         $item->description = $request->description;
         $item->price = $request->price;
+        $item->unit = $request->unit;
                 
         $item->save();
 
