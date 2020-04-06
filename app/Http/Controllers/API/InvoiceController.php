@@ -144,6 +144,7 @@ class InvoiceController extends ResponseController
         $searchValue   = $request->searchOption['searchValue'];
         $fromDate      = $request->searchOption['fromDate'];
         $toDate        = $request->searchOption['toDate'];
+        $type          = $request->searchOption['type'];
 
         // Initialize values if they are empty.
         if (empty($per_page)) {
@@ -154,18 +155,24 @@ class InvoiceController extends ResponseController
             $sortDirection = "DESC";
             $sortColumn = "created_at";
         }
-        
+
         if (empty($sortColumn)) {
-               $sortColumn = "created_at";
+            $sortColumn = "created_at";
+        }
+        
+        if (empty($type)) {
+            $type = "S";
         }
 
         $query = Invoice::query();
 
         $query->select('invoices.*');
 
+        $query->where('type', '=', $type);
+
         $query->when((!empty($searchValue)), function ($q) use($searchValue) {
-            return $q->where('invoices.serie', 'like', '%'. $searchValue .'%')
-                     ->orWhere('invoices.total', 'like', '%'. $searchValue .'%');
+            return $q->where('serie', 'like', '%'. $searchValue .'%')
+                     ->orWhere('total', 'like', '%'. $searchValue .'%');
         });
 
         $query->when((!empty($fromDate)) && (!empty($toDate)) , function ($q) use($fromDate,$toDate) {
@@ -173,7 +180,7 @@ class InvoiceController extends ResponseController
             return $q->whereBetween('created_at',[ $fromDate." 00:00:00", $toDate." 23:59:59"]);
         });
 
-        $results = $query->orderBy('invoices.'.$sortColumn, $sortDirection)
+        $results = $query->orderBy($sortColumn, $sortDirection)
                          ->paginate($per_page);
  
         return $this->sendResponse($results->items(), 'Invoices retrieved successfully.', $results->total() );
