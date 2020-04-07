@@ -72,8 +72,8 @@ class ItemController extends ResponseController
         $item->description = $request->description;
         $item->price = $request->price;
         $item->unit = $request->unit;
+        $item->stocked = $request->stocked;
         $item->store_id = $request->store_id;
-        
         $item->save();
 
         //Add price
@@ -143,6 +143,7 @@ class ItemController extends ResponseController
         $item->description = $request->description;
         $item->price = $request->price;
         $item->unit = $request->unit;
+        $item->stocked = $request->stocked;
                 
         $item->save();
 

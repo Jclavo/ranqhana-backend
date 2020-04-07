@@ -16,6 +16,8 @@ $factory->define(Item::class, function (Faker $faker) {
         'unit' => function () {
             return factory(Unit::class)->create()->code;
         },
+        // 'stocked' => intval($faker->boolean(100)),
+        'stocked' => intval($faker->boolean),
         'store_id' => function () {
             return factory(Store::class)->create()->id;
         }
