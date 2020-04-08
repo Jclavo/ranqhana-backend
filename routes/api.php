@@ -37,6 +37,7 @@ Route::middleware(['auth:api'])->group(function () {
 
     //Unit
     Route::resource('units', 'API\UnitController');
+    Route::post('units/pagination', 'API\UnitController@pagination');
 
    
 });

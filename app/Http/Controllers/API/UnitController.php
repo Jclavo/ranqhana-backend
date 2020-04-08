@@ -138,4 +138,52 @@ class UnitController extends ResponseController
 
         return $this->sendResponse($unit->toArray(), 'Unit deleted successfully.');
     }
+
+    /**
+     * 
+     */
+    public function pagination(Request $request)
+    {
+        $sortArray = array("asc", "ASC", "desc", "DESC");
+
+        // SearchOptions values
+        $per_page = $request->per_page;
+        $sortColumn = $request->sortColumn;
+        $sortDirection = $request->sortDirection;
+        $searchValue = $request->searchValue;
+
+        // Initialize values if they are empty.
+        if (empty($per_page)) {
+            $per_page = 20;
+        }
+
+        if (!in_array($sortDirection, $sortArray)) {
+            $sortDirection = "DESC";
+            $sortColumn = "updated_at";
+        }
+        
+        if (empty($sortColumn)) {
+               $sortColumn = "updated_at";
+        }
+
+        $query = Unit::query();
+
+        $query->select('units.*');
+
+        $query->when((!empty($searchValue)), function ($q) use($searchValue) {
+            return $q->where('code', 'like', '%'. $searchValue .'%')
+                     ->orWhere('description', 'like', '%'. $searchValue .'%');
+        });
+
+        $query->where('store_id', '=', 0)
+              ->orWhere('store_id', '=', Auth::user()->store_id);
+
+
+        $results = $query->orderBy($sortColumn, $sortDirection)
+        ->paginate($per_page);
+
+            
+        return $this->sendResponse($results->items(), 'Units retrieved successfully.', $results->total() );
+
+    }
 }
