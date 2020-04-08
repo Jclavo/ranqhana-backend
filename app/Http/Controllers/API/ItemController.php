@@ -144,7 +144,11 @@ class ItemController extends ResponseController
         $item->price = $request->price;
         $item->unit = $request->unit;
         $item->stocked = $request->stocked;
-                
+
+        if(!$item->stocked && $item->stock > 0){
+            return $this->sendError('The item has stock. It can not be modified.');
+        }
+     
         $item->save();
 
         //Add price

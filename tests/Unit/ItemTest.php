@@ -464,6 +464,83 @@ class ItemTest extends TestCase
          
     }
 
+    public function test_item_update_stocked_not_change()
+    {
+        // get api token from authenticate user
+        $api_token = $this->get_api_token();
+        
+         // Generate a item object
+        $item = factory(Item::class)->create(['stock' => 10, 'stocked' => true]);
+
+        //Verify in the database
+        $this->assertDatabaseHas('items', $item->toArray());
+        // $this->assertDatabaseHas('prices', $price->toArray());
+
+        // Set values to Update
+        $newItem = factory(Item::class)->make(['stocked' => false]);
+
+        $item->stocked = $newItem->stocked;
+
+         // Generate a price object
+        $price = factory(Price::class)->make(['price' => $item->price,
+                                              'item_id' => $item->id]);
+
+        //Submit post request with autorizathion header
+        $response = 
+        
+        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
+              ->put('api/items/' . $item->id ,  $item->toArray());
+        
+        //Verify in the database
+        $this->assertDatabaseMissing('items', $item->toArray());
+
+        // Verify status 200 
+        $response->assertStatus(200);
+        
+        // Verify values in response
+        $response->assertJson(['status' => false]);
+        $response->assertJson(['message' => 'The item has stock. It can not be modified.']);
+         
+    }
+
+    public function test_item_update_stocked_ok()
+    {
+        // get api token from authenticate user
+        $api_token = $this->get_api_token();
+        
+         // Generate a item object
+        $item = factory(Item::class)->create(['stocked' => false]);
+
+        //Verify in the database
+        $this->assertDatabaseHas('items', $item->toArray());
+
+        // Set values to Update
+        $newItem = factory(Item::class)->make(['stocked' => true]);
+
+        $item->stocked = $newItem->stocked;
+
+         // Generate a price object
+        $price = factory(Price::class)->make(['price' => $item->price,
+                                              'item_id' => $item->id]);
+
+        //Submit post request with autorizathion header
+        $response = 
+        
+        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
+              ->put('api/items/' . $item->id ,  $item->toArray());
+        
+        //Verify in the database
+        $this->assertDatabaseHas('items', $item->toArray());
+
+        // Verify status 200 
+        $response->assertStatus(200);
+        
+        // Verify values in response
+        $response->assertJson(['status' => true]);
+        $response->assertJson(['message' => 'Item updated successfully.']);
+         
+    }
+
     //TEST FUNCTION delete
 
     public function test_item_delete_id_not_found()
