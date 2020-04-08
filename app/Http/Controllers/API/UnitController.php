@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Unit;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ResponseController;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class UnitController extends ResponseController
 {
@@ -26,9 +28,9 @@ class UnitController extends ResponseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+
     }
 
     /**
@@ -39,7 +41,23 @@ class UnitController extends ResponseController
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'code' => 'required',
+        ]);
+        
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first());
+        }
+
+        $unit = new Unit();
+        
+        $unit->code = $request->code;
+        $unit->description = $request->description;
+        $unit->allow_decimal = $request->allow_decimal;
+        $unit->store_id = Auth::user()->store_id;
+        $unit->save();
+
+        return $this->sendResponse($unit->toArray(), 'Units created successfully.');  
     }
 
     /**
@@ -48,9 +66,15 @@ class UnitController extends ResponseController
      * @param  \App\Unit  $unit
      * @return \Illuminate\Http\Response
      */
-    public function show(Unit $unit)
+    public function show($id)
     {
-        //
+        $unit = unit::find($id);
+        
+        if (is_null($unit)) {
+            return $this->sendError('Unit not found.');
+        }
+        
+        return $this->sendResponse($unit->toArray(), 'Unit retrieved successfully.');
     }
 
     /**
@@ -71,9 +95,28 @@ class UnitController extends ResponseController
      * @param  \App\Unit  $unit
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Unit $unit)
+    public function update(int $id, Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'code' => 'required',
+        ]);
+        
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first());
+        }
+
+        $unit = Unit::find($id);
+
+        if (is_null($unit)) {
+            return $this->sendError('Unit not found.');
+        }
+        
+        $unit->code = $request->code;
+        $unit->description = $request->description;
+        $unit->allow_decimal = $request->allow_decimal;
+        $unit->save();
+
+        return $this->sendResponse($unit->toArray(), 'Units created successfully.');  
     }
 
     /**
@@ -82,8 +125,17 @@ class UnitController extends ResponseController
      * @param  \App\Unit  $unit
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Unit $unit)
+    public function destroy(int $id)
     {
-        //
+        
+        $unit = Unit::find($id);
+
+        if (is_null($unit)) {
+            return $this->sendError('Unit not found.');
+        }
+
+        $unit->delete();
+
+        return $this->sendResponse($unit->toArray(), 'Unit deleted successfully.');
     }
 }
