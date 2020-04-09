@@ -42,7 +42,7 @@ class UnitController extends ResponseController
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'code' => 'required',
+            'code' => 'required|unique:units', 
         ]);
         
         if ($validator->fails()) {
@@ -51,9 +51,11 @@ class UnitController extends ResponseController
 
         $unit = new Unit();
         
-        $unit->code = $request->code;
+        $unit->code = strtoupper($request->code);
         $unit->description = $request->description;
-        $unit->allow_decimal = $request->allow_decimal;
+        
+        $request->allow_decimal ? $unit->allow_decimal = true : $unit->allow_decimal = false;
+
         $unit->store_id = Auth::user()->store_id;
         $unit->save();
 
@@ -111,7 +113,7 @@ class UnitController extends ResponseController
             return $this->sendError('Unit not found.');
         }
         
-        $unit->code = $request->code;
+        $unit->code = strtoupper($request->code);
         $unit->description = $request->description;
         $unit->allow_decimal = $request->allow_decimal;
         $unit->save();
