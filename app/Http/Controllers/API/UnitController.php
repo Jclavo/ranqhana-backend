@@ -42,7 +42,7 @@ class UnitController extends ResponseController
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'code' => 'required|unique:units', 
+            'code' => 'required|unique:units|max:3', 
         ]);
         
         if ($validator->fails()) {
@@ -70,11 +70,9 @@ class UnitController extends ResponseController
      */
     public function show($id)
     {
-        $unit = unit::find($id);
-        
-        if (is_null($unit)) {
-            return $this->sendError('Unit not found.');
-        }
+        $unit = Unit::findOrFail($id);
+
+        $this->authorize('isMyUnit', $unit);
         
         return $this->sendResponse($unit->toArray(), 'Unit retrieved successfully.');
     }
@@ -107,11 +105,9 @@ class UnitController extends ResponseController
             return $this->sendError($validator->errors()->first());
         }
 
-        $unit = Unit::find($id);
+        $unit = Unit::findOrFail($id);
 
-        if (is_null($unit)) {
-            return $this->sendError('Unit not found.');
-        }
+        $this->authorize('isMyUnit', $unit);
         
         $unit->code = strtoupper($request->code);
         $unit->description = $request->description;
@@ -129,12 +125,9 @@ class UnitController extends ResponseController
      */
     public function destroy(int $id)
     {
-        
-        $unit = Unit::find($id);
+        $unit = Unit::findOrFail($id);
 
-        if (is_null($unit)) {
-            return $this->sendError('Unit not found.');
-        }
+        $this->authorize('isMyUnit', $unit);
 
         $unit->delete();
 
@@ -188,4 +181,5 @@ class UnitController extends ResponseController
         return $this->sendResponse($results->items(), 'Units retrieved successfully.', $results->total() );
 
     }
+
 }
