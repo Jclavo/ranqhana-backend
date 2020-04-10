@@ -50,6 +50,10 @@ php artisan make:test UserTest --unit
 
 ./vendor/bin/phpunit --filter=xxx
 
+- CREATE POLICE
+
+php artisan make:policy PostPolicy
+
 
 
 
