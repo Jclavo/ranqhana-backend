@@ -13,7 +13,7 @@ class ResponseController extends Controller
     
     public function sendError($error, $errorMessages = [], $code = 200)
     {
-        $response = ['status' => false, 'result' => $errorMessages, 'message' => $error];
+        $response = ['status' => false, 'result' => $errorMessages, 'message' => $error, 'records' => 0];
         
         return response()->json($response, $code);
     }
