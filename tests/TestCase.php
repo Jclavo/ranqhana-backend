@@ -6,6 +6,7 @@ use App\User;
 use Illuminate\Support\Facades\Auth as Auth;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Tests\TestCaseBase;
+use Faker;
 
 abstract class TestCase extends TestCaseBase
 {
@@ -25,7 +26,11 @@ abstract class TestCase extends TestCaseBase
 
     protected $databaseHas = true;
 
+    protected $faker = null;
 
+    function setFaker(){
+        $this->faker = Faker\Factory::create();
+    }
 
     protected function setBaseRoute($route){
         $this->baseRoute = 'api/' . $route . '/';
@@ -126,11 +131,10 @@ abstract class TestCase extends TestCaseBase
         //Submit post request with autorizathion header
         $response = $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
                         ->post($route, $modelFactory->toArray());
-
         
-        $this->checkRecordInDatabase($model,$modelFactory);
-
         $this->checkJSONResponse($response);
+
+        $this->checkRecordInDatabase($model,$modelFactory);
             
         return $response;
     }
@@ -146,11 +150,10 @@ abstract class TestCase extends TestCaseBase
         $response = $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
                         ->get($route . $modelFactory->id);
 
-        
-        $this->checkRecordInDatabase($model,$modelFactory);
-
         $this->checkJSONResponse($response);
             
+        $this->checkRecordInDatabase($model,$modelFactory);
+
         return $response;
     }
 
@@ -174,12 +177,11 @@ abstract class TestCase extends TestCaseBase
         //Submit post request with autorizathion header
         $response = $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
                         ->put($route . $modelFactory->id , $modelFactory->toArray());
+    
+        $this->checkJSONResponse($response);
 
-        
         $this->checkRecordInDatabase($model,$modelFactory);
 
-        $this->checkJSONResponse($response);
-            
         return $response;
     }
 
@@ -194,11 +196,10 @@ abstract class TestCase extends TestCaseBase
         $response = $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
                          ->delete($route . $modelFactory->id);
 
-        
-        $this->checkRecordInDatabase($model,$modelFactory);
-
         $this->checkJSONResponse($response);
             
+        $this->checkRecordInDatabase($model,$modelFactory);
+        
         return $response;
     }
 
