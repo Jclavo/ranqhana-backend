@@ -25,6 +25,7 @@ $factory->define(User::class, function (Faker $faker) {
         'email_verified_at' => now(),
         'identification' => $faker->unique()->randomNumber($nbDigits = 9, $strict = true) . $faker->unique()->randomNumber($nbDigits = 2, $strict = true),
         'password' => bcrypt('secret'),
+        'api_token' => $faker->regexify('[A-Za-z0-9]{80}'),
         'country_code' => function () {
              return factory(Country::class)->create()->country_code;
         },
