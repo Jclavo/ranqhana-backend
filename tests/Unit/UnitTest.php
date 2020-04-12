@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\User;
 use App\Unit;
+use Illuminate\Support\Facades\Auth as Auth;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -15,65 +16,49 @@ class UnitTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->seed();      
-    }
-
-    public function get_api_token()
-    {
-        // Generate an user object
-        $user = factory(User::class)->create(['country_code' => '55', 'email' => '']);
-                
-        $user->password = 'secret';
+        $this->seed();    
         
-        //Submit post request to create an user endpoint
-        $response = $this->post('api/login', $user->toArray());
-        
-        //Verify in the database
-        $this->assertNotEmpty(json_decode($response->content(),true)['result']['api_token']);
-
-        return json_decode($response->content(),true)['result']['api_token'];
+        $this->setBaseRoute('units');
+        $this->setBaseModel('App\Unit');
+        $this->setFaker();
     }
 
     public function test_unit_unauthenticated_user()
     {       
-        //Submit post request with autorizathion header
-        $response = $this->get('api/units');
-        
-        // Verify status 200 
-        $response->assertStatus(401);
-        
-        // Verify values in response
-        $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'Unauthenticated.']);
-         
+        //Set values to Response
+        $this->setAssertStatus(401);
+
+        //Set Json structure
+        $this->setAssertJsonStructure([]);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['message' => 'Unauthenticated.']);
+        $this->setAssertJson($assertsJson);
+
+        //Action
+        $this->read();
     }
 
     //TEST FUNCTION index
 
     public function test_unit_get_all()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-        
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->get('api/units');
-        
-        
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJsonStructure([
-            'status',
-            'message',
-            'result' => []
-          ]);
+        //Set values to Response
+        $this->setAssertStatus(200);
+       
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => true]);
+        array_push($assertsJson,['message' => 'Units retrieved successfully.']);
+        $this->setAssertJson($assertsJson);
 
-        $response->assertJson(['status' => true]);
-        $response->assertJson(['message' => 'Units retrieved successfully.']);
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        $this->read();
          
     }
 
@@ -81,216 +66,236 @@ class UnitTest extends TestCase
 
     public function test_unit_create_code_is_required()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-        
-         // Generate an unit object
-        $unit = factory(Unit::class)->make(['code' => '']);
+        // Set Database has
+        $this->setDatabaseHas(false);
 
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->post('api/units', $unit->toArray());
-        
-        //Verify in the database
-        $this->assertDatabaseMissing('units', $unit->toArray());
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['result' => []]);
+        array_push($assertsJson,['message' => 'The code field is required.']);
+        $this->setAssertJson($assertsJson);
 
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'The code field is required.']);   
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        $this->create(['code' => '']);
+    }
+
+    public function test_unit_create_code_max()
+    {
+        // Set Database has
+        $this->setDatabaseHas(false);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['message' => 'The code may not be greater than 3 characters.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        $this->create(['code' => $this->faker->lexify('????')]);
+    }
+
+    public function test_unit_create_code_repeated()
+    {
+        // Set Database has
+        $this->setDatabaseHas(false);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['message' => 'The code has already been taken.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Generate one
+        $unit = factory(Unit::class)->create(['store_id' => auth()->user()->store_id]);
+
+        //Action
+        $this->create(['code' => $unit->code,
+                       'store_id' => auth()->user()->store_id]);
     }
 
     public function test_unit_create_ok()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-        
-         // Generate an unit object
-        $unit = factory(Unit::class)->make();
+        // Set Database has
+        $this->setDatabaseHas(true);
 
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->post('api/units', $unit->toArray());
-        
-        //Verify in the database
-        // $this->assertDatabaseHas('units', $unit->toArray());
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => true]);
+        array_push($assertsJson,['message' => 'Units created successfully.']);
+        $this->setAssertJson($assertsJson);
 
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJsonStructure([
-            'status',
-            'message',
-            'result' => [],
-            'records',
-            ]);
-        $response->assertJson(['status' => true]);
-        $response->assertJson(['message' => 'Units created successfully.']);   
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        $this->create(['store_id' => auth()->user()->store_id]);
     }
+
 
     //TEST FUNCTION show
 
-    public function test_unit_not_found()
-    {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-        
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->get('api/units/' . '0');
-        
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'Unit not found.']);
-         
+    public function test_unit_show_from_another_store()
+    {     
+        // Set Database has
+        $this->setDatabaseHas(true);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['message' => 'This action is unauthorized.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        // $this->create(['store_id' => auth()->user()->store_id]);
+        $this->readBy();
     }
 
     public function test_unit_show_ok()
-    {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-        
-        // Generate a item object
-        $unit = factory(Unit::class)->create();
+    {     
+        // Set Database has
+        $this->setDatabaseHas(true);
 
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->get('api/units/' . $unit->id);
-        
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJson(['status' => true]);
-        $response->assertJson(['message' => 'Unit retrieved successfully.']);
-         
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => true]);
+        array_push($assertsJson,['message' => 'Unit retrieved successfully.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        $this->readBy(['store_id' => auth()->user()->store_id]);
+
     }
 
     //TEST FUNCTION update
+
     public function test_unit_update_code_is_required()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-        
-        // Generate an unit object
-        $unit = factory(Unit::class)->create();
+        // Set Database has
+        $this->setDatabaseHas(true);
 
-        //Verify in the database
-        $this->assertDatabaseHas('units', $unit->toArray());
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['message' => 'The code field is required.']);
+        $this->setAssertJson($assertsJson);
 
-        // Generate an unit object to edit
-        $newUnit = factory(Unit::class)->make(['code' => '']);
+        //Authentication
+        $this->get_api_token();
 
-        $unit->code = $newUnit->code;
+        //Action
+        $this->update(['code' => '']);
+    }
 
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-             ->put('api/units/' . $unit->id ,  $unit->toArray());
-        
-        //Verify in the database
-        $this->assertDatabaseMissing('units', $unit->toArray());
+    public function test_unit_update_from_another_store()
+    {
+        // Set Database has
+        $this->setDatabaseHas(true);
 
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'The code field is required.']);   
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['message' => 'This action is unauthorized.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        $this->update();
+    }
+
+    public function test_unit_update_code_repeated()
+    {
+        // Set Database has
+        $this->setDatabaseHas(true);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['message' => 'The code has already been taken.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Generate one
+        $unit = factory(Unit::class)->create(['store_id' => auth()->user()->store_id]);
+
+        //Action
+        $this->update(['code' => $unit->code,
+                       'store_id' => auth()->user()->store_id]);
     }
 
     public function test_unit_update_ok()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-        
-        // Generate an unit object
-        $unit = factory(Unit::class)->create();
+        // Set Database has
+        $this->setDatabaseHas(true);
 
-        //Verify in the database
-        $this->assertDatabaseHas('units', $unit->toArray());
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => true]);
+        array_push($assertsJson,['message' => 'Units updated successfully.']);
+        $this->setAssertJson($assertsJson);
 
-        // Generate an unit object to edit
-        $newUnit = factory(Unit::class)->make();
+        //Authentication
+        $this->get_api_token();
 
-        $unit->code = $newUnit->code;
-        $unit->description = $newUnit->description;
-        $unit->allow_decimal = $newUnit->allow_decimal;
-
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-             ->put('api/units/' . $unit->id ,  $unit->toArray());
-        
-        //Verify in the database
-        $this->assertDatabaseHas('units', $unit->toArray());
-
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJson(['status' => true]);
-        $response->assertJson(['message' => 'Units created successfully.']);   
+        //Action
+        $this->update(['store_id' => auth()->user()->store_id]);   
     }
 
     //TEST FUNCTION delete
 
-    public function test_unit_delete_not_found()
+    public function test_unit_delete_from_another_store()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-       
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->delete('api/units/' . '0');
-        
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'Unit not found.']);
+        // Set Database has
+        $this->setDatabaseHas(true);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['message' => 'This action is unauthorized.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        $this->destroy();
          
     }
 
     public function test_unit_delete_ok()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
+        // Set Database has
+        $this->setDatabaseHas(false);
 
-        // Generate an unit object
-        $unit = factory(Unit::class)->create();
-        
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->delete('api/units/' . $unit->id);
-        
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJson(['status' => true]);
-        $response->assertJson(['message' => 'Unit deleted successfully.']);
-         
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => true]);
+        array_push($assertsJson,['message' => 'Unit deleted successfully.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        $this->destroy(['store_id' => auth()->user()->store_id]);   
     }
 }

@@ -8,7 +8,7 @@ use Faker\Generator as Faker;
 
 $factory->define(Unit::class, function (Faker $faker) {
     return [
-        'code' => $faker->unique()->lexify('??'),
+        'code' => strtoupper($faker->unique()->lexify('??')),
         'description' => $faker->name,
         'allow_decimal' => intval($faker->boolean),
         'store_id' => function () {

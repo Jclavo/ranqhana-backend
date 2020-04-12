@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\ResponseController;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule; 
 
 class UnitController extends ResponseController
 {
@@ -42,7 +43,12 @@ class UnitController extends ResponseController
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'code' => 'required|unique:units|max:3', 
+            'code' => ['required',
+                        'max:3',
+                        Rule::unique('units')->where(function($query) {
+                            $query->where('store_id', '=', Auth::user()->store_id);
+                        })
+                    ], 
         ]);
         
         if ($validator->fails()) {
@@ -98,7 +104,13 @@ class UnitController extends ResponseController
     public function update(int $id, Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'code' => 'required',
+            'code' => ['required',
+                        'max:3',
+                        Rule::unique('units')->where(function($query) use($id){
+                            $query->where('id', '<>', $id)
+                                  ->where('store_id', '=', Auth::user()->store_id);
+                        })  
+                    ],
         ]);
         
         if ($validator->fails()) {
@@ -110,11 +122,12 @@ class UnitController extends ResponseController
         $this->authorize('isMyUnit', $unit);
         
         $unit->code = strtoupper($request->code);
-        $unit->description = $request->description;
-        $unit->allow_decimal = $request->allow_decimal;
+        // $unit->description = $request->description;
+        // $unit->allow_decimal = $request->allow_decimal;
+
         $unit->save();
 
-        return $this->sendResponse($unit->toArray(), 'Units created successfully.');  
+        return $this->sendResponse($unit->toArray(), 'Units updated successfully.');  
     }
 
     /**
