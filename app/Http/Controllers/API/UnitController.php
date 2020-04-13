@@ -122,8 +122,8 @@ class UnitController extends ResponseController
         $this->authorize('isMyUnit', $unit);
         
         $unit->code = strtoupper($request->code);
-        // $unit->description = $request->description;
-        // $unit->allow_decimal = $request->allow_decimal;
+        $unit->description = $request->description;
+        $unit->allow_decimal = $request->allow_decimal;
 
         $unit->save();
 

@@ -187,7 +187,7 @@ class UnitTest extends TestCase
     public function test_unit_update_code_is_required()
     {
         // Set Database has
-        $this->setDatabaseHas(true);
+        $this->setDatabaseHas(false);
 
         //Set Json asserts
         $assertsJson = array();
@@ -205,7 +205,7 @@ class UnitTest extends TestCase
     public function test_unit_update_from_another_store()
     {
         // Set Database has
-        $this->setDatabaseHas(true);
+        $this->setDatabaseHas(false);
 
         //Set Json asserts
         $assertsJson = array();
@@ -223,7 +223,7 @@ class UnitTest extends TestCase
     public function test_unit_update_code_repeated()
     {
         // Set Database has
-        $this->setDatabaseHas(true);
+        $this->setDatabaseHas(false);
 
         //Set Json asserts
         $assertsJson = array();
@@ -239,7 +239,9 @@ class UnitTest extends TestCase
 
         //Action
         $this->update(['code' => $unit->code,
-                       'store_id' => auth()->user()->store_id]);
+                       'store_id' => auth()->user()->store_id],
+                       ['store_id' => auth()->user()->store_id] //attribute mandatory
+                    );
     }
 
     public function test_unit_update_ok()
@@ -257,7 +259,9 @@ class UnitTest extends TestCase
         $this->get_api_token();
 
         //Action
-        $this->update(['store_id' => auth()->user()->store_id]);   
+        $this->update(['store_id' => auth()->user()->store_id],
+                      ['store_id' => auth()->user()->store_id] //attribute mandatory 
+                    );   
     }
 
     //TEST FUNCTION delete
