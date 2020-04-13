@@ -70,10 +70,10 @@ abstract class TestCase extends TestCaseBase
         }
     }
 
-    protected function checkRecordInDatabase($model,$modelFactory){
+    protected function checkRecordInDatabase($model,$modelFactory,$databaseHas){
         $modelDB = new $model;
 
-        if($this->databaseHas){
+        if($databaseHas){
             $this->assertDatabaseHas($modelDB->getTable(), $modelFactory->toArray());
         }else{
             $this->assertDatabaseMissing($modelDB->getTable(), $modelFactory->toArray());
@@ -134,7 +134,7 @@ abstract class TestCase extends TestCaseBase
         
         $this->checkJSONResponse($response);
 
-        $this->checkRecordInDatabase($model,$modelFactory);
+        $this->checkRecordInDatabase($model,$modelFactory, $this->databaseHas);
             
         return $response;
     }
@@ -152,26 +152,27 @@ abstract class TestCase extends TestCaseBase
 
         $this->checkJSONResponse($response);
             
-        $this->checkRecordInDatabase($model,$modelFactory);
+        $this->checkRecordInDatabase($model,$modelFactory, $this->databaseHas);
 
         return $response;
     }
 
-    protected function update($attributes = [], $model = '', $route = '')
+    protected function update($attributes = [], $attributesMandatory = [], $model = '', $route = '')
     {
         $route = $this->baseRoute ?? $route;
         $model = $this->baseModel ?? $model;
 
-        $modelFactory = $this->factoryCreate($model, $attributes);
+        $modelFactory = $this->factoryCreate($model, $attributesMandatory);
 
-        $this->checkRecordInDatabase($model,$modelFactory);
+        // Verify in the db
+        $this->checkRecordInDatabase($model,$modelFactory,true);
 
         $modelFactoryNew = $this->factoryMake($model, $attributes);
 
         //Assign values to update
-        $attributes_keys = array_keys($attributes);
-        foreach($attributes_keys as $attributes_key) {
-            $modelFactory[$attributes_key] = $modelFactoryNew[$attributes_key];
+        $model_keys = array_keys($modelFactoryNew->toArray());
+        foreach($model_keys as $key) {
+            $modelFactory[$key] = $modelFactoryNew[$key];
         }
 
         //Submit post request with autorizathion header
@@ -180,7 +181,7 @@ abstract class TestCase extends TestCaseBase
     
         $this->checkJSONResponse($response);
 
-        $this->checkRecordInDatabase($model,$modelFactory);
+        $this->checkRecordInDatabase($model,$modelFactory,$this->databaseHas);
 
         return $response;
     }
@@ -198,7 +199,7 @@ abstract class TestCase extends TestCaseBase
 
         $this->checkJSONResponse($response);
             
-        $this->checkRecordInDatabase($model,$modelFactory);
+        $this->checkRecordInDatabase($model,$modelFactory,$this->databaseHas);
         
         return $response;
     }
