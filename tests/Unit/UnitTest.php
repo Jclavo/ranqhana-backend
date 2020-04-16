@@ -5,13 +5,10 @@ namespace Tests\Unit;
 use App\User;
 use App\Unit;
 use Illuminate\Support\Facades\Auth as Auth;
-
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class UnitTest extends TestCase
 {
-    use RefreshDatabase;
 
     public function setUp(): void
     {
