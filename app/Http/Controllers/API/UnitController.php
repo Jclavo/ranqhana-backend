@@ -19,9 +19,9 @@ class UnitController extends ResponseController
      */
     public function index()
     {
-        $units = Unit::all();
+        // $units = Unit::all();
             
-        return $this->sendResponse($units->toArray(), 'Units retrieved successfully.');
+        // return $this->sendResponse($units->toArray(), 'Units retrieved successfully.');
     }
 
     /**
@@ -59,13 +59,11 @@ class UnitController extends ResponseController
         
         $unit->code = strtoupper($request->code);
         $unit->description = $request->description;
-        
-        $request->allow_decimal ? $unit->allow_decimal = true : $unit->allow_decimal = false;
-
+        $request->fractioned ? $unit->fractioned = true : $unit->fractioned = false;
         $unit->store_id = Auth::user()->store_id;
         $unit->save();
 
-        return $this->sendResponse($unit->toArray(), 'Units created successfully.');  
+        return $this->sendResponse($unit->toArray(), 'Unit created successfully.');  
     }
 
     /**
@@ -123,11 +121,11 @@ class UnitController extends ResponseController
         
         $unit->code = strtoupper($request->code);
         $unit->description = $request->description;
-        $unit->allow_decimal = $request->allow_decimal;
+        $request->fractioned ? $unit->fractioned = true : $unit->fractioned = false;
 
         $unit->save();
 
-        return $this->sendResponse($unit->toArray(), 'Units updated successfully.');  
+        return $this->sendResponse($unit->toArray(), 'Unit updated successfully.');  
     }
 
     /**

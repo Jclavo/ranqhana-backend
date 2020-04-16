@@ -40,24 +40,24 @@ class UnitTest extends TestCase
 
     //TEST FUNCTION index
 
-    public function test_unit_get_all()
-    {
-        //Set values to Response
-        $this->setAssertStatus(200);
+    // public function test_unit_get_all()
+    // {
+    //     //Set values to Response
+    //     $this->setAssertStatus(200);
        
-        //Set Json asserts
-        $assertsJson = array();
-        array_push($assertsJson,['status' => true]);
-        array_push($assertsJson,['message' => 'Units retrieved successfully.']);
-        $this->setAssertJson($assertsJson);
+    //     //Set Json asserts
+    //     $assertsJson = array();
+    //     array_push($assertsJson,['status' => true]);
+    //     array_push($assertsJson,['message' => 'Unit retrieved successfully.']);
+    //     $this->setAssertJson($assertsJson);
 
-        //Authentication
-        $this->get_api_token();
+    //     //Authentication
+    //     $this->get_api_token();
 
-        //Action
-        $this->read();
+    //     //Action
+    //     $this->read();
          
-    }
+    // }
 
     //TEST FUNCTION create/store
 
@@ -120,6 +120,29 @@ class UnitTest extends TestCase
                        'store_id' => auth()->user()->store_id]);
     }
 
+    public function test_unit_create_ok_with_empty_not_mandatory_fields()
+    {
+        // Set Database has
+        $this->setDatabaseHas(true);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => true]);
+        array_push($assertsJson,['message' => 'Unit created successfully.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Generate one
+        $unit = factory(Unit::class)->create(['store_id' => auth()->user()->store_id]);
+
+        //Action
+        $this->create(['description' => null,
+                       'fractioned' => 0,
+                       'store_id' => auth()->user()->store_id]);
+    }
+
     public function test_unit_create_ok()
     {
         // Set Database has
@@ -128,7 +151,7 @@ class UnitTest extends TestCase
         //Set Json asserts
         $assertsJson = array();
         array_push($assertsJson,['status' => true]);
-        array_push($assertsJson,['message' => 'Units created successfully.']);
+        array_push($assertsJson,['message' => 'Unit created successfully.']);
         $this->setAssertJson($assertsJson);
 
         //Authentication
@@ -241,6 +264,31 @@ class UnitTest extends TestCase
                     );
     }
 
+    public function test_unit_update_ok_with_empty_not_mandatory_fields()
+    {
+        // Set Database has
+        $this->setDatabaseHas(true);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => true]);
+        array_push($assertsJson,['message' => 'Unit updated successfully.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Generate one
+        $unit = factory(Unit::class)->create(['store_id' => auth()->user()->store_id]);
+
+        //Action
+        $this->update(['description' => null,
+                       'fractioned' => 0,
+                       'store_id' => auth()->user()->store_id],
+                       ['store_id' => auth()->user()->store_id]
+                );
+    }
+
     public function test_unit_update_ok()
     {
         // Set Database has
@@ -249,7 +297,7 @@ class UnitTest extends TestCase
         //Set Json asserts
         $assertsJson = array();
         array_push($assertsJson,['status' => true]);
-        array_push($assertsJson,['message' => 'Units updated successfully.']);
+        array_push($assertsJson,['message' => 'Unit updated successfully.']);
         $this->setAssertJson($assertsJson);
 
         //Authentication

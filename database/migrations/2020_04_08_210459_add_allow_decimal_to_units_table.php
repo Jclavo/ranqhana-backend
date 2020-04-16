@@ -14,7 +14,7 @@ class AddAllowDecimalToUnitsTable extends Migration
     public function up()
     {
         Schema::table('units', function (Blueprint $table) {
-            $table->boolean('allow_decimal')->default(false)->after('description');
+            $table->boolean('fractioned')->default(false)->before('created_at');
         });
     }
 

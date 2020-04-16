@@ -10,7 +10,7 @@ $factory->define(Unit::class, function (Faker $faker) {
     return [
         'code' => strtoupper($faker->unique()->lexify('??')),
         'description' => $faker->name,
-        'allow_decimal' => intval($faker->boolean),
+        'fractioned' => intval($faker->boolean),
         'store_id' => function () {
             return factory(Store::class)->create()->id;
         }

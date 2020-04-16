@@ -14,6 +14,6 @@ class Unit extends BaseModel
      * @var array
      */
     protected $fillable = [
-        'code', 'description', 'allow_decimal'
+        'code', 'description', 'fractioned'
     ];
 }
