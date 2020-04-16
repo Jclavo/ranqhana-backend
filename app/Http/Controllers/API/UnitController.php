@@ -181,7 +181,7 @@ class UnitController extends ResponseController
                      ->orWhere('description', 'like', '%'. $searchValue .'%');
         });
 
-        $query->where('store_id', '=', 0)
+        $query->where('store_id', '=', 1)
               ->orWhere('store_id', '=', Auth::user()->store_id);
 
 
