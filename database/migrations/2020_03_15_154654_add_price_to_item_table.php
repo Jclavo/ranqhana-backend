@@ -14,7 +14,7 @@ class AddPriceToItemTable extends Migration
     public function up()
     {
         Schema::table('items', function (Blueprint $table) {
-            $table->decimal('price',7,2)->default(0.0)->before('quantity');
+            $table->decimal('price',7,2)->default(0.0)->before('created_at');
         });
     }
 

@@ -14,7 +14,7 @@ class AddCountriesToUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-           $table->string('country_code')->nullable(true);
+           $table->string('country_code')->nullable(true)->before('created_at');
            $table->foreign('country_code')->references('country_code')->on('countries');
         });
     }

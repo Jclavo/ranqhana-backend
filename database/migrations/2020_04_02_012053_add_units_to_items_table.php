@@ -14,8 +14,8 @@ class AddUnitsToItemsTable extends Migration
     public function up()
     {
         Schema::table('items', function (Blueprint $table) {
-            $table->string('unit')->nullable(true)->after('stock');
-            $table->foreign('unit')->references('code')->on('units');
+            $table->unsignedBigInteger('unit_id')->nullable(true)->before('created_at');
+            $table->foreign('unit_id')->references('id')->on('units');
         });
     }
 

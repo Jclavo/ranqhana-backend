@@ -14,7 +14,7 @@ class AddStockedToItemsTable extends Migration
     public function up()
     {
         Schema::table('items', function (Blueprint $table) {
-            $table->boolean('stocked')->default(true)->after('unit');
+            $table->boolean('stocked')->default(true)->before('created_at');
         });
     }
 

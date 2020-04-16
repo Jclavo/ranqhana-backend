@@ -14,7 +14,7 @@ class AddStoresToItemsTable extends Migration
     public function up()
     {
         Schema::table('items', function (Blueprint $table) {
-            $table->unsignedBigInteger('store_id')->nullable(true);;
+            $table->unsignedBigInteger('store_id')->nullable(true)->before('created_at');
             $table->foreign('store_id')->references('id')->on('stores');
         });
     }

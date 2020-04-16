@@ -14,7 +14,7 @@ class AddUserToInvoicesTable extends Migration
     public function up()
     {
         Schema::table('invoices', function (Blueprint $table) {
-            $table->unsignedBigInteger('user_id')->nullable(true)->after('type');
+            $table->unsignedBigInteger('user_id')->nullable(true)->before('created_at');
             $table->foreign('user_id')->references('id')->on('users');
         });
     }

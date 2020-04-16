@@ -14,7 +14,7 @@ class AddItemsToPricesTable extends Migration
     public function up()
     {
         Schema::table('prices', function (Blueprint $table) {
-            $table->unsignedBigInteger('item_id')->nullable(true)->after('price');
+            $table->unsignedBigInteger('item_id')->nullable(true)->before('created_at');
             $table->foreign('item_id')->references('id')->on('items');
         });
     }

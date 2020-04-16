@@ -14,7 +14,7 @@ class AddStoreIdToUnitsTable extends Migration
     public function up()
     {
         Schema::table('units', function (Blueprint $table) {
-            $table->unsignedBigInteger('store_id')->default(0)->after('allow_decimal');
+            $table->unsignedBigInteger('store_id')->default(0)->before('created_at');
         });
     }
 

@@ -14,7 +14,7 @@ class AddStoresToUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->unsignedBigInteger('store_id')->before('api_token')->nullable(true);;
+            $table->unsignedBigInteger('store_id')->before('created_at')->nullable(true);;
             $table->foreign('store_id')->references('id')->on('stores');
         });
     }
