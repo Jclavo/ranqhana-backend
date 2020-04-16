@@ -5,53 +5,38 @@ namespace Tests\Unit;
 use App\Item;
 use App\User;
 use App\Price;
-// use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-
 use App\Http\Controllers\API\ItemController;
 
 class ItemTest extends TestCase
 { 
-    use RefreshDatabase;
-    //use DatabaseMigrations;
 
     public function setUp(): void
     {
         parent::setUp();
-        // Seed database
         $this->seed();
-        // Artisan::call('db:seed');
-       
-    }
 
-    public function get_api_token()
-    {
-        // Generate an user object
-        $user = factory(User::class)->create(['country_code' => '55', 'email' => '']);
-                
-        $user->password = 'secret';
-        
-        //Submit post request to create an user endpoint
-        $response = $this->post('api/login', $user->toArray());
-        
-        //Verify in the database
-        $this->assertNotEmpty(json_decode($response->content(),true)['result']['api_token']);
-
-        return json_decode($response->content(),true)['result']['api_token'];
+        $this->setBaseRoute('items');
+        $this->setBaseModel('App\Item');
+        $this->setFaker();   
     }
 
     public function test_item_unauthenticated_user()
     {       
-        //Submit post request with autorizathion header
-        $response = $this->get('api/items');
-        
-        // Verify status 200 
-        $response->assertStatus(401);
-        
-        // Verify values in response
-        $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'Unauthenticated.']);
+        //Set values to Response
+        $this->setAssertStatus(401);
+
+        //Set Json structure
+        $this->setAssertJsonStructure([]);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['message' => 'Unauthenticated.']);
+        $this->setAssertJson($assertsJson);
+
+        //Action
+        $this->read();
          
     }
 
@@ -59,27 +44,19 @@ class ItemTest extends TestCase
 
     public function test_item_get_all()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-        
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->get('api/items');
-        
-        
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJsonStructure([
-            'status',
-            'message',
-            'result' => []
-          ]);
-        $response->assertJson(['status' => true]);
-        $response->assertJson(['message' => 'Items retrieved successfully.']);
+        $this->setAssertStatus(200);
+       
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => true]);
+        array_push($assertsJson,['message' => 'Items retrieved successfully.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        $this->read();
          
     }
 
@@ -87,258 +64,99 @@ class ItemTest extends TestCase
 
     public function test_item_create_name_is_required()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-        
-         // Generate a item object
-        $item = factory(Item::class)->make(['name' => '']);
-
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->post('api/items', $item->toArray());
-        
-        //Verify in the database
-        $this->assertDatabaseMissing('items', $item->toArray());
-
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'The name field is required.']);
-         
-    }
-
-    public function test_item_create_store_id_is_required()
-    {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-        
-         // Generate a item object
-        $item = factory(Item::class)->make(['store_id' => '']);
-
-         // Generate a price object
-        $price = factory(Price::class)->make();
-
-        $item->price = $price->price;
-
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->post('api/items', $item->toArray());
-        
-        //Verify in the database
-        $this->assertDatabaseMissing('items', $item->toArray());
-
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'The store id field is required.']);
-         
+        $this->item_name_is_required('C'); 
     }
 
     public function test_item_create_price_is_required()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-        
-         // Generate a item object
-        $item = factory(Item::class)->make(['price' => '']);
-
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->post('api/items', $item->toArray());
-        
-        //Verify in the database
-        $this->assertDatabaseMissing('items', $item->toArray());
-
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'The price field is required.']);
-         
+        $this->item_price_is_required('C'); 
     }
 
     public function test_item_create_price_must_be_a_number()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-        
-         // Generate a item object
-        $item = factory(Item::class)->make(['price' => 'abc']);
-
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->post('api/items', $item->toArray());
-        
-        //Verify in the database
-        $this->assertDatabaseMissing('items', $item->toArray());
-
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'The price must be a number.']);
-         
+        $this->item_price_must_be_a_number('C');
     }
 
     public function test_item_create_price_must_be_a_positive_number()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-        
-         // Generate a item object
-        $item = factory(Item::class)->make(['price' => -4]);
-
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->post('api/items', $item->toArray());
-        
-        //Verify in the database
-        $this->assertDatabaseMissing('items', $item->toArray());
-
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'The price must be between 0.00 and 99999.99.']); 
+        $this->item_price_must_be_a_positive_number('C');
     }
 
     public function test_item_create_unit_not_found()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-        
-         // Generate a item object
-        $item = factory(Item::class)->make(['unit' => 'AB']);
+        $this->item_unit_not_found('C');
+    }
 
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->post('api/items', $item->toArray());
-        
-        //Verify in the database
-        $this->assertDatabaseMissing('items', $item->toArray());
+    public function test_item_create_unit_required()
+    {
+        $this->item_unit_required('C');
+    }
 
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'Unit not found.']); 
+    public function test_item_create_unit_is_zero()
+    {
+        $this->item_unit_is_zero('C');
+    }
+
+    public function test_item_create_with_empty_not_required_fields()
+    {
+        $this->item_with_empty_not_required_fields('C');
     }
 
     public function test_item_create_ok()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-        
-         // Generate a item object
-        $item = factory(Item::class)->make();
+        // Set Database has
+        $this->setDatabaseHas(true);
 
-        // Generate a price object
-        // $price = factory(Price::class)->make(['price' => $item->price,
-        //                                       'item_id' => $item->id]);
-       
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->post('api/items', $item->toArray());
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => true]);
+        array_push($assertsJson,['message' => 'Item created successfully.']);
+        $this->setAssertJson($assertsJson);
 
-        //Verify in the database
-        $this->assertDatabaseHas('items', $item->toArray());
-        //$this->assertDatabaseHas('prices', $price->toArray());
+        //Authentication
+        $this->get_api_token();
 
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        //Verify values in response
-        $response->assertJsonStructure([
-            'status',
-            'message',
-            'result' => []
-            ]);
-        $response->assertJson(['status' => true]);
-        $response->assertJson(['message' => 'Items created successfully.']);
-         
+        //Action
+        $this->create(['store_id' => auth()->user()->store_id]);
     }
+
 
     //TEST FUNCTION show
 
-    public function test_item_not_found()
-    {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-        
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->get('api/items/' . '0');
-        
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'Item not found.']);
-         
+    public function test_item_show_from_another_store()
+    {     
+        // Set Database has
+        $this->setDatabaseHas(true);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['message' => 'This action is unauthorized.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        $this->readBy();
     }
 
     public function test_item_show_by_id()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-        
-         // Generate a item object
-        $item = factory(Item::class)->create();
+        // Set Database has
+        $this->setDatabaseHas(true);
 
-        // Generate a price object
-        $price = factory(Price::class)->create(['price' => $item->price,
-                                              'item_id' => $item->id]);
-       
-        //Verify in the database
-        $this->assertDatabaseHas('items', $item->toArray());
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => true]);
+        array_push($assertsJson,['message' => 'Item retrieved successfully.']);
+        $this->setAssertJson($assertsJson);
 
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-             ->get('api/items/' . $item->id);
-        
-        // Verify status 200 
-        $response->assertStatus(200);
+        //Authentication
+        $this->get_api_token();
 
-        //Verify in the database
-        $this->assertDatabaseHas('items', $item->toArray());
-        $this->assertDatabaseHas('prices', $price->toArray());
- 
-        
-        //Verify values in response
-        $response->assertJsonStructure([
-            'status',
-            'message',
-            'result' => []
-            ]);
-        $response->assertJson(['status' => true]);
-        $response->assertJson(['message' => 'Item retrieved successfully.']);
+        //Action
+        $this->readBy(['store_id' => auth()->user()->store_id]);
          
     }
 
@@ -346,138 +164,103 @@ class ItemTest extends TestCase
 
     public function test_item_update_name_is_required()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-        
-         // Generate a item object
-        $item = factory(Item::class)->create();
-
-        // Generate a price object
-        $price = factory(Price::class)->create(['price' => $item->price,
-                                              'item_id' => $item->id]);
-
-        //Verify in the database
-        $this->assertDatabaseHas('items', $item->toArray());
-        $this->assertDatabaseHas('prices', $price->toArray());
-
-        // Set values to Update
-        $item->name = '';
-
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->put('api/items/' . $item->id ,  $item->toArray());
-        
-        //Verify in the database
-        $this->assertDatabaseMissing('items', $item->toArray());
-
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'The name field is required.']);
-         
+        $this->item_price_is_required('U');         
     }
 
-    public function test_item_update_name()
+    public function test_item_update_price_is_required()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-        
-         // Generate a item object
-        $item = factory(Item::class)->create();
-
-        // Generate a price object
-        $price = factory(Price::class)->create(['price' => $item->price,
-                                              'item_id' => $item->id]);
-
-        //Verify in the database
-        $this->assertDatabaseHas('items', $item->toArray());
-        $this->assertDatabaseHas('prices', $price->toArray());
-
-        // Set values to Update
-        $newItem = factory(Item::class)->make();
-
-        $item->name = $newItem->name;
-
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->put('api/items/' . $item->id ,  $item->toArray());
-        
-        //Verify in the database
-        $this->assertDatabaseHas('items', $item->toArray());
-
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJson(['status' => true]);
-        $response->assertJson(['message' => 'Item updated successfully.']);
-         
+        $this->item_price_is_required('U'); 
     }
 
-    public function test_item_update_price()
+    public function test_item_update_price_must_be_a_number()
+    {
+        $this->item_price_must_be_a_number('U');
+    }
+
+    public function test_item_update_price_must_be_a_positive_number()
+    {
+        $this->item_price_must_be_a_positive_number('U');
+    }
+
+    public function test_item_update_unit_not_found()
+    {
+        $this->item_unit_not_found('U');
+    }
+
+    public function test_item_update_unit_required()
+    {
+        $this->item_unit_required('U');
+    }
+
+    public function test_item_update_unit_is_zero()
+    {
+        $this->item_unit_is_zero('U');
+    }
+
+    public function test_item_update_price_ok()
     {
         // get api token from authenticate user
-        $api_token = $this->get_api_token();
+        $this->get_api_token();
         
          // Generate a item object
-        $item = factory(Item::class)->create();
+        $item = factory(Item::class)->create(['store_id' => auth()->user()->store_id]);
 
         // Generate a price object
         $price = factory(Price::class)->create(['price' => $item->price,
-                                                'item_id' => $item->id]);
+                                                'item_id' => $item->id
+                                                ]);
 
         //Verify in the database
         $this->assertDatabaseHas('items', $item->toArray());
         $this->assertDatabaseHas('prices', $price->toArray());
 
         // Set values to Update
-        $newItem = factory(Item::class)->make();
+        $newItem = factory(Item::class)->make(['store_id' => auth()->user()->store_id]);
 
         $item->price = $newItem->price;
 
          // Generate a price object
         $price = factory(Price::class)->make(['price' => $item->price,
-                                              'item_id' => $item->id]);
+                                              'item_id' => $item->id
+                                            ]);
 
         //Submit post request with autorizathion header
         $response = 
         
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
+        $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
               ->put('api/items/' . $item->id ,  $item->toArray());
         
-        //Verify in the database
-        $this->assertDatabaseHas('items', $item->toArray());
-        $this->assertDatabaseHas('prices', $price->toArray());
-
         // Verify status 200 
         $response->assertStatus(200);
         
         // Verify values in response
         $response->assertJson(['status' => true]);
-        $response->assertJson(['message' => 'Item updated successfully.']);
-         
+        $response->assertJson(['message' => 'Item updated successfully.']);  
+
+        //Verify in the database
+        $this->assertDatabaseHas('items', $item->toArray());
+        $this->assertDatabaseHas('prices', $price->toArray());
     }
 
     public function test_item_update_stocked_not_change()
     {
         // get api token from authenticate user
-        $api_token = $this->get_api_token();
+        $this->get_api_token();
         
          // Generate a item object
-        $item = factory(Item::class)->create(['stock' => 10, 'stocked' => true]);
+        $item = factory(Item::class)->create(['stock' => $this->faker->randomNumber(2), 
+                                              'stocked' => true,
+                                              'store_id' => auth()->user()->store_id
+                                            ]);
 
         //Verify in the database
         $this->assertDatabaseHas('items', $item->toArray());
         // $this->assertDatabaseHas('prices', $price->toArray());
 
         // Set values to Update
-        $newItem = factory(Item::class)->make(['stocked' => false]);
+        $newItem = factory(Item::class)->make(['stocked' => false,
+                                               'store_id' => auth()->user()->store_id
+                                             ]);
 
         $item->stocked = $newItem->stocked;
 
@@ -488,7 +271,7 @@ class ItemTest extends TestCase
         //Submit post request with autorizathion header
         $response = 
         
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
+        $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
               ->put('api/items/' . $item->id ,  $item->toArray());
         
         //Verify in the database
@@ -506,16 +289,16 @@ class ItemTest extends TestCase
     public function test_item_update_stocked_ok()
     {
         // get api token from authenticate user
-        $api_token = $this->get_api_token();
+        $this->get_api_token();
         
          // Generate a item object
-        $item = factory(Item::class)->create(['stocked' => false]);
+        $item = factory(Item::class)->create(['stocked' => false, 'store_id' => auth()->user()->store_id]);
 
         //Verify in the database
         $this->assertDatabaseHas('items', $item->toArray());
 
         // Set values to Update
-        $newItem = factory(Item::class)->make(['stocked' => true]);
+        $newItem = factory(Item::class)->make(['stocked' => true, 'store_id' => auth()->user()->store_id]);
 
         $item->stocked = $newItem->stocked;
 
@@ -526,7 +309,7 @@ class ItemTest extends TestCase
         //Submit post request with autorizathion header
         $response = 
         
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
+        $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
               ->put('api/items/' . $item->id ,  $item->toArray());
         
         //Verify in the database
@@ -541,48 +324,86 @@ class ItemTest extends TestCase
          
     }
 
+    public function test_item_update_from_another_store()
+    {
+        // Set Database has
+        $this->setDatabaseHas(false);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['message' => 'This action is unauthorized.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        $this->update();
+    }
+
+    public function test_item_update_with_empty_not_required_fields()
+    {
+        $this->item_with_empty_not_required_fields('U');
+    }
+
+    public function test_item_update_ok()
+    {
+        // Set Database has
+        $this->setDatabaseHas(true);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => true]);
+        array_push($assertsJson,['message' => 'Item updated successfully.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        $this->update(['store_id' => auth()->user()->store_id],
+                      ['store_id' => auth()->user()->store_id] //attribute mandatory 
+                    );   
+    }
+
     //TEST FUNCTION delete
 
-    public function test_item_delete_id_not_found()
+    public function test_item_delete_from_another_store()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
-        
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->delete('api/items/' . '0');
-        
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'Item not found.']);
+        // Set Database has
+        $this->setDatabaseHas(true);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['message' => 'This action is unauthorized.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        $this->destroy();
          
     }
 
-    public function test_item_delete()
+    public function test_item_delete_ok()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
+        // Set Database has
+        $this->setDatabaseHas(false);
 
-        // Generate a item 
-        $item = factory(Item::class)->create();
-        
-        //Submit post request with autorizathion header
-        $response = 
-        
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->delete('api/items/' . $item->id);
-        
-        // Verify status 200 
-        $response->assertStatus(200);
-        
-        // Verify values in response
-        $response->assertJson(['status' => true]);
-        $response->assertJson(['message' => 'Item deleted successfully.']);
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => true]);
+        array_push($assertsJson,['message' => 'Item deleted successfully.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        $this->softDestroy(['store_id' => auth()->user()->store_id]);   
          
     }
 
@@ -703,4 +524,210 @@ class ItemTest extends TestCase
         $this->assertEquals(json_decode($stock->content(),true)['message'], 'Stock updated.');
         // $this->assertTrue($stock);
     }
+
+
+    //PRIVATE
+    private function item_name_is_required($option = '')
+    {
+        $this->checkOptionCRUD($option);      
+        // Set Database has
+        $this->setDatabaseHas(false);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['result' => []]);
+        array_push($assertsJson,['message' => 'The name field is required.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        switch ($option) {
+            case 'C': $this->create(['name' => '']);
+                break;
+            case 'U': $this->update(['name' => '']);
+                break;
+        }
+    }
+
+    private function item_price_is_required($option = '')
+    {
+        $this->checkOptionCRUD($option);      
+        // Set Database has
+        $this->setDatabaseHas(false);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['result' => []]);
+        array_push($assertsJson,['message' => 'The price field is required.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        switch ($option) {
+            case 'C': $this->create(['price' => '']);
+                break;
+            case 'U': $this->update(['price' => '']);
+                break;
+        }
+    }
+
+    private function item_price_must_be_a_number($option = '')
+    {
+        $this->checkOptionCRUD($option);   
+        // Set Database has
+        $this->setDatabaseHas(false);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['result' => []]);
+        array_push($assertsJson,['message' => 'The price must be a number.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        switch ($option) {
+            case 'C': $this->create(['price' => $this->faker->lexify('???')]);
+            break;
+            case 'U': $this->update(['price' => $this->faker->lexify('???')]);
+            break;
+        }
+    }
+
+    public function item_price_must_be_a_positive_number($option = '')
+    {
+        $this->checkOptionCRUD($option);   
+        // Set Database has
+        $this->setDatabaseHas(false);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['result' => []]);
+        array_push($assertsJson,['message' => 'The price must be between 0.00 and 99999.99.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        switch ($option) {
+            case 'C': $this->create(['price' => $this->faker->randomNumber(2) * - 1]);
+            break;
+            case 'U': $this->update(['price' => $this->faker->randomNumber(2) * - 1]);
+            break;
+        }
+    }
+
+    private function item_unit_not_found($option = '')
+    {
+        $this->checkOptionCRUD($option);   
+        // Set Database has
+        $this->setDatabaseHas(false);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        $unit_id = $this->faker->randomNumber(4, $strict = true);
+        array_push($assertsJson,['message' => 'No query results for model [App\\Unit] ' . $unit_id]);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        switch ($option) {
+            case 'C': $this->create(['unit_id' => $unit_id]);
+            break;
+            case 'U': $this->update(['unit_id' => $unit_id]);
+            break;
+        }
+    }
+
+    private function item_unit_required($option = '')
+    {
+        $this->checkOptionCRUD($option);   
+        // Set Database has
+        $this->setDatabaseHas(false);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['message' => 'The unit id field is required.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        switch ($option) {
+            case 'C': $this->create(['unit_id' => '']);
+            break;
+            case 'U': $this->update(['unit_id' => '']);
+            break;
+        }
+    }
+
+    private function item_unit_is_zero($option = '')
+    {
+        $this->checkOptionCRUD($option);   
+        // Set Database has
+        $this->setDatabaseHas(false);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['message' => 'The unit id must be greater than 0.']);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        switch ($option) {
+            case 'C': $this->create(['unit_id' => 0]);
+            break;
+            case 'U': $this->update(['unit_id' => 0]);
+            break;
+        }
+    }
+
+    public function item_with_empty_not_required_fields($option = '')
+    {
+        $this->checkOptionCRUD($option);   
+        // Set Database has
+        $this->setDatabaseHas(false);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => true]);
+
+        //Authentication
+        $this->get_api_token();
+
+        //Action
+        switch ($option) {
+            case 'C':
+                array_push($assertsJson,['message' => 'Item created successfully.']);
+                $this->setAssertJson($assertsJson); 
+                $this->create(['stocked' => '', 'description' => '']);
+                break;
+            case 'U': 
+                array_push($assertsJson,['message' => 'Item updated successfully.']);
+                $this->setAssertJson($assertsJson); 
+                $this->update(['store_id' => auth()->user()->store_id, 'stocked' => '', 'description' => ''],
+                                    ['store_id' => auth()->user()->store_id] //attribute mandatory 
+                                    );
+                break;
+        }
+    }
+
 }

@@ -46,9 +46,8 @@ class ItemController extends ResponseController
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            // 'price' => 'required:decimal',
             'price' => 'required|numeric|between:0.00,99999.99',
-            'store_id' => 'required',
+            'unit_id' => 'required|numeric|gt:0',
         ]);
         
         if ($validator->fails()) {
@@ -56,31 +55,22 @@ class ItemController extends ResponseController
         }
 
         //Validate Unit
-        if (!empty($request->unit)) {
-
-            $unit = Unit::where('code', '=', $request->unit)->get();
-        
-            if (count($unit) == 0) {
-                return $this->sendError('Unit not found.');
-            }
-        }
-
+        Unit::findOrFail($request->unit_id);
 
         $item = new Item();
         
         $item->name = $request->name;
         $item->description = $request->description;
         $item->price = $request->price;
-        $item->unit = $request->unit;
-        $item->stocked = $request->stocked;
-        $item->store_id = $request->store_id;
+        $item->unit_id = $request->unit_id;
+        $request->stocked ? $item->stocked = $request->stocked : $item->stocked = false; 
+        $item->store_id = Auth::user()->store_id;
         $item->save();
 
         //Add price
-
         $this->savePrice($item->price,$item->id);
 
-        return $this->sendResponse($item->toArray(), 'Items created successfully.');  
+        return $this->sendResponse($item->toArray(), 'Item created successfully.');  
     }
 
     /**
@@ -91,19 +81,10 @@ class ItemController extends ResponseController
      */
     public function show($id)
     {
-        $item = Item::find($id);
-        
-        // $item = Item::
-        //         select('items.*','prices.price')
-        //         ->leftJoin('prices', 'items.id', '=', 'prices.item_id')
-        //         ->where('items.id', '=', $id)
-        //         ->orderBy('prices.created_at', 'DESC')
-        //         ->first();
+        $item = Item::findOrFail($id);
 
-        if (is_null($item)) {
-            return $this->sendError('Item not found.');
-        }
-        
+        $this->authorize('isMyItem', $item);
+                
         return $this->sendResponse($item->toArray(), 'Item retrieved successfully.');
     }
 
@@ -128,22 +109,28 @@ class ItemController extends ResponseController
     public function update(int $id, Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'id' => 'required',
             'name' => 'required',
             'price' => 'required|numeric|between:0.00,99999.99',
+            'unit_id' => 'required|numeric|gt:0',
         ]);
         
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
         }
 
-        $item = Item::find($id);
+        //Validate Unit
+        Unit::findOrFail($request->unit_id);
+        
+        $item = Item::findOrFail($id);
+        $this->authorize('isMyItem', $item);
         
         $item->name = $request->name;
         $item->description = $request->description;
         $item->price = $request->price;
-        $item->unit = $request->unit;
-        $item->stocked = $request->stocked;
+        $item->unit_id = $request->unit_id;
+
+        $request->stocked ? $item->stocked = $request->stocked : $item->stocked = false; 
+        
 
         if(!$item->stocked && $item->stock > 0){
             return $this->sendError('The item has stock. It can not be modified.');
@@ -152,10 +139,6 @@ class ItemController extends ResponseController
         $item->save();
 
         //Add price
-        // $price = 0;
-        // if ($request->price) {
-        //    $price = $request->price;
-        // }
         $this->savePrice($item->price,$item->id);
         
         return $this->sendResponse($item->toArray(), 'Item updated successfully.');
@@ -169,21 +152,9 @@ class ItemController extends ResponseController
      */
     public function destroy(int $id)
     {
+        $item = Item::findOrFail($id);
         
-        $item = Item::find($id);
-
-        if (is_null($item)) {
-            return $this->sendError('Item not found.');
-        }
-
-        $belongs = Item::where('id','=',$id)
-                        ->where('store_id','=',Auth::user()->store_id)
-                        ->get();
-        
-        
-        if(count($belongs) == 0) {
-            return $this->sendError('Item does not belongs to the logged user.');
-        }
+        $this->authorize('isMyItem', $item);
 
         $item->delete();
 
@@ -196,10 +167,7 @@ class ItemController extends ResponseController
      */
     public function pagination(Request $request)
     {
-      // return $this->sendResponse($request->store_id, 'Items retrieved successfully.' );
-
         $sortArray = array("asc", "ASC", "desc", "DESC");
-
 
         $store_id = $request->store_id;
         // SearchOptions values
@@ -225,19 +193,19 @@ class ItemController extends ResponseController
         }
 
         $results = Item::
-                select('items.*')
+                select('items.*', 'units.code as unit')
                 // DB::raw('(select price from prices where item_id  = items.id order by created_at desc limit 1) as price')  
                 ->join('stores', function ($join) use($store_id){
                     $join->on('stores.id', '=', 'items.store_id')
                          ->where('items.store_id', '=', $store_id);
                 })
-                // ->leftJoin('prices', function ($join){
-                //     $join->on('items.id', '=', 'prices.item_id')
-                //          ->latest();
-                //         //  ->orderBy('prices.created_at', 'DESC')
-                //         //  ->take(1);
-                //         //  ->first();
-                // })
+                ->leftJoin('units', function ($join){
+                    $join->on('units.id', '=', 'items.unit_id')
+                         ->latest();
+                        //  ->orderBy('prices.created_at', 'DESC')
+                        //  ->take(1);
+                        //  ->first();
+                })
 
                 ->where('items.name', 'like', '%'. $searchValue .'%')
                 ->orWhere('items.description', 'like', '%'. $searchValue .'%')

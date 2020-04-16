@@ -13,8 +13,8 @@ $factory->define(Item::class, function (Faker $faker) {
         'description' => $faker->name,
         'price' => $faker->randomNumber(3),
         'stock' => 0,
-        'unit' => function () {
-            return factory(Unit::class)->create()->code;
+        'unit_id' => function () {
+            return factory(Unit::class)->create()->id;
         },
         // 'stocked' => intval($faker->boolean(100)),
         'stocked' => intval($faker->boolean),
