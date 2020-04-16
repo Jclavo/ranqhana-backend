@@ -2,9 +2,11 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+// use Illuminate\Database\Eloquent\Model;
+// use App\Unit;
+use App\BaseModel;
 
-class Unit extends Model
+class Unit extends BaseModel
 {
     /**
      * The attributes that are mass assignable.
@@ -12,6 +14,6 @@ class Unit extends Model
      * @var array
      */
     protected $fillable = [
-        'code', 'description'
+        'code', 'description', 'allow_decimal'
     ];
 }
