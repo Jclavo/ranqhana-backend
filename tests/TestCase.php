@@ -6,11 +6,13 @@ use App\User;
 use Illuminate\Support\Facades\Auth as Auth;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Tests\TestCaseBase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Faker;
 
 abstract class TestCase extends TestCaseBase
 {
     use CreatesApplication;
+    use RefreshDatabase;
 
     protected $baseRoute = null;
     protected $baseModel = null;
@@ -202,6 +204,31 @@ abstract class TestCase extends TestCaseBase
         $this->checkRecordInDatabase($model,$modelFactory,$this->databaseHas);
         
         return $response;
+    }
+
+    protected function softDestroy($attributes = [], $model = '', $route = '')
+    {
+        $route = $this->baseRoute ?? $route;
+        $model = $this->baseModel ?? $model;
+
+        $modelFactory = $this->factoryCreate($model, $attributes);
+
+        //Submit post request with autorizathion header
+        $response = $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+                         ->delete($route . $modelFactory->id);
+
+        $this->checkJSONResponse($response);
+         
+        //Check softDelete
+        $modelDB = new $model;
+        $this->assertSoftDeleted($modelDB->getTable(), $modelFactory->toArray());
+        
+        return $response;
+    }
+
+
+    protected function checkOptionCRUD($option){
+        !in_array($option, ['C','U']) ?  $this->assertEquals('OK','Unknown option.') : null;
     }
 
     // private function factoryCreate($class, $attributes = [], $times = null)
