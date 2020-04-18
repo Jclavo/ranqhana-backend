@@ -14,7 +14,7 @@ class AddStoreIdToUnitsTable extends Migration
     public function up()
     {
         Schema::table('units', function (Blueprint $table) {
-            $table->unsignedBigInteger('store_id')->default(0)->before('created_at');
+            $table->unsignedBigInteger('store_id')->nullable(true)->before('created_at');
         });
     }
 
