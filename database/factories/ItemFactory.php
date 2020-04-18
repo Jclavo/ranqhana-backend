@@ -13,14 +13,10 @@ $factory->define(Item::class, function (Faker $faker) {
         'description' => $faker->name,
         'price' => $faker->randomNumber(3),
         'stock' => 0,
-        'unit_id' => function () {
-            return factory(Unit::class)->create()->id;
-        },
+        'unit_id' => Unit::all()->random()->id,
         // 'stocked' => intval($faker->boolean(100)),
         'stocked' => intval($faker->boolean),
-        'store_id' => function () {
-            return factory(Store::class)->create()->id;
-        }
+        'store_id' => Store::all()->random()->id,
 
     ];
 });

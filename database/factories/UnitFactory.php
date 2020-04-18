@@ -11,8 +11,6 @@ $factory->define(Unit::class, function (Faker $faker) {
         'code' => strtoupper($faker->unique()->lexify('??')),
         'description' => $faker->name,
         'fractioned' => intval($faker->boolean),
-        'store_id' => function () {
-            return factory(Store::class)->create()->id;
-        }
+        'store_id' => Store::all()->random()->id,
     ];
 });
