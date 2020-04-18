@@ -2,8 +2,9 @@
 
 namespace App;
 use Illuminate\Support\Str;
-// use Illuminate\Support\Collection as BaseCollection;  
+use Illuminate\Support\Collection as BaseCollection;  
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Support\Facades\DB;
 
 class BaseModel extends Eloquent {
 
@@ -19,10 +20,50 @@ class BaseModel extends Eloquent {
             return parent::setAttribute($key, $value);
         }
 
-        return null;
-        //the next line are to get the database field type but I never tested it
-        //$this->table();
-        // DB::getSchemaBuilder()->getColumnType($tableName, $colName)
+        //the next line are to get the database field type
+        $type = DB::getSchemaBuilder()->getColumnType($this->getTable(), $key);
+
+
+        switch ($type) {
+            case 'int':
+            case 'integer':
+                $value = (int) 0;
+                break;
+            case 'real':
+            case 'decimal':
+            case 'float':
+            case 'double':
+                $value = (float) 0;
+                break;
+            case 'string':
+                $value = ''; 
+                break;
+            case 'bool':
+            case 'boolean':
+                $value = false;
+                break;
+            case 'object':
+            case 'array':
+            case 'json':
+                $value = [];
+                break;
+            case 'collection':
+                $value = new BaseCollection();
+                break;
+            case 'date':
+                $value = $this->asDate('0000-00-00');
+                break;
+            case 'datetime':
+                $value = $this->asDateTime('0000-00-00');
+                break;
+            case 'timestamp':
+                $value = $this->asTimestamp('0000-00-00');
+                break;
+            // default:
+            //     $value = null;
+        }
+
+        return parent::setAttribute($key, $value);
     }
 
 
