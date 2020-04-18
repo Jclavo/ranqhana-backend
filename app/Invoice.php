@@ -14,7 +14,7 @@ class Invoice extends BaseModel
      * @var array
      */
     protected $fillable = [
-        'serie', 'subtotal', 'taxes', 'discount', 'total', 'type', 'user_id'
+        'serie', 'subtotal', 'taxes', 'discount', 'total', 'type_id', 'user_id'
     ];
 
     /**

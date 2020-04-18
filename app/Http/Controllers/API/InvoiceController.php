@@ -10,8 +10,6 @@ use App\Http\Controllers\ResponseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-// use Illuminate\Support\Facades\Schema;
-// use Illuminate\Support\Facades\DB;
 
 use App\Http\Controllers\API\ItemController;
 
@@ -44,7 +42,31 @@ class InvoiceController extends ResponseController
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'subtotal' => 'required|numeric|gt:0',
+            'taxes' => 'numeric|gte:0|lt:subtotal',
+            'discount' => 'numeric|gte:0|lt:subtotal',
+            'type_id' => 'required|exists:invoice_types,id',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first());
+        }
+
+        $sellInvoice = new Invoice();
+        
+        $sellInvoice->serie    = $request->serie;
+        $sellInvoice->subtotal = $request->subtotal;
+        $sellInvoice->taxes    = $request->taxes;
+        $sellInvoice->discount = $request->discount;
+        $sellInvoice->total    = $sellInvoice->subtotal + $sellInvoice->taxes - $sellInvoice->discount;
+        $sellInvoice->type_id  = $request->type_id;
+        $sellInvoice->user_id  = Auth::user()->id;
+        $sellInvoice->store_id  = Auth::user()->store_id;
+        
+        $sellInvoice->save();
+
+        return $this->sendResponse($sellInvoice->toArray(), 'Sell invoice created successfully.');  
     }
 
     /**
@@ -191,32 +213,31 @@ class InvoiceController extends ResponseController
      * 
      */
 
-    public function createSellInvoice(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'subtotal' => 'required|numeric|between:0.01,99999.99',
-            // 'total' => 'required|numeric|between:0.01,99999.99',
-        ]);
+    // public function createSellInvoice(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'subtotal' => 'required|numeric|between:0.01,99999.99',
+    //     ]);
 
-        if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first());
-        }
+    //     if ($validator->fails()) {
+    //         return $this->sendError($validator->errors()->first());
+    //     }
 
-        $sellInvoice = new Invoice();
+    //     $sellInvoice = new Invoice();
         
-        // $sellInvoice->serie    = $request->serie;
-        $sellInvoice->subtotal = $request->subtotal;
-        $sellInvoice->taxes    = $request->taxes;
-        $sellInvoice->discount = $request->discount;
-        $sellInvoice->total    = $sellInvoice->subtotal + $sellInvoice->taxes - $sellInvoice->discount;
+    //     // $sellInvoice->serie    = $request->serie;
+    //     $sellInvoice->subtotal = $request->subtotal;
+    //     $sellInvoice->taxes    = $request->taxes;
+    //     $sellInvoice->discount = $request->discount;
+    //     $sellInvoice->total    = $sellInvoice->subtotal + $sellInvoice->taxes - $sellInvoice->discount;
 
-        $sellInvoice->type     = 'S';
-        $sellInvoice->user_id  = Auth::user()->id;
+    //     $sellInvoice->type     = 'S';
+    //     $sellInvoice->user_id  = Auth::user()->id;
         
-        $sellInvoice->save();
+    //     $sellInvoice->save();
 
-        return $this->sendResponse($sellInvoice->toArray(), 'Sell invoice created successfully.');  
-    }
+    //     return $this->sendResponse($sellInvoice->toArray(), 'Sell invoice created successfully.');  
+    // }
 
     public function createInvoiceDetail(Request $request)
     {
