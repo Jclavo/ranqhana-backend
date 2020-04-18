@@ -15,10 +15,13 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CountriesTableSeeder::class,
             StoresTableSeeder::class,
+            InvoiceTypesTableSeeder::class,
+            UnitsTableSeeder::class,
             
             UsersTableSeeder::class,
             ItemsTableSeeder::class,
-            UnitsTableSeeder::class,
+            
+            
         ]);
     }
 }
