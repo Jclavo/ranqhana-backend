@@ -17,10 +17,10 @@ class CreateInvoicesTable extends Migration
             $table->bigIncrements('id');
             $table->string('serie')->nullable(true);
             $table->decimal('subtotal',7,2);
-            $table->decimal('taxes',7,2)->default('0')->nullable(true);
-            $table->decimal('discount',7,2)->default('0')->nullable(true);
+            $table->decimal('taxes',7,2)->default('0');
+            $table->decimal('discount',7,2)->default('0');
             $table->decimal('total',7,2);
-            $table->enum('type', array('S','P'));
+            // $table->enum('type', array('S','P'));
             $table->timestamps();
 
         });
