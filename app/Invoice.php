@@ -2,10 +2,10 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\BaseModel;
 
-class Invoice extends Model
+class Invoice extends BaseModel 
 {
     use SoftDeletes;
     /**
@@ -16,4 +16,13 @@ class Invoice extends Model
     protected $fillable = [
         'serie', 'subtotal', 'taxes', 'discount', 'total', 'type', 'user_id'
     ];
+
+    /**
+     * The attributes that are cast.
+     */
+    protected $casts = [
+        // 'subtotal' => 'decimal:2',
+        //  'discount' => 'decimal:2',
+    ];
+ 
 }
