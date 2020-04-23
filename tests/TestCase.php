@@ -91,7 +91,8 @@ abstract class TestCase extends TestCaseBase
     protected function get_api_token()
     {
         // Generate an user object
-        $user = factory(User::class)->create(['country_code' => '55']);
+        // $user = factory(User::class)->create(['country_code' => '55']);
+        $user = factory(User::class)->create(['country_code' => '55', 'store_id' => 1]);
                 
         $user->password = 'secret';
         
