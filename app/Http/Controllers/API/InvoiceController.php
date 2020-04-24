@@ -166,7 +166,7 @@ class InvoiceController extends ResponseController
         $searchValue   = $request->searchOption['searchValue'];
         $fromDate      = $request->searchOption['fromDate'];
         $toDate        = $request->searchOption['toDate'];
-        $type          = $request->searchOption['type'];
+        $type_id       = $request->searchOption['type_id'];
 
         // Initialize values if they are empty.
         if (empty($per_page)) {
@@ -190,7 +190,7 @@ class InvoiceController extends ResponseController
 
         $query->select('invoices.*');
 
-        $query->where('type', '=', $type);
+        $query->where('type_id', '=', $type_id);
 
         $query->when((!empty($searchValue)), function ($q) use($searchValue) {
             return $q->where('serie', 'like', '%'. $searchValue .'%')
