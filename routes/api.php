@@ -32,8 +32,11 @@ Route::middleware(['auth:api'])->group(function () {
     Route::resource('invoices', 'API\InvoiceController');
     Route::post('invoices/pagination', 'API\InvoiceController@pagination');
     // sell invoice
-    Route::post('sellInvoices', 'API\InvoiceController@createSellInvoice');
-    Route::post('invoiceDetails', 'API\InvoiceController@createInvoiceDetail');
+    // Route::post('sellInvoices', 'API\InvoiceController@createSellInvoice');
+    //Route::post('invoiceDetails', 'API\InvoiceController@createInvoiceDetail');
+
+    //Invoice details
+    Route::resource('invoiceDetails', 'API\InvoiceDetailController');
 
     //Unit
     Route::resource('units', 'API\UnitController');
