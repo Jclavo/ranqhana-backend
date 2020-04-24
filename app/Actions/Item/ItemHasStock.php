@@ -17,13 +17,13 @@ class ItemHasStock
     {
         if(!$this->item->hasStock()) return false;
 
-        if($this->$quantity > $this->item->stock) return false;
+        if($this->quantity > $this->item->stock) return false;
         
         return true;
     }    
     
     public function message()
     {
-        return 'There is not stock for product ' . $this->item->id;
+        return 'There is not stock for item ' . $this->item->id;
     }
 }
