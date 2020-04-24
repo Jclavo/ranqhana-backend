@@ -730,4 +730,36 @@ class ItemTest extends TestCase
         }
     }
 
+
+    //TESTING MODEL
+    public function test_item_has_stock()
+    {
+        $item = factory(Item::class)->create(['stock' => $this->faker->randomNumber(4, $strict = true)]);
+
+        $this->assertTrue($item->hasStock());
+    }
+
+    public function test_item_increase_stock()
+    {
+        $item = factory(Item::class)->create(['stock' => $this->faker->randomNumber(3, $strict = true)]);
+
+        $item->increaseStock($this->faker->randomNumber(1, $strict = true));
+
+        $item->save();
+
+        $this->assertDatabaseHas('items', $item->toArray());
+    }
+
+    public function test_item_decrease_stock()
+    {
+        $item = factory(Item::class)->create(['stock' => $this->faker->randomNumber(3, $strict = true)]);
+
+        $item->decreaseStock($this->faker->randomNumber(1, $strict = true));
+
+        $item->save();
+
+        $this->assertDatabaseHas('items', $item->toArray());
+    }
+    
+
 }

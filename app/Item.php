@@ -16,5 +16,25 @@ class Item extends Model
     protected $fillable = [
         'name', 'description', 'stock', 'store_id', 'unit_id'
     ];
+
+
+    //Custom functions
+    public function getStockAttribute(){
+        return $this->attributes['stock'];
+    }
+
+    public function hasStock()
+    {
+        if ($this->stock > 1) return true;
+        return false;
+    }
+
+    public function increaseStock($quantity){
+        $this->stock = $this->stock + $quantity;
+    }
+
+    public function decreaseStock($quantity){
+        $this->stock = $this->stock - $quantity;
+    }
 }
  
