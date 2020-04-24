@@ -239,42 +239,42 @@ class InvoiceController extends ResponseController
     //     return $this->sendResponse($sellInvoice->toArray(), 'Sell invoice created successfully.');  
     // }
 
-    public function createInvoiceDetail(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'item_id'    => 'required|integer',
-            'quantity'   => 'required|integer|min:1',
-            'price'      => 'required|numeric|between:0.01,99999.99',
-            // 'total'      => 'required|numeric|between:0.01,99999.99',
-            'invoice_id' => 'required|integer',
-        ]);
+    // public function createInvoiceDetail(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'item_id'    => 'required|integer',
+    //         'quantity'   => 'required|integer|min:1',
+    //         'price'      => 'required|numeric|between:0.01,99999.99',
+    //         // 'total'      => 'required|numeric|between:0.01,99999.99',
+    //         'invoice_id' => 'required|integer',
+    //     ]);
 
-        if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first());
-        }
+    //     if ($validator->fails()) {
+    //         return $this->sendError($validator->errors()->first());
+    //     }
 
-        // update stock
-        $itemController = new ItemController();
-        $stockResponse = $itemController->updateStock($request->item_id, $request->quantity);
+    //     // update stock
+    //     $itemController = new ItemController();
+    //     $stockResponse = $itemController->updateStock($request->item_id, $request->quantity);
 
-        if(json_decode($stockResponse->content(),true)['status']){
+    //     if(json_decode($stockResponse->content(),true)['status']){
             
-            $invoiceDetail = new InvoiceDetail();
+    //         $invoiceDetail = new InvoiceDetail();
         
-            $invoiceDetail->item_id    = $request->item_id;
-            $invoiceDetail->quantity   = $request->quantity;
-            $invoiceDetail->price      = $request->price;
-            $invoiceDetail->total      = $invoiceDetail->quantity * $invoiceDetail->price;
-            $invoiceDetail->invoice_id = $request->invoice_id;
+    //         $invoiceDetail->item_id    = $request->item_id;
+    //         $invoiceDetail->quantity   = $request->quantity;
+    //         $invoiceDetail->price      = $request->price;
+    //         $invoiceDetail->total      = $invoiceDetail->quantity * $invoiceDetail->price;
+    //         $invoiceDetail->invoice_id = $request->invoice_id;
             
-            $invoiceDetail->save();
+    //         $invoiceDetail->save();
 
-            return $this->sendResponse($invoiceDetail->toArray(), 'Invoice detail created successfully.');
-        }
-        else{
-            return $this->sendError(json_decode($stockResponse->content(),true)['message']);
-        }
-    }
+    //         return $this->sendResponse($invoiceDetail->toArray(), 'Invoice detail created successfully.');
+    //     }
+    //     else{
+    //         return $this->sendError(json_decode($stockResponse->content(),true)['message']);
+    //     }
+    // }
 
     
 }

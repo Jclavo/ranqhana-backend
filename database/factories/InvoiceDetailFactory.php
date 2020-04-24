@@ -9,7 +9,8 @@ use Faker\Generator as Faker;
 
 $factory->define(InvoiceDetail::class, function (Faker $faker) {
 
-    $quantity = $faker->randomNumber(2);
+    // defineAs
+    $quantity = $faker->randomNumber(2, $strict = true);
     $price    = $faker->randomNumber(2, $strict = true);
     $total    = $quantity * $price;
 
@@ -19,7 +20,7 @@ $factory->define(InvoiceDetail::class, function (Faker $faker) {
         },
         'quantity' => $quantity,
         'price' => $price,
-        'total' => $total,
+        'total' => 0,
         'invoice_id' => function () {
             return factory(Invoice::class)->create()->id;
         },

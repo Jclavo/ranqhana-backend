@@ -18,7 +18,7 @@ $factory->define(Invoice::class, function (Faker $faker) {
         'subtotal' => $faker->randomNumber(4, $strict = true),
         'taxes' => $faker->randomNumber(1),
         'discount' => $faker->randomNumber(1),
-        //'total' => $subtotal - $discount,
+        'total' => 0,
         //'type_id' => $faker->randomElement(['1', '2']),
         'type_id' => InvoiceTypes::all()->random()->id,
         'user_id' => function () {
