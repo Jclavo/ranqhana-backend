@@ -282,7 +282,7 @@ class InvoiceDetailTest extends TestCase
         $this->get_api_token();
 
         //models needed
-        $item = factory(Item::class)->create(['store_id' => auth()->user()->store_id, 'stocked' => false]);
+        $item = factory(Item::class)->create(['store_id' => auth()->user()->store_id, 'stock' => 0, 'stocked' => false]);
         $invoice = factory(Invoice::class)->create(['store_id' => auth()->user()->store_id ]);
         
 
@@ -308,7 +308,7 @@ class InvoiceDetailTest extends TestCase
         //Check that stock is updated
         $itemUpdate = Item::findOrFail($item->id);
 
-        $this->assertLessThan($item->stock, $itemUpdate->stock);
+        $this->assertEquals($itemUpdate->stock, 0);
     }
 
     public function test_invoice_detail_create_ok()
