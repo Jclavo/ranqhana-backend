@@ -77,9 +77,9 @@ class InvoiceDetailController extends ResponseController
         $invoiceDetail->invoice_id = $request->invoice_id;
         $invoiceDetail->calculateTotal();
 
-        $this->businessValidations([
-            new InvoiceHasEnoughSubtotal($invoice, $invoiceDetail)
-        ]);
+        $this->businessValidations([ new InvoiceHasEnoughSubtotal($invoice, $invoiceDetail)], 
+                                   [ new InvoiceAnull($invoice)]
+        );
 
         $invoiceDetail->save();
 
