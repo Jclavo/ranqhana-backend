@@ -26,3 +26,21 @@ $factory->define(InvoiceDetail::class, function (Faker $faker) {
         },
     ];
 });
+
+$factory->defineAs(InvoiceDetail::class,'full', function (Faker $faker) {
+
+    $item = factory(Item::class)->create();
+    $quantity = $faker->randomNumber(2, $strict = true);
+    $price    = $item->price;
+    $total    = $quantity * $price;
+
+    return [
+        'item_id' => $item->id,
+        'quantity' => $quantity,
+        'price' => $price,
+        'total' => $total,
+        'invoice_id' => function () {
+            return factory(Invoice::class)->create()->id;
+        },
+    ];
+});

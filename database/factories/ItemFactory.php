@@ -10,9 +10,9 @@ use Faker\Generator as Faker;
 $factory->define(Item::class, function (Faker $faker) {
     return [
         'name' => $faker->name,
-        'description' => $faker->name,
-        'price' => $faker->randomNumber(3),
-        'stock' => 0,
+        'description' => $faker->text(),
+        'price' => $faker->randomNumber(2, $strict = true),
+        'stock' => $faker->randomNumber(3, $strict = true),
         'unit_id' => Unit::all()->random()->id,
         // 'stocked' => intval($faker->boolean(100)),
         'stocked' => intval($faker->boolean),
