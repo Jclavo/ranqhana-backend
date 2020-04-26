@@ -15,6 +15,8 @@ class ItemHasStock
     
     public function passes()
     {
+        if(!$this->item->stocked) return true;
+
         if(!$this->item->hasStock()) return false;
 
         if($this->quantity > $this->item->stock) return false;
