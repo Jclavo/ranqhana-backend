@@ -14,7 +14,7 @@ class Invoice extends BaseModel
      * @var array
      */
     protected $fillable = [
-        'serie', 'subtotal', 'taxes', 'discount', 'total', 'type_id', 'user_id'
+        'serie', 'subtotal', 'taxes', 'discount', 'total', 'type_id', 'stage', 'user_id'
     ];
 
     /**
@@ -24,5 +24,20 @@ class Invoice extends BaseModel
         // 'subtotal' => 'decimal:2',
         //  'discount' => 'decimal:2',
     ];
+
+    //Custom functions
+    // public function getStockAttribute(){
+    //     return $this->attributes['stock'];
+    // }
+
+    public function setStageAnulled()
+    {
+        $this->stage = 'A';
+    }
+
+    public function setStagePaid()
+    {
+        $this->stage = 'P';
+    }
  
 }
