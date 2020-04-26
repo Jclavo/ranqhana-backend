@@ -32,12 +32,11 @@ class ResponseController extends Controller
     {
         foreach ($objectives as $objective) {
             if (!$objective->passes()){
-                abort(200, $objective->message());  
                 
                 foreach ($errorObjectives as $errorObjective) {
                     $errorObjective->execute();
                 }
-
+                abort(200, $objective->message());  
                 break; 
             } 
         }
