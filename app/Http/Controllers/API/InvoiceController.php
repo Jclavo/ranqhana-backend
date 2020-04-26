@@ -63,6 +63,9 @@ class InvoiceController extends ResponseController
         $sellInvoice->type_id  = $request->type_id;
         $sellInvoice->user_id  = Auth::user()->id;
         $sellInvoice->store_id  = Auth::user()->store_id;
+
+        //Update stage
+        $sellInvoice->setStagePaid();
         
         $sellInvoice->save();
 
