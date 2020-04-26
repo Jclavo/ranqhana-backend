@@ -16,10 +16,6 @@ class BelongsToStore
     
     public function passes()
     {
-        // if(!$this->item->hasStock()) return false;
-
-        // if($this->quantity > $this->item->stock) return false;
-
         foreach ($this->models as $model) {
             if ($this->user->store_id != $model->store_id ){
                 $this->baseClass = class_basename($model);
