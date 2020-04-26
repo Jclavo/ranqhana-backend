@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             CountriesTableSeeder::class,
             StoresTableSeeder::class,
             InvoiceTypesTableSeeder::class,
+            InvoiceStagesTableSeeder::class,
             UnitsTableSeeder::class,
             
             UsersTableSeeder::class,
