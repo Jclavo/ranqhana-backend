@@ -6,6 +6,7 @@ use App\InvoiceDetail;
 use App\Item;
 use App\Invoice;
 use App\Store;
+use App\Unit;
 
 use Carbon\Carbon;
 use Tests\TestCase;
@@ -158,8 +159,11 @@ class InvoiceDetailTest extends TestCase
 
     public function test_invoice_detail_create_without_stock()
     {
+        //Authentication
+        $this->get_api_token();
+
         //models needed
-        $item = factory(Item::class)->create();
+        $item = factory(Item::class)->create(['store_id' => auth()->user()->store_id, 'stock' => 0, 'stocked' => true]);
 
         //set db checking
         $this->setDatabaseHas(false);
@@ -170,17 +174,17 @@ class InvoiceDetailTest extends TestCase
         array_push($assertsJson,['message' => 'There is not stock for item '. $item->id]);
         $this->setAssertJson($assertsJson);
 
-        //Authentication
-        $this->get_api_token();
-
         //run option
         $this->create(['item_id' => $item->id]);
     }
 
     public function test_invoice_detail_create_check_invoice_date()
     {
+        //Authentication
+        $this->get_api_token();
+
         //models needed
-        $item = factory(Item::class)->create(['stock' => $this->faker->randomNumber(3, $strict = true) ]);
+        $item = factory(Item::class)->create(['store_id' => auth()->user()->store_id,'stock' => $this->faker->randomNumber(3, $strict = true) ]);
         // $invoice = factory(Invoice::class)->create(['created_at' => Carbon::now()->subDay() ]);
         $invoice = factory(Invoice::class)->create(['created_at' => Carbon::now()->subMinute(2) ]);
 
@@ -192,9 +196,6 @@ class InvoiceDetailTest extends TestCase
         array_push($assertsJson,['status' => false]);
         array_push($assertsJson,['message' => 'Invoice is out the date range.' ]);
         $this->setAssertJson($assertsJson);
-
-        //Authentication
-        $this->get_api_token();
 
         //run option
         $response = $this->create(['item_id' => $item->id, 'invoice_id' => $invoice->id]);
@@ -216,7 +217,7 @@ class InvoiceDetailTest extends TestCase
 
         //Authentication
         $this->get_api_token();
-
+        
         //run option
         $response = $this->create(['item_id' => $item->id]);
 
@@ -273,6 +274,41 @@ class InvoiceDetailTest extends TestCase
         //run option
         $response = $this->create(['item_id' => $item->id, 'invoice_id' => $invoice->id]);
 
+    }
+
+    public function test_invoice_detail_create_ok_item_not_stocked()
+    {
+        //Authentication
+        $this->get_api_token();
+
+        //models needed
+        $item = factory(Item::class)->create(['store_id' => auth()->user()->store_id, 'stocked' => false]);
+        $invoice = factory(Invoice::class)->create(['store_id' => auth()->user()->store_id ]);
+        
+
+        //set db checking
+        $this->setDatabaseHas(false);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => true]);
+        array_push($assertsJson,['message' => 'Invoice detail created successfully.' ]);
+        $this->setAssertJson($assertsJson);
+
+        //Authentication
+        $this->get_api_token();
+
+        //run option
+        $response = $this->create(['item_id' => $item->id, 'price' => $item->price, 'invoice_id' => $invoice->id,
+                                   'quantity' => 1]);
+
+        //Check that invoice details was created successfully
+        $this->assertDatabaseHas('invoice_details', json_decode($response->content(),true)['result']);
+
+        //Check that stock is updated
+        $itemUpdate = Item::findOrFail($item->id);
+
+        $this->assertLessThan($item->stock, $itemUpdate->stock);
     }
 
     public function test_invoice_detail_create_ok()
