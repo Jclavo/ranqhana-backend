@@ -30,11 +30,12 @@ class Item extends Model
     }
 
     public function increaseStock($quantity){
-        $this->stock = $this->stock + $quantity;
+        $this->stocked ? $this->stock = $this->stock + $quantity : null;
+        
     }
 
     public function decreaseStock($quantity){
-        $this->stock = $this->stock - $quantity;
+        $this->stocked ? $this->stock = $this->stock - $quantity: null;
     }
 }
  
