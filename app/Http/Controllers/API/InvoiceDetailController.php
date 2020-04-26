@@ -9,6 +9,7 @@ use App\Item;
 use App\Actions\Item\ItemHasStock;
 use App\Actions\Invoice\InvoiceIsOpened;
 use App\Actions\Invoice\InvoiceHasEnoughSubtotal;
+use App\Actions\Invoice\InvoiceAnull;
 use App\Actions\BelongsToStore;
 
 use App\Http\Controllers\ResponseController;
@@ -61,11 +62,11 @@ class InvoiceDetailController extends ResponseController
         $item = Item::findOrFail($request->item_id);
         $invoice = Invoice::findOrFail($request->invoice_id);
 
-        $this->business([
+        $this->businessValidations([
             new ItemHasStock($item , $request->quantity),
             new InvoiceIsOpened($invoice),
             new BelongsToStore(Auth::user(), [$item , $invoice ]),
-        ]);
+        ], [ new InvoiceAnull($invoice)]);
 
            
         $invoiceDetail = new InvoiceDetail();
@@ -76,7 +77,7 @@ class InvoiceDetailController extends ResponseController
         $invoiceDetail->invoice_id = $request->invoice_id;
         $invoiceDetail->calculateTotal();
 
-        $this->business([
+        $this->businessValidations([
             new InvoiceHasEnoughSubtotal($invoice, $invoiceDetail)
         ]);
 
