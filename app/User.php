@@ -36,4 +36,18 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+
+    /**
+     * Prepare a date for array / JSON serialization.
+     *
+     * @param  \DateTimeInterface  $date
+     * @return string
+     */
+    protected function serializeDate($date)
+    {
+        $carbonInstance = \Carbon\Carbon::instance($date);
+
+        return $carbonInstance->toISOString();
+    }
 }
