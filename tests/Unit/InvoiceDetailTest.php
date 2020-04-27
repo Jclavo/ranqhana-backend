@@ -319,7 +319,7 @@ class InvoiceDetailTest extends TestCase
         //models needed
         $invoice = factory(Invoice::class)->create(['store_id' => auth()->user()->store_id ]);
                                                     // 'sub' => $this->faker->randomNumber(3, $strict = true)]);
-        $item = factory(Item::class)->create(['stock' => $this->faker->randomNumber(3, $strict = true),
+        $item = factory(Item::class)->create(['stock' => $this->faker->randomNumber(3, $strict = true), 'stocked' => true,
                                               'store_id' => auth()->user()->store_id]);
 
         //set db checking
