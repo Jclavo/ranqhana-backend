@@ -29,15 +29,16 @@ class ResponseController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function businessValidations($objectives, $errorObjectives = [])
+    public function businessValidations($validations, $actions = [])
     {
-        foreach ($objectives as $objective) {
-            if (!$objective->passes()){
+        foreach ($validations as $validation) {
+            if (!$validation->passes()){
                 
-                foreach ($errorObjectives as $errorObjective) {
-                    $errorObjective->execute();
-                }
-                abort(200, $objective->message());  
+                // foreach ($errorObjectives as $errorObjective) {
+                //     $errorObjective->execute();
+                // }
+                $this->businessActions($actions);
+                abort(200, $validation->message());  
                 break; 
             } 
         }
@@ -46,7 +47,10 @@ class ResponseController extends Controller
     public function businessActions($actions)
     {
         foreach ($actions as $action) {
-            $action->execute();
+            if (!$action->execute()){
+                abort(200, $action->message());  
+                break; 
+            } 
         }
     }
   
