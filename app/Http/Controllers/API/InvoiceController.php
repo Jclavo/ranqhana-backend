@@ -10,6 +10,7 @@ use App\Http\Controllers\ResponseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use App\Actions\Invoice\InvoiceAnull;
 
 use App\Http\Controllers\API\ItemController;
 
@@ -216,68 +217,23 @@ class InvoiceController extends ResponseController
      * 
      */
 
-    // public function createSellInvoice(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'subtotal' => 'required|numeric|between:0.01,99999.99',
-    //     ]);
+    public function anull(int $id)
+    {
+        $invoice = Invoice::findOrFail($id);
 
-    //     if ($validator->fails()) {
-    //         return $this->sendError($validator->errors()->first());
-    //     }
+        // $belongs = User::where('id','=',Auth::user()->id)
+        //                 ->where('store_id','=',Auth::user()->store_id)
+        //                 ->get();
+        // if(count($belongs) == 0) {
+        //     return $this->sendError('Invoice does not belongs to the logged user.');
+        // }
 
-    //     $sellInvoice = new Invoice();
-        
-    //     // $sellInvoice->serie    = $request->serie;
-    //     $sellInvoice->subtotal = $request->subtotal;
-    //     $sellInvoice->taxes    = $request->taxes;
-    //     $sellInvoice->discount = $request->discount;
-    //     $sellInvoice->total    = $sellInvoice->subtotal + $sellInvoice->taxes - $sellInvoice->discount;
+        // $invoice->delete();
+        $this->businessActions([ new InvoiceAnull($invoice)]);
 
-    //     $sellInvoice->type     = 'S';
-    //     $sellInvoice->user_id  = Auth::user()->id;
-        
-    //     $sellInvoice->save();
+        return $this->sendResponse($invoice->toArray(), 'Invoice Anulled successfully.');
+    }
 
-    //     return $this->sendResponse($sellInvoice->toArray(), 'Sell invoice created successfully.');  
-    // }
-
-    // public function createInvoiceDetail(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'item_id'    => 'required|integer',
-    //         'quantity'   => 'required|integer|min:1',
-    //         'price'      => 'required|numeric|between:0.01,99999.99',
-    //         // 'total'      => 'required|numeric|between:0.01,99999.99',
-    //         'invoice_id' => 'required|integer',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return $this->sendError($validator->errors()->first());
-    //     }
-
-    //     // update stock
-    //     $itemController = new ItemController();
-    //     $stockResponse = $itemController->updateStock($request->item_id, $request->quantity);
-
-    //     if(json_decode($stockResponse->content(),true)['status']){
-            
-    //         $invoiceDetail = new InvoiceDetail();
-        
-    //         $invoiceDetail->item_id    = $request->item_id;
-    //         $invoiceDetail->quantity   = $request->quantity;
-    //         $invoiceDetail->price      = $request->price;
-    //         $invoiceDetail->total      = $invoiceDetail->quantity * $invoiceDetail->price;
-    //         $invoiceDetail->invoice_id = $request->invoice_id;
-            
-    //         $invoiceDetail->save();
-
-    //         return $this->sendResponse($invoiceDetail->toArray(), 'Invoice detail created successfully.');
-    //     }
-    //     else{
-    //         return $this->sendError(json_decode($stockResponse->content(),true)['message']);
-    //     }
-    // }
 
     
 }

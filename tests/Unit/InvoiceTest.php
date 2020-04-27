@@ -343,11 +343,13 @@ class InvoiceTest extends TestCase
 
     public function test_invoice_anull_ok()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
+        // // get api token from authenticate user
+        // $api_token = $this->get_api_token();
+         //Authentication
+         $this->get_api_token();
 
         // Generate a item 
-        $invoice = factory(Invoice::class)->create(['type' => 'S']);
+        $invoice = factory(Invoice::class,'full')->create(['type_id' => '1']);
         
         //Verify in the database
         $this->assertDatabaseHas('invoices', $invoice->toArray());
@@ -355,15 +357,19 @@ class InvoiceTest extends TestCase
         //Submit post request with autorizathion header
         $response = 
         
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->delete('api/invoices/' . $invoice->id);
+        $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+              ->get('api/invoices/anull/' . $invoice->id);
         
         // Verify status 200 
         $response->assertStatus(200);
+
+        //Verify in the database
+        $invoice->setStageAnulled();
+        $this->assertDatabaseHas('invoices', $invoice->toArray());
         
         // Verify values in response
         $response->assertJson(['status' => true]);
-        $response->assertJson(['message' => 'Invoice Anulled/Canceled successfully.']);
+        $response->assertJson(['message' => 'Invoice Anulled successfully.']);
          
     }
 
