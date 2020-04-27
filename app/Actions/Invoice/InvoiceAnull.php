@@ -17,6 +17,8 @@ class InvoiceAnull
     
     public function execute()
     {
+        if($this->invoice->stage == 'A') return false; 
+
         $invoice_id = $this->invoice->id;
         $results = Invoice::
                 select('invoices.id', 'invoice_details.item_id', 'invoice_details.quantity' )
@@ -37,5 +39,10 @@ class InvoiceAnull
         $this->invoice->save();
         
         return true;
+    }
+
+    public function message()
+    {
+        return 'Invoice has already been anulled';
     }
 }
