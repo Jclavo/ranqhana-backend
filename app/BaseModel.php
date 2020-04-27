@@ -66,6 +66,19 @@ class BaseModel extends Eloquent {
         return parent::setAttribute($key, $value);
     }
 
+    /**
+     * Prepare a date for array / JSON serialization.
+     *
+     * @param  \DateTimeInterface  $date
+     * @return string
+     */
+    protected function serializeDate($date)
+    {
+        $carbonInstance = \Carbon\Carbon::instance($date);
+
+        return $carbonInstance->toISOString();
+    }
+
 
 
     // public function getAttribute($key)
