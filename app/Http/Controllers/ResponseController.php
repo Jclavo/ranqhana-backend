@@ -24,6 +24,7 @@ class ResponseController extends Controller
      * Enforces business objectives.
      *
      * @param  array $objectives
+     * @param  array $errorObjectives
      * @return void
      *
      * @throws \Illuminate\Validation\ValidationException
@@ -39,6 +40,13 @@ class ResponseController extends Controller
                 abort(200, $objective->message());  
                 break; 
             } 
+        }
+    }
+
+    public function businessActions($actions)
+    {
+        foreach ($actions as $action) {
+            $action->execute();
         }
     }
   
