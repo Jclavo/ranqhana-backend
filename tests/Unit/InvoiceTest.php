@@ -329,24 +329,22 @@ class InvoiceTest extends TestCase
         //Submit post request with autorizathion header
         $response = 
         
-        $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-              ->delete('api/invoices/' . '0');
+        $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+              ->get('api/invoices/anull/' . '0');
         
         // Verify status 200 
         $response->assertStatus(200);
         
         // Verify values in response
         $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'Invoice not found.']);
+        $response->assertJson(['message' => 'No query results for model [App\\Invoice] 0']);
          
     }
 
     public function test_invoice_anull_ok()
     {
-        // // get api token from authenticate user
-        // $api_token = $this->get_api_token();
-         //Authentication
-         $this->get_api_token();
+        //Authentication
+        $this->get_api_token();
 
         // Generate a item 
         $invoice = factory(Invoice::class,'full')->create(['type_id' => '1']);
