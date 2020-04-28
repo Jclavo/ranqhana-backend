@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Actions\Invoice\InvoiceAnull;
 
 use App\Http\Controllers\API\ItemController;
+use Carbon\Carbon;
 
 class InvoiceController extends ResponseController
 {
@@ -172,6 +173,13 @@ class InvoiceController extends ResponseController
         $toDate        = $request->searchOption['toDate'];
         $type_id       = $request->searchOption['type_id'];
 
+        //change date format
+        $fromDate = Carbon::createFromFormat('Y-m-d H:i:s', $fromDate . ' 00:00:00', 'America/Sao_Paulo');
+        $fromDate->setTimezone('UTC');
+
+        $toDate = Carbon::createFromFormat('Y-m-d H:i:s', $toDate . ' 23:59:59', 'America/Sao_Paulo');
+        $toDate->setTimezone('UTC');
+        
         // Initialize values if they are empty.
         if (empty($per_page)) {
             $per_page = 20;
