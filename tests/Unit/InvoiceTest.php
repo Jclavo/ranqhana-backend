@@ -14,7 +14,9 @@ class InvoiceTest extends TestCase
         $this->seed();
         $this->setBaseRoute('invoices');
         $this->setBaseModel('App\Invoice');
-        $this->setFaker();   
+        $this->setFaker(); 
+        // $this->setFieldsDatabaseHas(['id', 'subtotal', 'created_at']);
+        $this->setFieldsDatabaseHas(['id', 'subtotal', 'taxes', 'discount', 'total', 'user_id', 'type_id', 'store_id', 'stage']);  
     }
 
 
@@ -346,11 +348,15 @@ class InvoiceTest extends TestCase
         //Authentication
         $this->get_api_token();
 
+        // db config
+        $this->setDatabaseHas(true);
+
         // Generate a item 
         $invoice = factory(Invoice::class,'full')->create(['type_id' => '1']);
         
         //Verify in the database
-        $this->assertDatabaseHas('invoices', $invoice->toArray());
+        
+        $this->checkRecordInDB();
 
         //Submit post request with autorizathion header
         $response = 
@@ -361,9 +367,12 @@ class InvoiceTest extends TestCase
         // Verify status 200 
         $response->assertStatus(200);
 
-        //Verify in the database
+        //Set Anulled value
         $invoice->setStageAnulled();
-        $this->assertDatabaseHas('invoices', $invoice->toArray());
+
+        //Verify in the database
+        $this->setResultResponse($response);
+        $this->checkRecordInDB();
         
         // Verify values in response
         $response->assertJson(['status' => true]);
