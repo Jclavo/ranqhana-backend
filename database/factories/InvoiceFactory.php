@@ -27,6 +27,7 @@ $factory->define(Invoice::class, function (Faker $faker) {
         'store_id' => function () {
             return factory(Store::class)->create()->id;
         },
+        'stage' => 'P',
 
     ];
 });
