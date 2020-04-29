@@ -69,10 +69,19 @@ abstract class TestCase extends TestCaseBase
             $this->response = $response; 
         }
 
-        if(!empty($this->response)){
-            $this->resultResponse = json_decode($this->response->content(),true)['result']; 
+        if(!empty($this->response)){  
+            if(array_key_exists('result', json_decode($this->response->content(),true))){
+                $this->resultResponse = json_decode($this->response->content(),true)['result'];
+            }          
         }
         
+    }
+
+    protected function setResultResponseSimple($response){
+
+        if(!empty($response)){
+            $this->resultResponse = $response; 
+        }        
     }
 
     protected function checkJSONResponse($response){
@@ -203,7 +212,9 @@ abstract class TestCase extends TestCaseBase
         $modelFactory = $this->factoryCreate($model, $attributesMandatory);
 
         // Verify in the db
+        $this->setResultResponseSimple($modelFactory->toArray());
         $this->checkRecordInDatabase($model,$modelFactory,true);
+        $this->resultResponse = null;
 
         $modelFactoryNew = $this->factoryMake($model, $attributes);
 
