@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Actions\Invoice\InvoiceAnull;
+use App\Actions\BelongsToStore;
 
 use App\Http\Controllers\API\ItemController;
 use Carbon\Carbon;
@@ -105,26 +106,18 @@ class InvoiceController extends ResponseController
      */
     public function update(int $id, Request $request)
     {
-        // $validator = Validator::make($request->all(), [
-        //     'invoice_id' => 'required|integer',
-        // ]);
+        $invoice = Invoice::findOrFail($id);
 
-        // if ($validator->fails()) {
-        //     return $this->sendError($validator->errors()->first());
-        // }
+        $this->businessValidations([
+            new BelongsToStore(Auth::user(), [$invoice]),
+        ]);
 
-        $sellInvoice = Invoice::find($id);
-
-        if (is_null($sellInvoice)) {
-            return $this->sendError('Invoice not found.');
-        }
-
-        $sellInvoice->serie    = $request->serie;
+        $invoice->serie    = $request->serie;
         // $sellInvoice->client   = $request->client;
 
-        $sellInvoice->save();
+        $invoice->save();
 
-        return $this->sendResponse($sellInvoice->toArray(), 'Sell invoice updated successfully.');  
+        return $this->sendResponse($invoice->toArray(), 'Invoice updated successfully.');  
     }
 
     /**
@@ -133,27 +126,27 @@ class InvoiceController extends ResponseController
      * @param  \App\Invoice  $invoice
      * @return \Illuminate\Http\Response
      */
-    public function destroy(int $id)
-    {
-        $invoice = Invoice::find($id);
+    // public function destroy(int $id)
+    // {
+    //     $invoice = Invoice::find($id);
 
-        if (is_null($invoice)) {
-            return $this->sendError('Invoice not found.');
-        }
+    //     if (is_null($invoice)) {
+    //         return $this->sendError('Invoice not found.');
+    //     }
 
-        $belongs = User::where('id','=',Auth::user()->id)
-                        ->where('store_id','=',Auth::user()->store_id)
-                        ->get();
+    //     $belongs = User::where('id','=',Auth::user()->id)
+    //                     ->where('store_id','=',Auth::user()->store_id)
+    //                     ->get();
         
         
-        if(count($belongs) == 0) {
-            return $this->sendError('Invoice does not belongs to the logged user.');
-        }
+    //     if(count($belongs) == 0) {
+    //         return $this->sendError('Invoice does not belongs to the logged user.');
+    //     }
 
-        $invoice->delete();
+    //     $invoice->delete();
 
-        return $this->sendResponse($invoice->toArray(), 'Invoice Anulled/Canceled successfully.');
-    }
+    //     return $this->sendResponse($invoice->toArray(), 'Invoice Anulled/Canceled successfully.');
+    // }
 
     /**
      * 
@@ -229,14 +222,10 @@ class InvoiceController extends ResponseController
     {
         $invoice = Invoice::findOrFail($id);
 
-        // $belongs = User::where('id','=',Auth::user()->id)
-        //                 ->where('store_id','=',Auth::user()->store_id)
-        //                 ->get();
-        // if(count($belongs) == 0) {
-        //     return $this->sendError('Invoice does not belongs to the logged user.');
-        // }
+        $this->businessValidations([
+            new BelongsToStore(Auth::user(), [$invoice]),
+        ]);
 
-        // $invoice->delete();
         $this->businessActions([ new InvoiceAnull($invoice)]);
 
         return $this->sendResponse($invoice->toArray(), 'Invoice Anulled successfully.');

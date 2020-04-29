@@ -256,70 +256,46 @@ class InvoiceTest extends TestCase
     }
 
 
-
-
-
     // FUNCTION: update
 
-    public function test_invoice_updated_invoice_id_not_found()
+    public function test_invoice_update_from_another_store()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
+        // Set Database has
+        $this->setDatabaseHas(false);
 
-        // Generate a invoice detail object
-        $sellInvoice = factory(Invoice::class)->create(['serie' => '', 'type' => 'S']);
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['message' => 'Invoice does not belong to current store.']);
+        $this->setAssertJson($assertsJson);
 
-        //Verify in the database
-        $this->assertDatabaseHas('invoices', $sellInvoice->toArray());
+        //Authentication
+        $this->get_api_token();
 
-         // Set values to Update
-        $sellInvoice->serie = 'AB-123';
-
-        //Submit post request with autorizathion header
-        $response = $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-                         ->put('api/invoices/0',  $sellInvoice->toArray());
-
-        //Verify in the database
-        $this->assertDatabaseMissing('invoices', $sellInvoice->toArray());
-
-        // Verify status 200
-        $response->assertStatus(200);
-
-        // Verify values in response
-        $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'Invoice not found.']);
+        //Action
+        $this->update(['serie' => $this->faker->lexify('???')],
+                      ['serie' => ''] //attribute mandatory 
+                    );   
     }
 
-    public function test_invoice_updated_ok()
+    public function test_invoice_update_ok()
     {
-        // get api token from authenticate user
-        $api_token = $this->get_api_token();
+        // Set Database has
+        $this->setDatabaseHas(true);
 
-        // Generate a invoice detail object
-        $sellInvoice = factory(Invoice::class)->create(['serie' => '', 'type' => 'S']);
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => true]);
+        array_push($assertsJson,['message' => 'Invoice updated successfully.']);
+        $this->setAssertJson($assertsJson);
 
-        //Verify in the database
-        $this->assertDatabaseHas('invoices', $sellInvoice->toArray());
+        //Authentication
+        $this->get_api_token();
 
-         // Set values to Update
-
-        // Set values to Update
-        $newSellInvoice     = factory(Invoice::class)->make();
-        $sellInvoice->serie = $newSellInvoice->serie;
-
-        //Submit post request with autorizathion header
-        $response = $this->withHeaders(['Authorization' => 'Bearer '. $api_token])
-                         ->put('api/invoices/' . $sellInvoice->id,  $sellInvoice->toArray());
-
-        //Verify in the database
-        $this->assertDatabaseHas('invoices', $sellInvoice->toArray());
-
-        // Verify status 200
-        $response->assertStatus(200);
-
-        // Verify values in response
-        $response->assertJson(['status' => true]);
-        $response->assertJson(['message' => 'Sell invoice updated successfully.']);
+        //Action
+        $this->update(['serie' => $this->faker->lexify('???')],
+                      ['serie' => '', 'store_id' => auth()->user()->store_id] //attribute mandatory 
+                    );   
     }
 
     //FUNCTION delete/anul
@@ -343,7 +319,7 @@ class InvoiceTest extends TestCase
          
     }
 
-    public function test_invoice_anull_ok()
+    public function test_invoice_anull_from_another_store()
     {
         //Authentication
         $this->get_api_token();
@@ -366,6 +342,36 @@ class InvoiceTest extends TestCase
         
         // Verify status 200 
         $response->assertStatus(200);
+        
+        // Verify values in response
+        $response->assertJson(['status' => false]);
+        $response->assertJson(['message' => 'Invoice does not belong to current store.']);
+         
+    }
+
+    public function test_invoice_anull_ok()
+    {
+        //Authentication
+        $this->get_api_token();
+
+        // db config
+        $this->setDatabaseHas(true);
+
+        // Generate a item 
+        $invoice = factory(Invoice::class,'full')->create(['type_id' => '1', 'store_id' => auth()->user()->store_id]);
+        
+        //Verify in the database
+        
+        $this->checkRecordInDB();
+
+        //Submit post request with autorizathion header
+        $response = 
+        
+        $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+              ->get('api/invoices/anull/' . $invoice->id);
+        
+        // Verify status 200 
+        $response->assertStatus(200);
 
         //Set Anulled value
         $invoice->setStageAnulled();
@@ -373,7 +379,7 @@ class InvoiceTest extends TestCase
         //Verify in the database
         $this->setResultResponse($response);
         $this->checkRecordInDB();
-        
+              
         // Verify values in response
         $response->assertJson(['status' => true]);
         $response->assertJson(['message' => 'Invoice Anulled successfully.']);

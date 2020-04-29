@@ -19,9 +19,11 @@ class ActionInvoiceAnullTest extends TestCase
     {
         parent::setUp();
         $this->seed();
+        $this->setBaseModel('App\Invoice');
+        $this->setFieldsDatabaseHas(['id', 'subtotal', 'taxes', 'discount', 'total', 'user_id', 'type_id', 'store_id', 'stage']);  
     }
 
-    public function test_invoice_anull_testing()
+    public function test_action_anull_invoice()
     {
         // $item = factory(Item::class)->create();
 
@@ -35,6 +37,8 @@ class ActionInvoiceAnullTest extends TestCase
         //Change the stage to be ANULLED
         $invoice->setStageAnulled();
 
-        $this->assertDatabaseHas('invoices', $invoice->toArray());
+        // $this->assertDatabaseHas('invoices', $invoice->toArray());
+        $this->setResultResponseSimple($invoice->toArray());
+        $this->checkRecordInDB();
     }
 }
