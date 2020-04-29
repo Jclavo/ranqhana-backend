@@ -18,6 +18,9 @@ abstract class TestCase extends TestCaseBase
     protected $baseModel = null;
     protected $assertStatus = 200;
     protected $assertJsonStructure = [];
+    protected $fieldsDatabaseHas = [];
+    protected $resultResponse = null;
+    protected $response = null;
     // protected $assertJsonStructure = [
     //     'status',
     //     'message',
@@ -25,9 +28,7 @@ abstract class TestCase extends TestCaseBase
     //     'records'
     //   ];
     protected $assertJson = [];
-
     protected $databaseHas = true;
-
     protected $faker = null;
 
     function setFaker(){
@@ -58,6 +59,22 @@ abstract class TestCase extends TestCaseBase
         $this->databaseHas = $databaseHas;
     }
 
+    protected function setFieldsDatabaseHas($fieldsDatabaseHas = []){
+        $this->fieldsDatabaseHas = $fieldsDatabaseHas;
+    }
+
+    protected function setResultResponse($response = null){
+
+        if(!empty($response)){
+            $this->response = $response; 
+        }
+
+        if(!empty($this->response)){
+            $this->resultResponse = json_decode($this->response->content(),true)['result']; 
+        }
+        
+    }
+
     protected function checkJSONResponse($response){
 
         // Verify status 200 in response
@@ -75,11 +92,27 @@ abstract class TestCase extends TestCaseBase
     protected function checkRecordInDatabase($model,$modelFactory,$databaseHas){
         $modelDB = new $model;
 
-        if($databaseHas){
-            $this->assertDatabaseHas($modelDB->getTable(), $modelFactory->toArray());
-        }else{
-            $this->assertDatabaseMissing($modelDB->getTable(), $modelFactory->toArray());
+        if(empty($this->resultResponse)) return;
+
+        $fields = [];
+
+        foreach ($this->fieldsDatabaseHas as $fieldDatabaseHas) {
+            $fields[$fieldDatabaseHas] = $this->resultResponse[$fieldDatabaseHas];
         }
+
+        if($databaseHas){
+            $this->assertDatabaseHas($modelDB->getTable(), $fields);
+        }else{
+            $this->assertDatabaseMissing($modelDB->getTable(), $fields);
+        }
+    }
+
+    protected function checkRecordInDB(){
+        $model = $this->baseModel;
+        $modelFactory = "";
+        $databaseHas = $this->databaseHas;
+
+        $this->checkRecordInDatabase($model,$modelFactory,$databaseHas);
     }
 
     protected function getAPIToken(){
@@ -116,12 +149,12 @@ abstract class TestCase extends TestCaseBase
         $model = $this->baseModel ?? $model;
 
         //Submit post request with autorizathion header
-        $response = $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+        $this->response = $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
                         ->get($route);
  
-        $this->checkJSONResponse($response);
+        $this->checkJSONResponse($this->response);
             
-        return $response;
+        return $this->response;
     } 
 
     protected function create($attributes = [], $model = '', $route = '')
@@ -132,14 +165,15 @@ abstract class TestCase extends TestCaseBase
         $modelFactory = $this->factoryMake($model, $attributes);
 
         //Submit post request with autorizathion header
-        $response = $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+        $this->response = $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
                         ->post($route, $modelFactory->toArray());
         
-        $this->checkJSONResponse($response);
+        $this->checkJSONResponse($this->response);
 
+        $this->setResultResponse();
         $this->checkRecordInDatabase($model,$modelFactory, $this->databaseHas);
             
-        return $response;
+        return $this->response;
     }
 
     protected function readBy($attributes = [], $model = '', $route = '')
@@ -150,14 +184,15 @@ abstract class TestCase extends TestCaseBase
         $modelFactory = $this->factoryCreate($model, $attributes);
 
         //Submit post request with autorizathion header
-        $response = $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+        $this->response = $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
                         ->get($route . $modelFactory->id);
 
-        $this->checkJSONResponse($response);
+        $this->checkJSONResponse($this->response);
             
+        $this->setResultResponse();
         $this->checkRecordInDatabase($model,$modelFactory, $this->databaseHas);
 
-        return $response;
+        return $this->response;
     }
 
     protected function update($attributes = [], $attributesMandatory = [], $model = '', $route = '')
@@ -179,14 +214,15 @@ abstract class TestCase extends TestCaseBase
         }
 
         //Submit post request with autorizathion header
-        $response = $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+        $this->response = $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
                         ->put($route . $modelFactory->id , $modelFactory->toArray());
     
-        $this->checkJSONResponse($response);
+        $this->checkJSONResponse($this->response);
 
+        $this->setResultResponse();
         $this->checkRecordInDatabase($model,$modelFactory,$this->databaseHas);
 
-        return $response;
+        return $this->response;
     }
 
     protected function destroy($attributes = [], $model = '', $route = '')
@@ -197,14 +233,15 @@ abstract class TestCase extends TestCaseBase
         $modelFactory = $this->factoryCreate($model, $attributes);
 
         //Submit post request with autorizathion header
-        $response = $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+        $this->response = $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
                          ->delete($route . $modelFactory->id);
 
-        $this->checkJSONResponse($response);
-            
+        $this->checkJSONResponse($this->response);
+        
+        $this->setResultResponse();
         $this->checkRecordInDatabase($model,$modelFactory,$this->databaseHas);
         
-        return $response;
+        return $this->response;
     }
 
     protected function softDestroy($attributes = [], $model = '', $route = '')
@@ -215,16 +252,16 @@ abstract class TestCase extends TestCaseBase
         $modelFactory = $this->factoryCreate($model, $attributes);
 
         //Submit post request with autorizathion header
-        $response = $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+        $this->response = $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
                          ->delete($route . $modelFactory->id);
 
-        $this->checkJSONResponse($response);
+        $this->checkJSONResponse($this->response);
          
         //Check softDelete
         $modelDB = new $model;
         $this->assertSoftDeleted($modelDB->getTable(), $modelFactory->toArray());
         
-        return $response;
+        return $this->response;
     }
 
 
