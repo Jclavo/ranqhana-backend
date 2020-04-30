@@ -63,18 +63,21 @@ class LoginController extends ResponseController
     {
         
         $validator = Validator::make($request->all(), [
-            'country_code' => 'required|numeric',
-            'password' => 'required'
+            'country_code' => 'required|exists:countries,country_code',
+            'password' => 'required',
+            'identification' => 'required'
         ]);
         
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
         }
 
+
+
        switch ($request->country_code) {
             case "55":
                 $validator = Validator::make($request->all(), [
-                    'identification' => 'required|digits:11',
+                    'identification' => 'digits:11',
                 ]);
                 if ($validator->fails()) {
                     return $this->sendError($validator->errors()->first());
@@ -94,7 +97,6 @@ class LoginController extends ResponseController
         Auth::user()->api_token = Str::random(80);
         Auth::user()->save();
         
-        //return response()->json(['user' => Auth::user(),'token' => Auth::user()->api_token]);
         return $this->sendResponse(Auth::user()->toArray(), 'User logged successfully.');  
     }
     

@@ -14,17 +14,18 @@ class LoginTest extends TestCase
     //use DatabaseMigrations;
     use RefreshDatabase;
 
+    protected $routeRegister = 'register';
+
     public function setUp(): void
     {
         parent::setUp();
-        // Seed database
-        //$this->seed();
-       
+        $this->seed();
+        $this->setFaker();   
     }
 
     public function test_register_country_code_is_required()
     {
-        // Generate an user object
+        // // Generate an user object
         $user = factory(User::class)->make(['country_code' => '']);
               
         //Submit post request to create an user endpoint
@@ -40,6 +41,18 @@ class LoginTest extends TestCase
         // Verify values in response
         $response->assertJson(['status' => false]);
         $response->assertJson(['message' => 'The country code field is required.']);
+        // $this->setDatabaseHas(false);
+
+        // //Set Json asserts
+        // $assertsJson = array();
+        // array_push($assertsJson,['status' => false]);
+        // array_push($assertsJson,['message' => 'The subtotal field is required.']);
+        // $this->setAssertJson($assertsJson);
+
+        // //Authentication
+        // $this->get_api_token();
+
+        // $this->create(['subtotal' => ''],'',$this->routeRegister);
     }
  
     public function test_register_email_format_is_invalid()
@@ -227,23 +240,15 @@ class LoginTest extends TestCase
     }
     
 
+
      //FUNCTION LOGIN
-
-
-
      public function test_login_country_code_is_required()
     {
         // Generate an user object
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->create(['country_code' => '']);
               
-        // set values to login
-        $user->country_code = '';
-
         //Submit post request to create an user endpoint
         $response = $this->post('api/login', $user->toArray());
-        
-        //Verify in the database
-        $this->assertDatabaseMissing('users', $user->toArray());
         
         // Verify status 200
         $response->assertStatus(200);
@@ -252,20 +257,30 @@ class LoginTest extends TestCase
         $response->assertJson(['status' => false]);
         $response->assertJson(['message' => 'The country code field is required.']);
     }
+
+    public function test_login_country_code_is_not_in_DB()
+    {
+        // Generate an user object
+        $user = factory(User::class)->create(['country_code' => $this->faker->lexify('???')]);
+              
+        //Submit post request to create an user endpoint
+        $response = $this->post('api/login', $user->toArray());
+        
+        // Verify status 200
+        $response->assertStatus(200);
+        
+        // Verify values in response
+        $response->assertJson(['status' => false]);
+        $response->assertJson(['message' => 'The selected country code is invalid.']);
+    }
  
     public function test_login_password_is_required()
     {
         // Generate an user object
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->create(['password' => '']);
         
-         // set values to login
-         $user->password = '';
-
         //Submit post request to create an user endpoint
         $response = $this->post('api/login', $user->toArray());
-        
-        //Verify in the database
-        $this->assertDatabaseMissing('users', $user->toArray());
         
         // Verify status 200
         $response->assertStatus(200);
@@ -277,13 +292,9 @@ class LoginTest extends TestCase
 
     public function test_login_identification_from_brazil_is_required()
     {
-
         // Generate an user object
-        $user = factory(User::class)->create(['country_code' => '55']);
-        
-        // set c_password field
-        $user->identification = '';
-        
+        $user = factory(User::class)->create(['country_code' => '55', 'identification' => '']);
+                
         //Submit post request to create an user endpoint
         $response = $this->post('api/login', $user->toArray());
                
@@ -296,15 +307,10 @@ class LoginTest extends TestCase
     }
 
     
-
     public function test_login_identification_from_brazil_length_is_11()
     {
-
         // Generate an user object
-        $user = factory(User::class)->create(['country_code' => '55']);
-        
-        // set c_password field
-        $user->identification = '123';
+        $user = factory(User::class)->create(['country_code' => '55', 'identification' => $this->faker->lexify('???')]);
         
         //Submit post request to create an user endpoint
         $response = $this->post('api/login', $user->toArray());
@@ -319,13 +325,9 @@ class LoginTest extends TestCase
 
     public function test_login_identification_from_brazil_only_accepts_digits()
     {
-
         // Generate an user object
-        $user = factory(User::class)->create(['country_code' => '55']);
-        
-        // set c_password field
-        $user->identification = '123123123as';
-        
+        $user = factory(User::class)->create(['country_code' => '55', 'identification' => $this->faker->lexify('???????????')]);
+                
         //Submit post request to create an user endpoint
         $response = $this->post('api/login', $user->toArray());
                
@@ -334,24 +336,19 @@ class LoginTest extends TestCase
         
         // Verify values in response
         $response->assertJson(['status' => false]);
-        //$response->assertJson(['message' => 'The identification must be a number.']);
         $response->assertJson(['message' => 'The identification must be 11 digits.']);
     }
 
-    public function test_login_user_correctly()
+    public function test_login_user_ok()
     {
         // Generate an user object
         $user = factory(User::class)->create(['country_code' => '55', 'email' => '']);
-        
-        $this->assertDatabaseHas('users', $user->toArray());
-        
+                
         $user->password = 'secret';
 
         //Submit post request to create an user endpoint
         $response = $this->post('api/login', $user->toArray());
-        
-        //Verify in the database
-        
+               
         // Verify status 200
         $response->assertStatus(200);
         
@@ -372,20 +369,16 @@ class LoginTest extends TestCase
         // Generate an user object
         $user = factory(User::class)->create(['country_code' => '55', 'email' => '']);
         
-        $this->assertDatabaseHas('users', $user->toArray());
-        
         $user->password = 'secret';
         
         //Submit post request to create an user endpoint
         $response = $this->post('api/login', $user->toArray());
         
-        //Verify in the database
-             
         $this->assertNotEmpty(json_decode($response->content(),true)['result']['api_token']);
         
     }
     
-    public function test_unauthenticated_user()
+    public function test_login_unauthenticated_user()
     {
         // Generate an user object
         $user = factory(User::class)->create(['country_code' => '55', 'email' => '']);
