@@ -6,7 +6,7 @@ use Tests\TestCase;
 
 use App\User;
 use App\Country;
-// use Illuminate\Foundation\Testing\DatabaseMigrations;
+use App\Store;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class LoginTest extends TestCase
@@ -340,10 +340,35 @@ class LoginTest extends TestCase
         $response->assertJson(['message' => 'The identification must be 11 digits.']);
     }
 
-    public function test_login_user_ok()
+    public function test_login_user_from_another_country()
     {
         // Generate an user object
         $user = factory(User::class)->create(['email' => '']);
+        $user->country_code = '55';         
+        $user->password = 'secret';
+
+        //Submit post request to create an user endpoint
+        $response = $this->post('api/login', $user->toArray());
+               
+        // Verify status 200
+        $response->assertStatus(200);
+        
+        // Verify values in response
+        $response->assertJsonStructure([
+            'status',
+            'message',
+            // 'result' => []
+          ]);
+        $response->assertJson(['status' => false]);
+        $response->assertJson(['message' => 'There current user does not belong to the selected country.']);
+         
+    }
+
+    public function test_login_user_ok()
+    {
+        // Generate an user object;
+        $store = factory(Store::class)->create(['country_id' => 1 ]);
+        $user = factory(User::class)->create(['store_id' => $store->id]);
         $user->country_code = '55';         
         $user->password = 'secret';
 
@@ -368,7 +393,8 @@ class LoginTest extends TestCase
     public function test_login_response_api_token()
     {
         // Generate an user object
-        $user = factory(User::class)->create(['email' => '']);
+        $store = factory(Store::class)->create(['country_id' => 1 ]);
+        $user = factory(User::class)->create(['store_id' => $store->id]);
         $user->country_code = '55';  
         $user->password = 'secret';
         
@@ -428,7 +454,7 @@ class LoginTest extends TestCase
         $response->assertJsonStructure([
         'status',
         'message',
-        'result' => []
+        // 'result' => []
         ]);      
         $response->assertJson(['status' => true]);
         $response->assertJson(['message' => 'User information gotten successfully.']);
