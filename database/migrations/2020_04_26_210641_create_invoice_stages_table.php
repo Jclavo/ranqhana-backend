@@ -16,7 +16,7 @@ class CreateInvoiceStagesTable extends Migration
         Schema::create('invoice_stages', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('code',1)->unique();
-            $table->string('description',100)->nullable(true);
+            $table->string('description',200)->nullable(true);
             $table->timestamps();
         });
     }
