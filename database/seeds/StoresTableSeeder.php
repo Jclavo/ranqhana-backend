@@ -13,7 +13,7 @@ class StoresTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(Store::class)->create(['name' => 'Store Chepen']);
-        factory(Store::class)->create(['name' => 'Store Guadalupe']);
+        factory(Store::class)->create(['name' => 'Store Chepen', 'country_id' => 1]);
+        factory(Store::class)->create(['name' => 'Store Guadalupe', 'country_id' => 1]);
     }
 }
