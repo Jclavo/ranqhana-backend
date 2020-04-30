@@ -9,6 +9,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
+//Validatiors
+use App\Actions\User\UserBelongsToCountry;
+
 class LoginController extends ResponseController
 {
     public function register(Request $request)
@@ -89,6 +92,10 @@ class LoginController extends ResponseController
             default:
                 return $this->sendError('Unknow country');
         }
+
+        $this->businessValidations([
+            new UserBelongsToCountry($request->identification,$request->country_code)
+        ]);
         
         if (!Auth::attempt($request->only('identification',  'password'))) {
             return $this->sendError('Invalid credentials');
