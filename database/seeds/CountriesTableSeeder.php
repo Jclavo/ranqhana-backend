@@ -13,7 +13,7 @@ class CountriesTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(Country::class)->create(['country_code' => '55','name' => 'Brazil', 'timezone' => 'America/Sao_Paulo']);
-        factory(Country::class)->create(['country_code' => '51','name' => 'Peru', 'timezone' => 'America/Lima']);
+        factory(Country::class)->create(['country_code' => '55','name' => 'Brazil', 'timezone' => 'America/Sao_Paulo', 'BRL']);
+        factory(Country::class)->create(['country_code' => '51','name' => 'Peru', 'timezone' => 'America/Lima', 'PEN']);
     }
 }

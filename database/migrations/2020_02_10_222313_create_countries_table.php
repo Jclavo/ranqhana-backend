@@ -18,6 +18,7 @@ class CreateCountriesTable extends Migration
             $table->string('code')->unique();
             $table->string('name');
             $table->string('timezone',20);
+            $table->string('currency',3);
             $table->timestamps();
         });
     }
