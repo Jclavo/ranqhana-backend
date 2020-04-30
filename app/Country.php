@@ -13,6 +13,6 @@ class Country extends Model
      * @var array
      */
     protected $fillable = [
-        'country_code', 'name'
+        'code', 'name'
     ];
 }
