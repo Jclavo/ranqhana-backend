@@ -18,7 +18,7 @@ class UsersTableSeeder extends Seeder
         //     'email' => 'jc@gmail.com',
         //     'password' => bcrypt('123'),
         //     'identification' => '10210210210',
-        //     'country_code' => 55,
+        //     'code' => 55,
         // ]);
 
         factory(User::class)->create([
@@ -26,7 +26,6 @@ class UsersTableSeeder extends Seeder
             'email' => 'jc@gmail.com',
             'password' => bcrypt('123'),
             'identification' => '10210210210',
-            'country_code' => '55',
             'store_id' => '1',
         ]);
     }

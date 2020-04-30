@@ -26,7 +26,6 @@ $factory->define(User::class, function (Faker $faker) {
         'identification' => $faker->unique()->randomNumber($nbDigits = 9, $strict = true) . $faker->unique()->randomNumber($nbDigits = 2, $strict = true),
         'password' => bcrypt('secret'),
         'api_token' => $faker->regexify('[A-Za-z0-9]{80}'),
-        'country_code' => Country::all()->random()->country_code,
         'store_id' => Store::all()->random()->id,
     ];
 });
