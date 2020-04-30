@@ -63,7 +63,7 @@ class LoginController extends ResponseController
     {
         
         $validator = Validator::make($request->all(), [
-            'country_code' => 'required|exists:countries,country_code',
+            'country_code' => 'required|exists:countries,code',
             'password' => 'required',
             'identification' => 'required'
         ]);
@@ -72,7 +72,7 @@ class LoginController extends ResponseController
             return $this->sendError($validator->errors()->first());
         }
 
-
+        
 
        switch ($request->country_code) {
             case "55":
@@ -90,7 +90,7 @@ class LoginController extends ResponseController
                 return $this->sendError('Unknow country');
         }
         
-        if (!Auth::attempt($request->only('country_code', 'identification',  'password'))) {
+        if (!Auth::attempt($request->only('identification',  'password'))) {
             return $this->sendError('Invalid credentials');
         }
         
