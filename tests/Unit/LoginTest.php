@@ -245,7 +245,8 @@ class LoginTest extends TestCase
      public function test_login_country_code_is_required()
     {
         // Generate an user object
-        $user = factory(User::class)->create(['country_code' => '']);
+        $user = factory(User::class)->create();
+        $user->country_code = ''; 
               
         //Submit post request to create an user endpoint
         $response = $this->post('api/login', $user->toArray());
@@ -261,8 +262,8 @@ class LoginTest extends TestCase
     public function test_login_country_code_is_not_in_DB()
     {
         // Generate an user object
-        $user = factory(User::class)->create(['country_code' => $this->faker->lexify('???')]);
-              
+        $user = factory(User::class)->create();
+        $user->country_code = $this->faker->lexify('???');      
         //Submit post request to create an user endpoint
         $response = $this->post('api/login', $user->toArray());
         
@@ -278,7 +279,7 @@ class LoginTest extends TestCase
     {
         // Generate an user object
         $user = factory(User::class)->create(['password' => '']);
-        
+        $user->country_code = Country::all()->random()->code;
         //Submit post request to create an user endpoint
         $response = $this->post('api/login', $user->toArray());
         
@@ -293,8 +294,8 @@ class LoginTest extends TestCase
     public function test_login_identification_from_brazil_is_required()
     {
         // Generate an user object
-        $user = factory(User::class)->create(['country_code' => '55', 'identification' => '']);
-                
+        $user = factory(User::class)->create(['identification' => '']);
+        $user->country_code = '55';       
         //Submit post request to create an user endpoint
         $response = $this->post('api/login', $user->toArray());
                
@@ -310,8 +311,8 @@ class LoginTest extends TestCase
     public function test_login_identification_from_brazil_length_is_11()
     {
         // Generate an user object
-        $user = factory(User::class)->create(['country_code' => '55', 'identification' => $this->faker->lexify('???')]);
-        
+        $user = factory(User::class)->create(['identification' => $this->faker->lexify('???')]);
+        $user->country_code = '55';  
         //Submit post request to create an user endpoint
         $response = $this->post('api/login', $user->toArray());
                
@@ -326,8 +327,8 @@ class LoginTest extends TestCase
     public function test_login_identification_from_brazil_only_accepts_digits()
     {
         // Generate an user object
-        $user = factory(User::class)->create(['country_code' => '55', 'identification' => $this->faker->lexify('???????????')]);
-                
+        $user = factory(User::class)->create(['identification' => $this->faker->lexify('???????????')]);
+        $user->country_code = '55';         
         //Submit post request to create an user endpoint
         $response = $this->post('api/login', $user->toArray());
                
@@ -342,8 +343,8 @@ class LoginTest extends TestCase
     public function test_login_user_ok()
     {
         // Generate an user object
-        $user = factory(User::class)->create(['country_code' => '55', 'email' => '']);
-                
+        $user = factory(User::class)->create(['email' => '']);
+        $user->country_code = '55';         
         $user->password = 'secret';
 
         //Submit post request to create an user endpoint
@@ -367,8 +368,8 @@ class LoginTest extends TestCase
     public function test_login_response_api_token()
     {
         // Generate an user object
-        $user = factory(User::class)->create(['country_code' => '55', 'email' => '']);
-        
+        $user = factory(User::class)->create(['email' => '']);
+        $user->country_code = '55';  
         $user->password = 'secret';
         
         //Submit post request to create an user endpoint
@@ -381,8 +382,8 @@ class LoginTest extends TestCase
     public function test_login_unauthenticated_user()
     {
         // Generate an user object
-        $user = factory(User::class)->create(['country_code' => '55', 'email' => '']);
-       
+        $user = factory(User::class)->create(['email' => '']);
+        $user->country_code = '55';  
         $user->password = 'secret';
         
         //Submit post request to create an user endpoint
@@ -401,8 +402,8 @@ class LoginTest extends TestCase
     public function test_only_user_logged()
     {
         // Generate an user object
-        $user = factory(User::class)->create(['country_code' => '55', 'email' => '']);
-        
+        $user = factory(User::class)->create(['email' => '']);
+        $user->country_code = '55';  
         $user->password = 'secret';
         
         //Submit post request to create an user endpoint
