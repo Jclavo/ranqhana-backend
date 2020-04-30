@@ -14,7 +14,7 @@ class AddTimezoneToCountriesTable extends Migration
     public function up()
     {
         Schema::table('countries', function (Blueprint $table) {
-            $table->string('timezone',20);
+            $table->string('timezone',20)->nullable(true);
         });
     }
 
