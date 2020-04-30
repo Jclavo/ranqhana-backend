@@ -10,6 +10,6 @@ $factory->define(Country::class, function (Faker $faker) {
          'country_code' => $faker->unique()->randomNumber($nbDigits = 2, $strict = true),
         //'country_code' => $faker->unique()->randomNumber(),
         'name' => $faker->name,
-        'timezone' => null,
+        'timezone' => 'America/Lima',
     ];
 });
