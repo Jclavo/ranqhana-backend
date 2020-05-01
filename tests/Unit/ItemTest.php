@@ -741,7 +741,8 @@ class ItemTest extends TestCase
 
         $item->save();
 
-        $this->assertDatabaseHas('items', $item->toArray());
+        $this->setResultResponseSimple($item->toArray());
+        $this->checkRecordInDB();
     }
 
     public function test_item_decrease_stock()
@@ -752,7 +753,8 @@ class ItemTest extends TestCase
 
         $item->save();
 
-        $this->assertDatabaseHas('items', $item->toArray());
+        $this->setResultResponseSimple($item->toArray());
+        $this->checkRecordInDB();
     }
     
 
