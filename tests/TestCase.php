@@ -272,7 +272,11 @@ abstract class TestCase extends TestCaseBase
          
         //Check softDelete
         $modelDB = new $model;
-        $this->assertSoftDeleted($modelDB->getTable(), $modelFactory->toArray());
+        $fields = [];
+        foreach ($this->fieldsDatabaseHas as $fieldDatabaseHas) {
+            $fields[$fieldDatabaseHas] = $modelFactory[$fieldDatabaseHas];
+        }
+        $this->assertSoftDeleted($modelDB->getTable(), $fields);
         
         return $this->response;
     }
