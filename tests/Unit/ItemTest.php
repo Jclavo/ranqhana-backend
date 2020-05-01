@@ -18,7 +18,9 @@ class ItemTest extends TestCase
 
         $this->setBaseRoute('items');
         $this->setBaseModel('App\Item');
-        $this->setFaker();   
+        $this->setFaker();
+        $this->setFieldsDatabaseHas(['id', 'name', 'price', 'stocked',
+                                      'store_id', 'unit_id']); 
     }
 
     public function test_item_unauthenticated_user()
@@ -203,7 +205,7 @@ class ItemTest extends TestCase
         $this->get_api_token();
         
          // Generate a item object
-        $item = factory(Item::class)->create(['store_id' => auth()->user()->store_id]);
+        $item = factory(Item::class)->create(['store_id' => auth()->user()->store_id, 'stock' => 0]);
 
         // Generate a price object
         $price = factory(Price::class)->create(['price' => $item->price,
@@ -211,8 +213,10 @@ class ItemTest extends TestCase
                                                 ]);
 
         //Verify in the database
-        $this->assertDatabaseHas('items', $item->toArray());
-        $this->assertDatabaseHas('prices', $price->toArray());
+        $this->setResultResponseSimple($item->toArray());
+        $this->checkRecordInDB();
+        // $this->setResultResponseSimple($price->toArray());
+        // $this->checkRecordInDB();
 
         // Set values to Update
         $newItem = factory(Item::class)->make(['store_id' => auth()->user()->store_id]);
@@ -238,8 +242,10 @@ class ItemTest extends TestCase
         $response->assertJson(['message' => 'Item updated successfully.']);  
 
         //Verify in the database
-        $this->assertDatabaseHas('items', $item->toArray());
-        $this->assertDatabaseHas('prices', $price->toArray());
+        $this->setResultResponseSimple($item->toArray());
+        $this->checkRecordInDB();
+        // $this->setResultResponseSimple($price->toArray());
+        // $this->checkRecordInDB();
     }
 
     public function test_item_update_stocked_not_change()
@@ -252,10 +258,6 @@ class ItemTest extends TestCase
                                               'stocked' => true,
                                               'store_id' => auth()->user()->store_id
                                             ]);
-
-        //Verify in the database
-        $this->assertDatabaseHas('items', $item->toArray());
-        // $this->assertDatabaseHas('prices', $price->toArray());
 
         // Set values to Update
         $newItem = factory(Item::class)->make(['stocked' => false,
@@ -275,7 +277,9 @@ class ItemTest extends TestCase
               ->put('api/items/' . $item->id ,  $item->toArray());
         
         //Verify in the database
-        $this->assertDatabaseMissing('items', $item->toArray());
+        $this->setDatabaseHas(false);
+        $this->setResultResponseSimple($item->toArray());
+        $this->checkRecordInDB();
 
         // Verify status 200 
         $response->assertStatus(200);
@@ -295,7 +299,8 @@ class ItemTest extends TestCase
         $item = factory(Item::class)->create(['stocked' => false, 'store_id' => auth()->user()->store_id]);
 
         //Verify in the database
-        $this->assertDatabaseHas('items', $item->toArray());
+        $this->setResultResponseSimple($item->toArray());
+        $this->checkRecordInDB();
 
         // Set values to Update
         $newItem = factory(Item::class)->make(['stocked' => true, 'store_id' => auth()->user()->store_id]);
@@ -313,7 +318,8 @@ class ItemTest extends TestCase
               ->put('api/items/' . $item->id ,  $item->toArray());
         
         //Verify in the database
-        $this->assertDatabaseHas('items', $item->toArray());
+        $this->setResultResponseSimple($item->toArray());
+        $this->checkRecordInDB();
 
         // Verify status 200 
         $response->assertStatus(200);
@@ -363,7 +369,7 @@ class ItemTest extends TestCase
 
         //Action
         $this->update(['store_id' => auth()->user()->store_id],
-                      ['store_id' => auth()->user()->store_id] //attribute mandatory 
+                      ['store_id' => auth()->user()->store_id, 'stock' => 0] //attribute mandatory 
                     );   
     }
 
@@ -493,19 +499,6 @@ class ItemTest extends TestCase
         $this->assertEquals(json_decode($stock->content(),true)['message'], 'Item not found.');
     }
 
-    public function test_item_update_stock_without_stock(){
-
-        $item = factory(Item::class)->create();
-
-        $itemController = new ItemController();
-
-        $stock = $itemController->updateStock($item->id, 10);
-
-        $this->assertFalse(json_decode($stock->content(),true)['status']);
-        $this->assertEquals(json_decode($stock->content(),true)['message'], 'There is not stock for product '. $item->id);
-        // $this->assertTrue($stock);
-    }
-
     public function test_item_update_stock_ok(){
 
         $item = factory(Item::class)->create(['stock' => 100]);
@@ -518,7 +511,8 @@ class ItemTest extends TestCase
         $item->stock = $item->stock - $quantitySold;
 
         //Verify in the database
-        $this->assertDatabaseHas('items', $item->toArray());
+        $this->setResultResponseSimple($item->toArray());
+        $this->checkRecordInDB();
 
         $this->assertTrue(json_decode($stock->content(),true)['status']);
         $this->assertEquals(json_decode($stock->content(),true)['message'], 'Stock updated.');
@@ -620,9 +614,9 @@ class ItemTest extends TestCase
 
         //Action
         switch ($option) {
-            case 'C': $this->create(['price' => $this->faker->randomNumber(2) * - 1]);
+            case 'C': $this->create(['price' => $this->faker->randomNumber(2, $strict = true) * - 1]);
             break;
-            case 'U': $this->update(['price' => $this->faker->randomNumber(2) * - 1]);
+            case 'U': $this->update(['price' => $this->faker->randomNumber(2, $strict = true) * - 1]);
             break;
         }
     }
@@ -704,7 +698,7 @@ class ItemTest extends TestCase
     {
         $this->checkOptionCRUD($option);   
         // Set Database has
-        $this->setDatabaseHas(false);
+        $this->setDatabaseHas(true);
 
         //Set Json asserts
         $assertsJson = array();
@@ -724,7 +718,7 @@ class ItemTest extends TestCase
                 array_push($assertsJson,['message' => 'Item updated successfully.']);
                 $this->setAssertJson($assertsJson); 
                 $this->update(['store_id' => auth()->user()->store_id, 'stocked' => '', 'description' => ''],
-                                    ['store_id' => auth()->user()->store_id] //attribute mandatory 
+                                    ['store_id' => auth()->user()->store_id, 'stock' => 0 ] //attribute mandatory 
                                     );
                 break;
         }
