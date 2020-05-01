@@ -18,9 +18,9 @@ class ActionUserBelongsToCountryTest extends TestCase
 
     public function test_action_user_belongs_to_country_fail()
     {
+        $country = factory(Country::class)->create();
         $user = factory(User::class)->create();
-
-        $action = new UserBelongsToCountry($user->identification, '55');
+        $action = new UserBelongsToCountry($user->identification, $country->code);
 
         $this->assertFalse($action->passes());
 
