@@ -17,7 +17,7 @@ class LoginController extends ResponseController
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'country_code' => 'required|numeric',
+            'country_code' => 'required|exists:countries,code',
             'email' => 'email|unique:users',
             'name' => 'required',
             'password' => 'required',
@@ -52,7 +52,7 @@ class LoginController extends ResponseController
         $user->identification = $request->identification;
         $user->email = $request->email;
         $user->password = bcrypt($request->password);
-        $user->country_code = $request->country_code;
+        // $user->country_code = $request->country_code;
         $user->store_id = $request->store_id;
         
         $user->save();
