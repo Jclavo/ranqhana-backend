@@ -16,6 +16,7 @@ use App\Actions\BelongsToStore;
 use App\Http\Controllers\API\ItemController;
 use Carbon\Carbon;
 use App\Utils\CustomCarbon;
+use App\Utils\UserUtils;
 
 class InvoiceController extends ResponseController
 {
@@ -190,9 +191,10 @@ class InvoiceController extends ResponseController
 
         $query->when((!empty($fromDate)) && (!empty($toDate)) , function ($q) use($fromDate,$toDate) {
 
+            $timezome = UserUtils::getTimezone(Auth::user());
             //change date format
-            $fromDate = CustomCarbon::UTCtoCountryTZ($fromDate,'00:00:00', 'America/Sao_Paulo');
-            $toDate = CustomCarbon::UTCtoCountryTZ($toDate,'23:59:59', 'America/Sao_Paulo');
+            $fromDate = CustomCarbon::UTCtoCountryTZ($fromDate,'00:00:00', $timezome);
+            $toDate = CustomCarbon::UTCtoCountryTZ($toDate,'23:59:59', $timezome);
 
             return $q->whereBetween('created_at',[ $fromDate." 00:00:00", $toDate." 23:59:59"]);
         });
