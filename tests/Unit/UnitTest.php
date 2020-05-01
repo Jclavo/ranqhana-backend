@@ -18,6 +18,8 @@ class UnitTest extends TestCase
         $this->setBaseRoute('units');
         $this->setBaseModel('App\Unit');
         $this->setFaker();
+        $this->setFieldsDatabaseHas(['id', 'code', 'description', 'fractioned', 'store_id',]);  
+    
     }
 
     public function test_unit_unauthenticated_user()
