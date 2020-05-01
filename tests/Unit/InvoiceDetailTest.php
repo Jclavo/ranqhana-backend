@@ -19,7 +19,8 @@ class InvoiceDetailTest extends TestCase
         $this->seed();
         $this->setBaseRoute('invoiceDetails');
         $this->setBaseModel('App\InvoiceDetail');
-        $this->setFaker();   
+        $this->setFaker();
+        $this->setFieldsDatabaseHas(['id', 'item_id', 'quantity', 'price', 'total', 'invoice_id']);  
     }
 
     //TEST FUNCTION create invoice detail
@@ -285,9 +286,8 @@ class InvoiceDetailTest extends TestCase
         $item = factory(Item::class)->create(['store_id' => auth()->user()->store_id, 'stock' => 0, 'stocked' => false]);
         $invoice = factory(Invoice::class)->create(['store_id' => auth()->user()->store_id ]);
         
-
         //set db checking
-        $this->setDatabaseHas(false);
+        $this->setDatabaseHas(true);
 
         //Set Json asserts
         $assertsJson = array();
@@ -295,15 +295,9 @@ class InvoiceDetailTest extends TestCase
         array_push($assertsJson,['message' => 'Invoice detail created successfully.' ]);
         $this->setAssertJson($assertsJson);
 
-        //Authentication
-        $this->get_api_token();
-
         //run option
         $response = $this->create(['item_id' => $item->id, 'price' => $item->price, 'invoice_id' => $invoice->id,
                                    'quantity' => 1]);
-
-        //Check that invoice details was created successfully
-        $this->assertDatabaseHas('invoice_details', json_decode($response->content(),true)['result']);
 
         //Check that stock is updated
         $itemUpdate = Item::findOrFail($item->id);
@@ -323,7 +317,7 @@ class InvoiceDetailTest extends TestCase
                                               'store_id' => auth()->user()->store_id]);
 
         //set db checking
-        $this->setDatabaseHas(false);
+        $this->setDatabaseHas(true);
 
         //Set Json asserts
         $assertsJson = array();
@@ -331,15 +325,9 @@ class InvoiceDetailTest extends TestCase
         array_push($assertsJson,['message' => 'Invoice detail created successfully.' ]);
         $this->setAssertJson($assertsJson);
 
-        //Authentication
-        $this->get_api_token();
-
         //run option
         $response = $this->create(['item_id' => $item->id, 'price' => $item->price, 'invoice_id' => $invoice->id,
                                    'quantity' => 1]);
-
-        //Check that invoice details was created successfully
-        $this->assertDatabaseHas('invoice_details', json_decode($response->content(),true)['result']);
 
         //Check that stock is updated
         $itemUpdate = Item::findOrFail($item->id);
@@ -352,12 +340,14 @@ class InvoiceDetailTest extends TestCase
 
     public function test_invoice_detail_calculate_total()
     {
+
         $invoice_detail = factory(InvoiceDetail::class)->make();
 
         $invoice_detail->calculateTotal();
 
         $invoice_detail->save();
 
-        $this->assertDatabaseHas('invoice_details', $invoice_detail->toArray());
+        $this->setResultResponseSimple($invoice_detail->toArray());
+        $this->checkRecordInDB();
     }
 }
