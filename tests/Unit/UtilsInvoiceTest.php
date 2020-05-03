@@ -15,12 +15,12 @@ class UtilsInvoiceTest extends TestCase
         $this->seed();
     }
 
-    public function test_util_invoice_get_type()
-    {
-        $invoice = factory(Invoice::class)->create();
+    // public function test_util_invoice_get_type()
+    // {
+    //     $invoice = factory(Invoice::class)->create();
 
-        $type = InvoiceUtils::getType($invoice);
+    //     $type = InvoiceUtils::getType($invoice);
 
-        $this->assertIsInt($type);
-    }
+    //     $this->assertIsInt($type);
+    // }
 }
