@@ -5,9 +5,12 @@ namespace App\Actions\Invoice;
 use App\Invoice;
 use App\Item;
 
+use App\Actions\Item\ItemHasStock;
+
 class InvoiceAnull
 {
     protected $invoice;
+    protected $failMessage = 'Invoice has already been anulled';
 
     public function __construct($invoice)
     {
@@ -29,9 +32,27 @@ class InvoiceAnull
                 ->where('invoices.id', '=', $invoice_id)
                 ->get();
 
+        $invoiceType = $this->invoice->getType();
+
         foreach ($results as $result) {
-            $item = Item::findOrFail($result->item_id); 
-            $item->increaseStock($result->quantity);
+            $item = Item::findOrFail($result->item_id);
+
+            if($invoiceType == $this->invoice->getTypeForSell()){
+                $item->increaseStock($result->quantity);
+            }else if($invoiceType == $this->invoice->getTypeForPurchase()){
+                
+                //Validate if it has stock is missing
+
+                // $checkStock = new ItemHasStock($item, $result->quantity);
+
+                if($item->isStocked()){
+                    $item->decreaseStock($result->quantity);
+                }
+                else{
+                    $this->failMessage = 'There is not enough stock available.';
+                    return false;
+                }
+            }
             $item->save();
         }
         
@@ -43,6 +64,7 @@ class InvoiceAnull
 
     public function message()
     {
-        return 'Invoice has already been anulled';
+        // return 'Invoice has already been anulled';
+        return $this->failMessage;
     }
 }
