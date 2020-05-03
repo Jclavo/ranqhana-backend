@@ -158,13 +158,14 @@ class InvoiceDetailTest extends TestCase
         $this->create(['invoice_id' => $this->faker->randomNumber(2, $strict = true)]);
     }
 
-    public function test_invoice_detail_create_without_stock()
+    public function test_invoice_detail_sell_create_without_stock()
     {
         //Authentication
         $this->get_api_token();
 
         //models needed
         $item = factory(Item::class)->create(['store_id' => auth()->user()->store_id, 'stock' => 0, 'stocked' => true]);
+        $invoice = factory(Invoice::class,'full-type-sell')->create();
 
         //set db checking
         $this->setDatabaseHas(false);
@@ -176,7 +177,7 @@ class InvoiceDetailTest extends TestCase
         $this->setAssertJson($assertsJson);
 
         //run option
-        $this->create(['item_id' => $item->id]);
+        $this->create(['item_id' => $item->id, 'invoice_id' => $invoice->id]);
     }
 
     public function test_invoice_detail_create_check_invoice_date()
@@ -187,7 +188,7 @@ class InvoiceDetailTest extends TestCase
         //models needed
         $item = factory(Item::class)->create(['store_id' => auth()->user()->store_id,'stock' => $this->faker->randomNumber(3, $strict = true) ]);
         // $invoice = factory(Invoice::class)->create(['created_at' => Carbon::now()->subDay() ]);
-        $invoice = factory(Invoice::class)->create(['created_at' => Carbon::now()->subMinute(2) ]);
+        $invoice = factory(Invoice::class,'full-type-sell')->create(['created_at' => Carbon::now()->subMinute(2) ]);
 
         //set db checking
         $this->setDatabaseHas(false);
@@ -207,6 +208,7 @@ class InvoiceDetailTest extends TestCase
     {
         //models needed
         $item = factory(Item::class)->create(['stock' => $this->faker->randomNumber(3, $strict = true)]);
+        $invoice = factory(Invoice::class,'full-type-sell')->create();
         //set db checking
         $this->setDatabaseHas(false);
 
@@ -220,7 +222,7 @@ class InvoiceDetailTest extends TestCase
         $this->get_api_token();
         
         //run option
-        $response = $this->create(['item_id' => $item->id]);
+        $response = $this->create(['item_id' => $item->id, 'invoice_id' => $invoice->id]);
 
     }
 
@@ -232,7 +234,8 @@ class InvoiceDetailTest extends TestCase
         //models needed
         $item = factory(Item::class)->create(['stock' => $this->faker->randomNumber(3, $strict = true),
                                               'store_id' => auth()->user()->store_id]);
-
+        $invoice = factory(Invoice::class,'full-type-sell')->create();
+                                            
         //set db checking
         $this->setDatabaseHas(false);
 
@@ -243,7 +246,7 @@ class InvoiceDetailTest extends TestCase
         $this->setAssertJson($assertsJson);
 
         //run option
-        $response = $this->create(['item_id' => $item->id]);
+        $response = $this->create(['item_id' => $item->id, 'invoice_id' => $invoice->id]);
 
     }
 
@@ -254,7 +257,7 @@ class InvoiceDetailTest extends TestCase
         $this->get_api_token();
 
         //models needed
-        $invoice = factory(Invoice::class)->create(['store_id' => auth()->user()->store_id,
+        $invoice = factory(Invoice::class, 'full-type-sell')->create(['store_id' => auth()->user()->store_id,
                                                     'subtotal' => $this->faker->randomNumber(1, $strict = true)]);
 
         $item = factory(Item::class)->create(['stock' => $this->faker->randomNumber(3, $strict = true),
@@ -277,14 +280,14 @@ class InvoiceDetailTest extends TestCase
 
     }
 
-    public function test_invoice_detail_create_ok_item_not_stocked()
+    public function test_invoice_detail_sell_create_ok_item_not_stocked()
     {
         //Authentication
         $this->get_api_token();
 
         //models needed
         $item = factory(Item::class)->create(['store_id' => auth()->user()->store_id, 'stock' => 0, 'stocked' => false]);
-        $invoice = factory(Invoice::class)->create(['store_id' => auth()->user()->store_id ]);
+        $invoice = factory(Invoice::class,'full-type-sell')->create(['store_id' => auth()->user()->store_id ]);
         
         //set db checking
         $this->setDatabaseHas(true);
@@ -305,13 +308,13 @@ class InvoiceDetailTest extends TestCase
         $this->assertEquals($itemUpdate->stock, 0);
     }
 
-    public function test_invoice_detail_create_ok()
+    public function test_invoice_detail_sell_create_ok()
     {
         //Authentication
         $this->get_api_token();
 
         //models needed
-        $invoice = factory(Invoice::class)->create(['store_id' => auth()->user()->store_id ]);
+        $invoice = factory(Invoice::class, 'full-type-sell')->create(['store_id' => auth()->user()->store_id ]);
                                                     // 'sub' => $this->faker->randomNumber(3, $strict = true)]);
         $item = factory(Item::class)->create(['stock' => $this->faker->randomNumber(3, $strict = true), 'stocked' => true,
                                               'store_id' => auth()->user()->store_id]);
@@ -333,6 +336,66 @@ class InvoiceDetailTest extends TestCase
         $itemUpdate = Item::findOrFail($item->id);
 
         $this->assertLessThan($item->stock, $itemUpdate->stock);
+    }
+
+    public function test_invoice_detail_purchase_create_item_not_stocked()
+    {
+        //Authentication
+        $this->get_api_token();
+
+        //models needed
+        $invoice = factory(Invoice::class, 'full-type-purchase')->create(['store_id' => auth()->user()->store_id ]);
+                                                    // 'sub' => $this->faker->randomNumber(3, $strict = true)]);
+        $item = factory(Item::class)->create(['stocked' => false,
+                                              'store_id' => auth()->user()->store_id]);
+
+        //set db checking
+        $this->setDatabaseHas(true);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => false]);
+        array_push($assertsJson,['message' => 'Item ' . $item->id . ' does not have stock.']);
+        $this->setAssertJson($assertsJson);
+
+        //run option
+        $response = $this->create(['item_id' => $item->id, 'price' => $item->price, 'invoice_id' => $invoice->id,
+                                   'quantity' => 1]);
+
+        //Check that stock is updated
+        $itemUpdate = Item::findOrFail($item->id);
+
+        $this->assertEquals($item->stock, $itemUpdate->stock);
+    }
+
+    public function test_invoice_detail_purchase_create_ok()
+    {
+        //Authentication
+        $this->get_api_token();
+
+        //models needed
+        $invoice = factory(Invoice::class, 'full-type-purchase')->create(['store_id' => auth()->user()->store_id ]);
+                                                    // 'sub' => $this->faker->randomNumber(3, $strict = true)]);
+        $item = factory(Item::class)->create(['stocked' => true,
+                                              'store_id' => auth()->user()->store_id]);
+
+        //set db checking
+        $this->setDatabaseHas(true);
+
+        //Set Json asserts
+        $assertsJson = array();
+        array_push($assertsJson,['status' => true]);
+        array_push($assertsJson,['message' => 'Invoice detail created successfully.' ]);
+        $this->setAssertJson($assertsJson);
+
+        //run option
+        $response = $this->create(['item_id' => $item->id, 'price' => $item->price, 'invoice_id' => $invoice->id,
+                                   'quantity' => 1]);
+
+        //Check that stock is updated
+        $itemUpdate = Item::findOrFail($item->id);
+
+        $this->assertGreaterThan($item->stock, $itemUpdate->stock);
     }
 
 

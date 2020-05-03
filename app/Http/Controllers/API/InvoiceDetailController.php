@@ -7,6 +7,7 @@ use App\Invoice;
 use App\Item;
 
 use App\Actions\Item\ItemHasStock;
+use App\Actions\Item\ItemIsStocked;
 use App\Actions\Invoice\InvoiceIsOpened;
 use App\Actions\Invoice\InvoiceHasEnoughSubtotal;
 use App\Actions\Invoice\InvoiceAnull;
@@ -53,6 +54,7 @@ class InvoiceDetailController extends ResponseController
             'item_id'    => 'required|exists:items,id',
             'quantity'   => 'required|numeric|gt:0',
             'invoice_id' => 'required|exists:invoices,id',
+            'price'    =>  'numeric|gt:0',
         ]);
 
         if ($validator->fails()) {
@@ -60,20 +62,42 @@ class InvoiceDetailController extends ResponseController
         }
 
         $item = Item::findOrFail($request->item_id);
+
         $invoice = Invoice::findOrFail($request->invoice_id);
+        $invoiceType = $invoice->getType();
+        $typeSell = $invoice->getTypeForSell();
+        $typePurchase = $invoice->getTypeForPurchase();
+
+        //Validation only for a Sell Invoice
+        if($invoiceType == $typeSell){
+            $this->businessValidations([
+                new ItemHasStock($item , $request->quantity),
+            ], [ new InvoiceAnull($invoice)]);
+        }else if($invoiceType == $typePurchase){
+            $this->businessValidations([
+                new ItemIsStocked($item),
+            ], [ new InvoiceAnull($invoice)]);
+        }
+
 
         $this->businessValidations([
-            new ItemHasStock($item , $request->quantity),
             new InvoiceIsOpened($invoice),
             new BelongsToStore(Auth::user(), [$item , $invoice ]),
         ], [ new InvoiceAnull($invoice)]);
+       
 
-           
+        //Set price according to invoice type
+        $price = 0;
+        if($invoiceType == $typeSell){
+            $price    = $item->price;
+        }else if($invoiceType == $typePurchase){
+            $price   = $request->price;
+        }
+
         $invoiceDetail = new InvoiceDetail();
-    
         $invoiceDetail->item_id    = $request->item_id;
         $invoiceDetail->quantity   = $request->quantity;
-        $invoiceDetail->price      = $item->price;
+        $invoiceDetail->price      = $price;
         $invoiceDetail->invoice_id = $request->invoice_id;
         $invoiceDetail->calculateTotal();
 
@@ -84,7 +108,12 @@ class InvoiceDetailController extends ResponseController
         $invoiceDetail->save();
 
         //Update stock
-        $item->decreaseStock($invoiceDetail->quantity);
+        //Set price according to invoice type
+        if($invoiceType == $typeSell){
+            $item->decreaseStock($invoiceDetail->quantity);
+        }else if($invoiceType == $typePurchase){
+            $item->increaseStock($invoiceDetail->quantity);
+        }
         $item->save();
 
         return $this->sendResponse($invoiceDetail->toArray(), 'Invoice detail created successfully.');
