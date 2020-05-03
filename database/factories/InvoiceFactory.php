@@ -55,3 +55,51 @@ $factory->defineAs(Invoice::class,'full', function (Faker $faker) {
         'stage' => 'P',
     ];
 });
+
+$factory->defineAs(Invoice::class,'full-type-sell', function (Faker $faker) {
+
+    $subtotal = $faker->randomNumber(4, $strict = true);
+    $discount = $faker->randomNumber(1, $strict = true);
+    $taxes = 0;
+    $total = ( $subtotal + $taxes ) - $discount;
+
+    return [
+        'serie' => strtoupper($faker->lexify('?')) . '-' . $faker->randomNumber(4, $strict = true),
+        'subtotal' => $subtotal,
+        'taxes' => $taxes,
+        'discount' => $discount,
+        'total' => $total,
+        'type_id' => 1,
+        'user_id' => function () {
+            return factory(User::class)->create()->id;
+        },
+        'store_id' => function () {
+            return factory(Store::class)->create()->id;
+        },
+        'stage' => 'P',
+    ];
+});
+
+$factory->defineAs(Invoice::class,'full-type-purchase', function (Faker $faker) {
+
+    $subtotal = $faker->randomNumber(4, $strict = true);
+    $discount = $faker->randomNumber(1, $strict = true);
+    $taxes = 0;
+    $total = ( $subtotal + $taxes ) - $discount;
+
+    return [
+        'serie' => strtoupper($faker->lexify('?')) . '-' . $faker->randomNumber(4, $strict = true),
+        'subtotal' => $subtotal,
+        'taxes' => $taxes,
+        'discount' => $discount,
+        'total' => $total,
+        'type_id' => 2,
+        'user_id' => function () {
+            return factory(User::class)->create()->id;
+        },
+        'store_id' => function () {
+            return factory(Store::class)->create()->id;
+        },
+        'stage' => 'P',
+    ];
+});
