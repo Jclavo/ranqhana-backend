@@ -37,5 +37,9 @@ class Item extends BaseModel
     public function decreaseStock($quantity){
         $this->stocked ? $this->stock = $this->stock - $quantity: null;
     }
+
+    public function isStocked(){
+        return $this->stocked;
+    }
 }
  
