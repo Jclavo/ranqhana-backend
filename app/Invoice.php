@@ -39,5 +39,17 @@ class Invoice extends BaseModel
     {
         $this->stage = 'P';
     }
+
+    public function getType(){
+        return $this->type_id;
+    }
+
+    public function getTypeForSell(){
+        return 1;
+    }
+
+    public function getTypeForPurchase(){
+        return 2;
+    }
  
 }
