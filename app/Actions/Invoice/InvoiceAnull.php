@@ -4,7 +4,7 @@ namespace App\Actions\Invoice;
 
 use App\Invoice;
 use App\Item;
-
+use Illuminate\Support\Facades\DB;
 use App\Actions\Item\ItemHasStock;
 
 class InvoiceAnull
@@ -34,6 +34,9 @@ class InvoiceAnull
 
         $invoiceType = $this->invoice->getType();
 
+        //beginTransaction
+        DB::beginTransaction();
+
         foreach ($results as $result) {
             $item = Item::findOrFail($result->item_id);
 
@@ -50,6 +53,7 @@ class InvoiceAnull
                 }
                 else{
                     $this->failMessage = 'There is not enough stock available.';
+                    DB::rollBack();
                     return false;
                 }
             }
@@ -59,6 +63,8 @@ class InvoiceAnull
         $this->invoice->setStageAnulled();
         $this->invoice->save();
         
+        //end transaction
+        DB::commit();
         return true;
     }
 
