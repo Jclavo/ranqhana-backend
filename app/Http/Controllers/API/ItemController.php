@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Item;
 use App\Price;
 use App\Unit;
+use App\Invoice;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ResponseController;
 use Illuminate\Support\Facades\Validator;
@@ -167,14 +168,33 @@ class ItemController extends ResponseController
      */
     public function pagination(Request $request)
     {
+        // $validator = Validator::make($request->all(), [
+        //     'invoice_type_id' => 'exists:invoice_types,id',
+        // ]);
+
+
+        // if ($validator->fails()) {
+        //     return $this->sendError($validator->errors()->first());
+        // }
+
         $sortArray = array("asc", "ASC", "desc", "DESC");
 
-        $store_id = $request->store_id;
+        // $store_id = $request->store_id;
+        // // SearchOptions values
+        // $per_page = $request->searchOption['per_page'];
+        // $sortColumn = $request->searchOption['sortColumn'];
+        // $sortDirection = $request->searchOption['sortDirection'];
+        // $searchValue = $request->searchOption['searchValue'];
+
+        $invoice = new Invoice();
+
         // SearchOptions values
-        $per_page = $request->searchOption['per_page'];
-        $sortColumn = $request->searchOption['sortColumn'];
-        $sortDirection = $request->searchOption['sortDirection'];
-        $searchValue = $request->searchOption['searchValue'];
+        $per_page      = $request->per_page;
+        $sortColumn    = $request->sortColumn;
+        $sortDirection = $request->sortDirection;
+        $searchValue   = $request->searchValue;
+        $invoice_type_id  = $request->invoice_type_id;
+        $store_id      = Auth::user()->store_id;
 
         // Initialize values if they are empty.
         if (empty($per_page)) {
@@ -186,41 +206,37 @@ class ItemController extends ResponseController
             $sortColumn = "updated_at";
         }
         
-
         //if(Schema::hasColumn('items', $sortColumn ) === false) ;
         if (empty($sortColumn)) {
                $sortColumn = "updated_at";
         }
 
-        $results = Item::
-                select('items.*', 'units.code as unit', 'units.fractioned')
-                // DB::raw('(select price from prices where item_id  = items.id order by created_at desc limit 1) as price')  
-                ->join('stores', function ($join) use($store_id){
+        $query = Item::query();
+        $query->select('items.*', 'units.code as unit', 'units.fractioned')
+              ->join('stores', function ($join) use($store_id){
                     $join->on('stores.id', '=', 'items.store_id')
                          ->where('items.store_id', '=', $store_id);
                 })
-                ->leftJoin('units', function ($join){
+              ->leftJoin('units', function ($join){
                     $join->on('units.id', '=', 'items.unit_id')
                          ->latest();
-                        //  ->orderBy('prices.created_at', 'DESC')
-                        //  ->take(1);
-                        //  ->first();
-                })
+                });
+        
+        $query->when((!empty($invoice_type_id) && $invoice_type_id == $invoice->getTypeForPurchase()), function ($q) {
+            return $q->where('items.stocked', '=', true );
+        });
 
-                ->where('items.name', 'like', '%'. $searchValue .'%')
-                ->orWhere('items.description', 'like', '%'. $searchValue .'%')
-                ->orWhere('items.price', 'like', $searchValue .'%')
-                ->orWhere('items.stock', 'like', $searchValue .'%')
-                ->orderBy('items.'.$sortColumn, $sortDirection)
-                // ->distinct()
-                ->paginate($per_page);
+        $query->where(function($q) use ($searchValue){
+            $q->where('items.name', 'like', '%'. $searchValue .'%')
+              ->orWhere('items.description', 'like', '%'. $searchValue .'%')
+              ->orWhere('items.price', 'like', $searchValue .'%')
+              ->orWhere('items.stock', 'like', $searchValue .'%');
+        });
 
-                // $item = Item::
-                // select('items.*','prices.price')
-                // ->leftJoin('prices', 'items.id', '=', 'prices.item_id')
-                // ->where('items.id', '=', $id)
-                // ->orderBy('prices.created_at', 'DESC')
-                // ->first();
+        
+        $results = $query->orderBy($sortColumn, $sortDirection)
+                         ->paginate($per_page);
+
             
         return $this->sendResponse($results->items(), 'Items retrieved successfully.', $results->total() );
 
@@ -280,4 +296,53 @@ class ItemController extends ResponseController
         return $this->sendResponse($item->toArray(), 'Stock updated.');
 
     }
+
+    /**
+     * To get "Items" according invoice type
+     */
+
+    // public function getForInvoiceType(int $invoiceType)
+    // {
+    //     $validator = Validator::make(['invoiceType' =>$invoiceType], [
+    //         'invoiceType' => 'required|exists:invoice_types,id',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return $this->sendError($validator->errors()->first());
+    //     }
+
+    //     $invoice = new Invoice();
+
+    //     $query = Item::query();
+
+    //     $query->select('items.*', 'units.code as unit', 'units.fractioned')
+    //             ->join('stores', function ($join){
+    //                 $join->on('stores.id', '=', 'items.store_id')
+    //                     ->where('items.store_id', '=', Auth::user()->store_id);
+    //             })
+    //             ->leftJoin('units', function ($join){
+    //                 $join->on('units.id', '=', 'items.unit_id')
+    //                     ->latest();
+    //             })
+    //             ->where('store_id', '=', Auth::user()->store_id);
+
+    //     $query->when(($invoiceType == $invoice->getTypeForPurchase()), function ($q)  {
+    //         return $q->where('stocked', true );
+    //     });
+
+    //     $item = $query->take(10);
+
+    //     return $this->sendResponse($item, 'Items retrieved successfully.');
+
+    //     // $invoice = Invoice::findOrFail($id);
+
+    //     // $this->businessValidations([
+    //     //     new BelongsToStore(Auth::user(), [$invoice]),
+    //     // ]);
+
+    //     // $this->businessActions([ new InvoiceAnull($invoice)]);
+
+    //     // return $this->sendResponse($invoice->toArray(), 'Invoice Anulled successfully.');
+    // }
+
 }

@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use App\Item;
 use App\User;
 use App\Price;
+use App\Invoice;
 use Tests\TestCase;
 use App\Http\Controllers\API\ItemController;
 
@@ -518,6 +519,23 @@ class ItemTest extends TestCase
         $this->assertEquals(json_decode($stock->content(),true)['message'], 'Stock updated.');
         // $this->assertTrue($stock);
     }
+
+    //FUNCTION getForInvoiceType
+    // public function test_item_get_for_invoice_type(){   
+
+    //     //Authentication
+    //     $this->get_api_token();
+
+    //     $invoice = new Invoice();
+    //     // factory(Invoice::class,'full-type-sell', 5)->create();
+
+    //     $response = $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+    //                       ->get('api/items/getForInvoiceType/' . $invoice->getTypeForSell());
+
+    //     // Verify values in response
+    //     $response->assertJson(['status' => true]);
+    //     $response->assertJsonCount(0 ,'result');
+    // }
 
 
     //PRIVATE
