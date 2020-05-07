@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Actions\Invoice\InvoiceAnull;
 use App\Actions\BelongsToStore;
+use Illuminate\Validation\Rule; 
 
 use App\Http\Controllers\API\ItemController;
 use Carbon\Carbon;
@@ -182,7 +183,8 @@ class InvoiceController extends ResponseController
 
         $query->select('invoices.*');
 
-        $query->where('type_id', '=', $type_id);
+        $query->where('type_id', '=', $type_id)
+              ->where('store_id', '=', Auth::user()->store_id);
 
         $query->when((!empty($searchValue)), function ($q) use($searchValue) {
             return $q->where('serie', 'like', '%'. $searchValue .'%')
@@ -221,6 +223,78 @@ class InvoiceController extends ResponseController
         $this->businessActions([ new InvoiceAnull($invoice)]);
 
         return $this->sendResponse($invoice->toArray(), 'Invoice Anulled successfully.');
+    }
+
+
+    /**
+     * 
+     */
+    public function graphicReport(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            'fromDate' => 'date',
+            'toDate' => 'date|after_or_equal:fromDate',
+            'type_id' => 'required|exists:invoice_types,id',
+            'searchBy' => [Rule::in(['Y', 'M', 'D'])]
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first());
+        }
+
+        $fromDate = $request->fromDate;
+        $toDate = $request->toDate;
+        $type_id = $request->type_id;
+        $searchBy = $request->searchBy;
+
+        $query = Invoice::query();
+
+        $query->select('invoices.total','invoices.created_at')
+              ->where('type_id', '=', $type_id)
+              ->where('store_id', '=', Auth::user()->store_id);
+
+
+        $query->when((!empty($fromDate)) && (!empty($toDate)) , function ($q) use($fromDate,$toDate) {
+
+            $timezome = UserUtils::getTimezone(Auth::user());
+            //change date format
+            $fromDate = CustomCarbon::UTCtoCountryTZ($fromDate,'00:00:00', $timezome);
+            $toDate = CustomCarbon::UTCtoCountryTZ($toDate,'23:59:59', $timezome);
+
+            return $q->whereBetween('created_at',[ $fromDate." 00:00:00", $toDate." 23:59:59"]);
+        });
+
+        $rawQuery = $query->get()
+                    ->groupBy(function($date) use($searchBy){
+
+                        switch ($searchBy) {
+                            case 'Y':
+                                return Carbon::parse($date->created_at)->format('Y'); // grouping by year
+                                break;
+                            case 'M':
+                                return Carbon::parse($date->created_at)->format('M/Y'); // grouping by month 
+                                break;
+                            case 'D':
+                                return Carbon::parse($date->created_at)->format('M/D-d'); // grouping by day
+                                break;
+                            default:
+                                # code...
+                                break;
+                        }
+                    })
+                    ->map(function ($row) {
+                        return $row->sum('total');
+                    });
+        
+        // Logic to convert the group by in an array with X/Y
+        $query_keys = array_keys($rawQuery->toArray());
+        $results = array();
+        foreach($query_keys as $key) {
+            array_push($results,['X' => $key, 'Y' => $rawQuery[$key]]);
+        }
+                    
+        return $this->sendResponse($results, 'Invoices retrieved successfully.' );
+
     }
 
 
