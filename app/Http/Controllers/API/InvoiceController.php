@@ -49,6 +49,8 @@ class InvoiceController extends ResponseController
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            // 'required|between:0,99.99'
+            // 'number' => 'required|numeric|digits_between:1,10' // it does not need numeric
             'subtotal' => 'required|numeric|gt:0',
             'taxes' => 'numeric|gte:0|lt:subtotal',
             'discount' => 'numeric|gte:0|lt:subtotal',
@@ -84,9 +86,20 @@ class InvoiceController extends ResponseController
      * @param  \App\Invoice  $invoice
      * @return \Illuminate\Http\Response
      */
-    public function show(Invoice $invoice)
+    public function show($id)
     {
-        //
+        $invoice = Invoice::select('invoices.*','stores.name as store', 'invoice_types.description as type')
+                   ->join('stores', 'invoices.store_id', '=', 'stores.id')
+                   ->join('invoice_types', 'invoices.type_id', '=', 'invoice_types.id')
+                   ->where('invoices.id','=', $id)
+                   ->where('invoices.store_id','=', Auth::user()->store_id)
+                   ->get();
+
+        if($invoice->isEmpty()){
+            return $this->sendError('Invoice not found.');
+        }else{
+            return $this->sendResponse($invoice, 'Invoice retrieved successfully.');
+        }
     }
 
     /**

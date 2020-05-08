@@ -126,9 +126,23 @@ class InvoiceDetailController extends ResponseController
      * @param  \App\InvoiceDetail  $invoiceDetail
      * @return \Illuminate\Http\Response
      */
-    public function show(InvoiceDetail $invoiceDetail)
+    public function show($id)
     {
-        //
+        $invoiceDetails = InvoiceDetail::select('invoice_details.*', 'items.name as item', 'units.code as unit')
+                        ->join('invoices', function ($join) use($id){
+                            $join->on('invoice_details.invoice_id', '=', 'invoices.id')
+                                ->where('invoices.id', '=', $id)
+                                ->where('invoices.store_id','=', Auth::user()->store_id);
+                        })
+                        ->join('items', 'invoice_details.item_id', '=', 'items.id')
+                        ->join('units', 'items.unit_id', '=', 'units.id')
+                        ->get();
+
+        if($invoiceDetails->isEmpty()){
+            return $this->sendError('Invoice details not found.');
+        }else{
+            return $this->sendResponse($invoiceDetails, 'Invoice details retrieved successfully.');
+        }
     }
 
     /**
