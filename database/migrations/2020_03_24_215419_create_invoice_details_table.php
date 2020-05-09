@@ -21,7 +21,7 @@ class CreateInvoiceDetailsTable extends Migration
 
             $table->integer('quantity');
             $table->decimal('price',7,2);
-            $table->decimal('total',7,2);
+            $table->decimal('total',10,2);
             
             $table->timestamps();
         });
