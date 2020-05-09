@@ -248,7 +248,7 @@ class InvoiceController extends ResponseController
             'fromDate' => 'date',
             'toDate' => 'date|after_or_equal:fromDate',
             'type_id' => 'required|exists:invoice_types,id',
-            'searchBy' => [Rule::in(['Y', 'M', 'D'])]
+            'searchBy' => [Rule::in(['Y', 'M', 'D', 'H'])]
         ]);
 
         if ($validator->fails()) {
@@ -289,6 +289,10 @@ class InvoiceController extends ResponseController
                                 break;
                             case 'D':
                                 return Carbon::parse($date->created_at)->format('M/D-d'); // grouping by day
+                                break;
+                            case 'H':
+                                return Carbon::parse($date->created_at)->format('D g A'); // grouping by day
+                                // format('g:i A');
                                 break;
                             default:
                                 # code...
