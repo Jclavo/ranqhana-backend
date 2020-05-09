@@ -95,11 +95,6 @@ class ItemTest extends TestCase
         $this->item_unit_required('C');
     }
 
-    public function test_item_create_unit_is_zero()
-    {
-        $this->item_unit_is_zero('C');
-    }
-
     public function test_item_create_with_empty_not_required_fields()
     {
         $this->item_with_empty_not_required_fields('C');
@@ -193,11 +188,6 @@ class ItemTest extends TestCase
     public function test_item_update_unit_required()
     {
         $this->item_unit_required('U');
-    }
-
-    public function test_item_update_unit_is_zero()
-    {
-        $this->item_unit_is_zero('U');
     }
 
     public function test_item_update_price_ok()
@@ -649,7 +639,7 @@ class ItemTest extends TestCase
         $assertsJson = array();
         array_push($assertsJson,['status' => false]);
         $unit_id = $this->faker->randomNumber(4, $strict = true);
-        array_push($assertsJson,['message' => 'No query results for model [App\\Unit] ' . $unit_id]);
+        array_push($assertsJson,['message' => 'The selected unit id is invalid.']);
         $this->setAssertJson($assertsJson);
 
         //Authentication
@@ -684,30 +674,6 @@ class ItemTest extends TestCase
             case 'C': $this->create(['unit_id' => '']);
             break;
             case 'U': $this->update(['unit_id' => '']);
-            break;
-        }
-    }
-
-    private function item_unit_is_zero($option = '')
-    {
-        $this->checkOptionCRUD($option);   
-        // Set Database has
-        $this->setDatabaseHas(false);
-
-        //Set Json asserts
-        $assertsJson = array();
-        array_push($assertsJson,['status' => false]);
-        array_push($assertsJson,['message' => 'The unit id must be greater than 0.']);
-        $this->setAssertJson($assertsJson);
-
-        //Authentication
-        $this->get_api_token();
-
-        //Action
-        switch ($option) {
-            case 'C': $this->create(['unit_id' => 0]);
-            break;
-            case 'U': $this->update(['unit_id' => 0]);
             break;
         }
     }

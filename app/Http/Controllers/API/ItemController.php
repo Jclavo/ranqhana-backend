@@ -48,15 +48,12 @@ class ItemController extends ResponseController
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'price' => 'required|numeric|between:0.00,99999.99',
-            'unit_id' => 'required|numeric|gt:0',
+            'unit_id' => 'required|exists:units,id',
         ]);
         
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
         }
-
-        //Validate Unit
-        Unit::findOrFail($request->unit_id);
 
         $item = new Item();
         
@@ -112,16 +109,13 @@ class ItemController extends ResponseController
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'price' => 'required|numeric|between:0.00,99999.99',
-            'unit_id' => 'required|numeric|gt:0',
+            'unit_id' => 'required|exists:units,id',
         ]);
         
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
         }
-
-        //Validate Unit
-        Unit::findOrFail($request->unit_id);
-        
+       
         $item = Item::findOrFail($id);
         $this->authorize('isMyItem', $item);
         
