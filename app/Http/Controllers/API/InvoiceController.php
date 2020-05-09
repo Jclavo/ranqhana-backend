@@ -49,9 +49,8 @@ class InvoiceController extends ResponseController
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            // 'required|between:0,99.99'
-            // 'number' => 'required|numeric|digits_between:1,10' // it does not need numeric
-            'subtotal' => 'required|numeric|gt:0',
+            // "/^-?[0-9]+(?:\.[0-9]{1,2})?$/"
+            'subtotal' => 'required|gt:0|regex:/^[0-9]{1,10}+(?:\.[0-9]{1,2})?$/',
             'taxes' => 'numeric|gte:0|lt:subtotal',
             'discount' => 'numeric|gte:0|lt:subtotal',
             'type_id' => 'required|exists:invoice_types,id',
@@ -71,6 +70,11 @@ class InvoiceController extends ResponseController
         $sellInvoice->type_id  = $request->type_id;
         $sellInvoice->user_id  = Auth::user()->id;
         $sellInvoice->store_id  = Auth::user()->store_id;
+
+        //Validate that total is not negative
+        if($sellInvoice->total < 0){
+            return $this->sendError($sellInvoice->toArray(), 'Invoice total is negative.');       
+        }
 
         //Update stage
         $sellInvoice->setStagePaid();
@@ -274,24 +278,29 @@ class InvoiceController extends ResponseController
             $fromDate = CustomCarbon::UTCtoCountryTZ($fromDate,'00:00:00', $timezome);
             $toDate = CustomCarbon::UTCtoCountryTZ($toDate,'23:59:59', $timezome);
 
-            return $q->whereBetween('created_at',[ $fromDate." 00:00:00", $toDate." 23:59:59"]);
+            return $q->whereBetween('created_at',[$fromDate, $toDate]);
         });
 
+       
         $rawQuery = $query->get()
                     ->groupBy(function($date) use($searchBy){
+                        //Only in hours case 
+                        $timezome = UserUtils::getTimezone(Auth::user());
+                        $date = Carbon::createFromFormat('Y-m-d H:i:s', $date->created_at, 'UTC');
+                        $date->setTimezone($timezome); 
 
                         switch ($searchBy) {
                             case 'Y':
-                                return Carbon::parse($date->created_at)->format('Y'); // grouping by year
+                                return Carbon::parse($date)->format('Y'); // grouping by year
                                 break;
                             case 'M':
-                                return Carbon::parse($date->created_at)->format('M/Y'); // grouping by month 
+                                return Carbon::parse($date)->format('M/Y'); // grouping by month 
                                 break;
                             case 'D':
-                                return Carbon::parse($date->created_at)->format('M/D-d'); // grouping by day
+                                return Carbon::parse($date)->format('M/D-d'); // grouping by day
                                 break;
                             case 'H':
-                                return Carbon::parse($date->created_at)->format('D g A'); // grouping by day
+                                return Carbon::parse($date)->format('D g A', $timezome); // grouping by day
                                 // format('g:i A');
                                 break;
                             default:

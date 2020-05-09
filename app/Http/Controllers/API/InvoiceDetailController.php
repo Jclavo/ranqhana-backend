@@ -52,9 +52,9 @@ class InvoiceDetailController extends ResponseController
     {
         $validator = Validator::make($request->all(), [
             'item_id'    => 'required|exists:items,id',
-            'quantity'   => 'required|numeric|gt:0',
+            'quantity'   => 'required|numeric|gt:0|digits_between:1,5',
             'invoice_id' => 'required|exists:invoices,id',
-            'price'    =>  'numeric|gt:0',
+            'price'    =>   'numeric|gt:0|regex:/^[0-9]{1,5}+(?:\.[0-9]{1,2})?$/',
         ]);
 
         if ($validator->fails()) {
