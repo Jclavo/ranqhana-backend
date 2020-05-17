@@ -24,6 +24,7 @@ $factory->define(User::class, function (Faker $faker) {
         'email' => $faker->unique()->safeEmail,
         'email_verified_at' => now(),
         'identification' => $faker->unique()->randomNumber($nbDigits = 9, $strict = true) . $faker->unique()->randomNumber($nbDigits = 2, $strict = true),
+        // 'identification' => $faker->regexify('[0-9]{11}'),
         'password' => bcrypt('secret'),
         'api_token' => $faker->regexify('[A-Za-z0-9]{80}'),
         'store_id' => Store::all()->random()->id,

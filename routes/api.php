@@ -44,6 +44,10 @@ Route::middleware(['auth:api'])->group(function () {
     Route::resource('units', 'API\UnitController');
     Route::post('units/pagination', 'API\UnitController@pagination');
 
+    //User
+    Route::resource('users', 'API\UserController');
+    Route::post('users/pagination', 'API\UserController@pagination');
+
    
 });
 
