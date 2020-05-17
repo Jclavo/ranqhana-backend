@@ -4,6 +4,9 @@ LARAVEL Basic commands
 
 composer create-project --prefer-dist laravel/laravel blog "5.8.*"
 
+- CREATE ALL
+php artisan make:model modelName -a
+
 - CREATE MODEL (& migration)
 
 php artisan make:model Flight -m
