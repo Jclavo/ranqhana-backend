@@ -48,6 +48,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::resource('users', 'API\UserController');
     Route::post('users/pagination', 'API\UserController@pagination');
 
+    //Stores
+    Route::post('stores/pagination', 'API\StoreController@pagination');
+
    
 });
 
