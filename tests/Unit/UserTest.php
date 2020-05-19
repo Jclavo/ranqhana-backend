@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\User;
 use App\Store;
+use App\Invoice;
 use Tests\TestCase;
 
 class UserTest extends TestCase
@@ -219,6 +220,70 @@ class UserTest extends TestCase
         // Verify values in response
         $response->assertJson(['status' => false]);
         $response->assertJson(['message' => 'The repassword and password must match.']);
+    }
+
+    public function test_user_update_user_busy_for_Brazil()
+    {       
+        //Authentication
+        $this->get_api_token();
+
+        // db config
+        $this->setDatabaseHas(false);
+
+        // Generate a user 
+        $store = factory(Store::class)->create(['country_id' => 1]);
+        $user = factory(User::class)->create(['password' => '']);
+        $invoice = factory(Invoice::class)->create(['user_id' => $user->id]);
+        $userUpdate = factory(User::class)->make(['identification' => $this->faker->regexify('[0-9]{11}'),
+                                                'store_id' => $store->id,
+                                                'password' => '' ]);
+        //Assign email
+        $user->name = $userUpdate->name;
+        $user->identification = $userUpdate->identification;
+        $user->email = $userUpdate->email;
+        $user->store_id = $userUpdate->store_id;
+
+        // Call method
+        $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+                          ->put('api/users/' . $user->id , $user->toArray());
+        
+        // Verify status 200 
+        $response->assertStatus(200);
+                    
+        // Verify values in response
+        $response->assertJson(['status' => false]);
+        $response->assertJson(['message' => 'Store can not be modify, because the user has already started to work.']);
+    }
+
+    public function test_user_update_ok_same_store_for_Brazil()
+    {       
+        //Authentication
+        $this->get_api_token();
+
+        // db config
+        $this->setDatabaseHas(false);
+
+        // Generate a user 
+        $store = factory(Store::class)->create(['country_id' => 1]);
+        $user = factory(User::class)->create(['store_id' => $store->id, 'password' => '']);
+        $invoice = factory(Invoice::class)->create(['user_id' => $user->id]);
+        $userUpdate = factory(User::class)->make(['identification' => $this->faker->regexify('[0-9]{11}'),
+                                                   'password' => '' ]);
+        //Assign email
+        $user->name = $userUpdate->name;
+        $user->identification = $userUpdate->identification;
+        $user->email = $userUpdate->email;
+
+        // Call method
+        $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+                          ->put('api/users/' . $user->id , $user->toArray());
+        
+        // Verify status 200 
+        $response->assertStatus(200);
+                                      
+        // Verify values in response
+        $response->assertJson(['status' => true]);
+        $response->assertJson(['message' => 'User updated successfully.']);
     }
 
     public function test_user_update_ok_without_password_for_Brazil()
@@ -514,8 +579,8 @@ class UserTest extends TestCase
         $this->setDatabaseHas(false);
 
         // Generate a user 
-        $user = factory(User::class)->create();
-        $userNew = factory(User::class)->make(['email' => '']);
+        $user = factory(User::class)->create(['password' => '']);
+        $userNew = factory(User::class)->make(['email' => $this->faker->regexify('[A-Z]{10}')]);
         //Assign email
         $user->identification = $userNew->identification;
         $user->email = $userNew->email;

@@ -16,6 +16,7 @@ use App\Utils\PaginationUtils;
 
 //Actions
 use App\Actions\User\UserIdentificationValidByCountry;
+use App\Actions\User\UserIsFree;
 
 class UserController extends ResponseController{
 
@@ -100,6 +101,13 @@ class UserController extends ResponseController{
 
         $user = User::findOrFail($id);
 
+        //Validate if store can be update
+        if($user->store_id != $request->store_id){
+            $this->businessValidations([
+                new UserIsFree(User::findOrFail($id)),
+            ]);
+        }
+        
         $user->name = $request->name;
         $user->identification = $request->identification;
         $user->email = $request->email;
