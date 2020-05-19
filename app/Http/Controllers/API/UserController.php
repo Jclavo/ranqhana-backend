@@ -123,6 +123,21 @@ class UserController extends ResponseController{
     }
 
     /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\User  $user
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(int $id)
+    {
+        $user = User::findOrFail($id);
+        
+        $user->delete();
+
+        return $this->sendResponse($user->toArray(), 'User deleted successfully.');
+    }
+
+    /**
      * Pagination of table users
      */
     public function pagination(Request $request)
