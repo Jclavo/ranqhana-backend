@@ -10,7 +10,7 @@ use App\Http\Controllers\ResponseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Validation\Rule; 
 //Utils
 use App\Utils\PaginationUtils;
 
@@ -54,6 +54,64 @@ class UserController extends ResponseController{
         $user->save();
         
         return $this->sendResponse($user->toArray(), 'User created successfully.');  
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\User  $user
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        $user = User::findOrFail($id, ['id','name','identification','email','store_id']);
+        
+        return $this->sendResponse($user->toArray(), 'User retrieved successfully.');
+    }
+
+        /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Unit  $unit
+     * @return \Illuminate\Http\Response
+     */
+    public function update(int $id, Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:45',
+            'identification' => ['required', 'numeric', 
+                                  Rule::unique('users')->ignore($id)],
+            'email' => ['nullable','email',
+                        Rule::unique('users')->ignore($id)],
+            'store_id' => 'required|exists:stores,id',
+            'password' => 'nullable|min:8|max:45',
+            'repassword' => 'nullable|min:8|max:45|same:password',
+        ]);
+        
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first());
+        }
+
+        // $store =  
+        $this->businessValidations([
+            new UserIdentificationValidByCountry(Store::findOrFail($request->store_id), $request->identification),
+        ]);
+
+        $user = User::findOrFail($id);
+
+        $user->name = $request->name;
+        $user->identification = $request->identification;
+        $user->email = $request->email;
+        $user->store_id = $request->store_id;
+        //Update password if it has a value
+        if(!empty($request->password)){
+            $user->password = bcrypt($request->password);
+        }
+        
+        $user->save();
+
+        return $this->sendResponse($user->toArray(), 'User updated successfully.');  
     }
 
     /**
