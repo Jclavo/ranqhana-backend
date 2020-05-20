@@ -131,6 +131,10 @@ class UserController extends ResponseController{
     public function destroy(int $id)
     {
         $user = User::findOrFail($id);
+
+        if($user->id === Auth::user()->id){
+            return $this->sendError('The logged user can not be deleted.');
+        }
         
         $user->delete();
 

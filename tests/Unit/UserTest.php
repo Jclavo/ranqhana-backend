@@ -368,6 +368,29 @@ class UserTest extends TestCase
         $response->assertJson(['message' => 'User updated successfully.']);
     }
 
+    public function test_user_softdelete_same()
+    {       
+        //Authentication
+        $this->get_api_token();
+
+        // db config
+        $this->setDatabaseHas(false);
+
+        $user = factory(User::class)->create();
+
+        // Call method
+        $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+                          ->delete('api/users/' . auth()->user()->id);
+
+        // Verify status 200 
+        $response->assertStatus(200);
+            
+        // Verify values in response
+        $response->assertJson(['status' => false]);
+        $response->assertJson(['message' => 'The logged user can not be deleted.']);
+
+    }
+
     public function test_user_softdelete_ok()
     {       
         //Authentication
