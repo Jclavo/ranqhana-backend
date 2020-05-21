@@ -20,13 +20,56 @@ use Illuminate\Support\Str;
 
 $factory->define(User::class, function (Faker $faker) {
     return [
+        'store_id' => Store::all()->random()->id,
+        'identification' => $faker->unique()->randomNumber(),
         'name' => $faker->name,
-        'email' => $faker->unique()->safeEmail,
-        'email_verified_at' => now(),
-        'identification' => $faker->unique()->randomNumber($nbDigits = 9, $strict = true) . $faker->unique()->randomNumber($nbDigits = 2, $strict = true),
-        // 'identification' => $faker->regexify('[0-9]{11}'),
+        'lastname' => $faker->name,
+        'email' => $faker->unique()->email,
+        'phone' => $faker->e164PhoneNumber,
+        'login' => $faker->unique()->randomNumber(),
+        'address' => $faker->address,
         'password' => bcrypt('secret'),
         'api_token' => $faker->regexify('[A-Za-z0-9]{80}'),
-        'store_id' => Store::all()->random()->id,
-    ];
+        
+    ]; 
 });
+
+$factory->defineAs(User::class, 'completed', function (Faker $faker)  {
+    $user = factory(User::class)->raw();
+    $user['login'] = $user['identification'] . $user['store_id'];
+    return $user;
+    // return array_merge($user,[
+    //     'completed' => true
+    // ]);
+});
+
+$factory->defineAs(User::class, 'brazilian', function (Faker $faker)  {
+    $user = factory(User::class)->raw([
+        'store_id' => function () {
+            return factory(Store::class)->create(['country_id' => 1])->id;
+        },
+        'identification' => $faker->regexify('[0-9]{11}'),
+    ]);
+    $user['login'] = $user['identification'] . $user['store_id'];
+    return $user;
+});
+
+// Samples about state
+// $factory->state(User::class, 'password', [
+//     'password' => 'secret'
+// ]);
+
+// factory(App\User::class,'brazilian')->states('password')->create();
+
+// $factory->state(User::class, 'brasilian', function (Faker $faker) {
+//     return [
+//         // 'store_id' => Store::all()->random()->id,
+//         'store_id' => function () {
+//             return factory(Store::class)->create(['country_id' => 1])->id;
+//         },
+//         'identification' => $faker->regexify('[0-9]{11}'),
+//     ];
+// });\
+
+
+
