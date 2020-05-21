@@ -11,12 +11,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule; 
+
 //Utils
 use App\Utils\PaginationUtils;
 
 //Actions
 use App\Actions\User\UserIdentificationValidByCountry;
 use App\Actions\User\UserIsFree;
+
+//Rules
+use App\Rules\Identification;
 
 class UserController extends ResponseController{
 
@@ -26,23 +30,27 @@ class UserController extends ResponseController{
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request) 
     {
         $validator = Validator::make($request->all(), [
+            'store_id' => 'required|exists:stores,id',
             'name' => 'required|max:45',
-            'identification' => 'required|numeric|unique:users',
+            'lastname' => 'required|max:45',
+            'address' => 'nullable|max:100',
+            'phone' => 'nullable|max:15',
+            'identification' => ['required', 'numeric' ,
+                                Rule::unique('users')->where(function($query) use($request) {
+                                    $query->where('store_id', '=', $request->store_id);
+                                }),
+                                new Identification($request->store_id)],
             'email' => 'email|unique:users',
-            'store_id' => 'required|exists:stores,id'
         ]);
+
+        // https://laravel.com/docs/7.x/validation#using-rule-objects
         
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
         }
-
-        // $store =  
-        $this->businessValidations([
-            new UserIdentificationValidByCountry(Store::findOrFail($request->store_id), $request->identification),
-        ]);
 
         $user = new User();
         

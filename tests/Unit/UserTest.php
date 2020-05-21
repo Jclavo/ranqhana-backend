@@ -20,14 +20,15 @@ class UserTest extends TestCase
     }
 
     //TEST FUNCTION create user
-    public function test_user_create_name_required()
-    {       
-        $this->user_name_required('C');        
+
+    public function test_user_create_store_id_required()
+    {   
+        $this->user_store_id_required('C');
     }
 
-    public function test_user_create_name_too_long()
-    {    
-        $this->user_name_too_long('C');
+    public function test_user_create_store_id_exist()
+    {       
+        $this->user_store_id_exist('C');
     }
 
     public function test_user_create_identification_required()
@@ -50,6 +51,37 @@ class UserTest extends TestCase
         $this->user_identification_lenght_for_Brazil('C');
     }
 
+
+    public function test_user_create_name_required()
+    {       
+        $this->user_name_required('C');        
+    }
+
+    public function test_user_create_name_too_long()
+    {    
+        $this->user_name_too_long('C');
+    }
+
+    public function test_user_create_lastname_required()
+    {       
+        $this->user_lastname_required('C');        
+    }
+
+    public function test_user_create_lastname_max()
+    {       
+        $this->user_lastname_max('C');        
+    }
+
+    public function test_user_create_address_max()
+    {       
+        $this->user_address_max('C');        
+    }
+
+    public function test_user_create_phone_max()
+    {       
+        $this->user_phone_max('C');        
+    }
+
     public function test_user_create_email_format()
     {       
         $this->user_email_format('C');
@@ -60,14 +92,36 @@ class UserTest extends TestCase
         $this->user_email_taken('C');
     }
 
-    public function test_user_create_store_id_required()
-    {   
-        $this->user_store_id_required('C');
-    }
-
-    public function test_user_create_store_id_exist()
+    public function test_user_create_same_identification_ok_Brazil()
     {       
-        $this->user_store_id_exist('C');
+        //Authentication
+        $this->get_api_token();
+
+        // db config
+        $this->setDatabaseHas(true);
+
+        // Generate a user 
+        $user = factory(User::class,'brazilian')->create();
+        $userNew = factory(User::class,'brazilian')->make();
+        //Assign email
+        $user->name = $userNew->name;
+        $user->email = $userNew->email;
+        $user->store_id = $userNew->store_id;
+
+        // Call method
+        $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+                          ->post('api/users/' , $user->toArray());
+        
+        // Verify status 200 
+        $response->assertStatus(200);
+
+        //Verify in the database
+        $this->setResultResponse($response);
+        $this->checkRecordInDB();
+                     
+        // Verify values in response
+        $response->assertJson(['status' => true]);
+        $response->assertJson(['message' => 'User created successfully.']);
     }
 
     public function test_user_create_ok_for_Brazil()
@@ -79,10 +133,8 @@ class UserTest extends TestCase
         $this->setDatabaseHas(true);
 
         // Generate a user 
-        $store = factory(Store::class)->create(['country_id' => 1]);
         $user = factory(User::class)->create();
-        $userNew = factory(User::class)->make(['identification' => $this->faker->regexify('[0-9]{11}'),
-                                                'store_id' => $store->id]);
+        $userNew = factory(User::class,'brazilian')->make();
         //Assign email
         $user->name = $userNew->name;
         $user->identification = $userNew->identification;
@@ -115,6 +167,11 @@ class UserTest extends TestCase
     {    
         $this->user_name_too_long('U');
     }
+
+    // public function test_user_update_lastname_required()
+    // {       
+    //     $this->user_lastname_required('U');        
+    // }
 
     public function test_user_update_identification_required()
     {   
@@ -452,6 +509,38 @@ class UserTest extends TestCase
         $response->assertJson(['message' => 'The name field is required.']);
     }
 
+    private function user_lastname_required($option = ''){
+        $this->checkOptionCRUD($option);      
+
+        //Authentication
+        $this->get_api_token();
+
+        // db config
+        $this->setDatabaseHas(false);
+
+        // Generate a user 
+        $user = factory(User::class)->create(['lastname' => '']);
+
+        // Call method
+        switch ($option) {
+            case 'C':
+                $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+                                  ->post('api/users/' , $user->toArray());
+                break;
+            case 'U': 
+                $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+                                  ->put('api/users/' . $user->id , $user->toArray());
+                break;
+        }
+        
+        // Verify status 200 
+        $response->assertStatus(200);
+                     
+        // Verify values in response
+        $response->assertJson(['status' => false]);
+        $response->assertJson(['message' => 'The lastname field is required.']);
+    }
+
     private function user_name_too_long($option = ''){
         $this->checkOptionCRUD($option);      
         //Authentication
@@ -481,6 +570,99 @@ class UserTest extends TestCase
         // Verify values in response
         $response->assertJson(['status' => false]);
         $response->assertJson(['message' => 'The name may not be greater than 45 characters.']);
+    }
+
+    private function user_lastname_max($option = ''){
+        $this->checkOptionCRUD($option);      
+        //Authentication
+        $this->get_api_token();
+
+        // db config
+        $this->setDatabaseHas(false);
+
+        // Generate a user 
+        $user = factory(User::class)->create(['lastname' => $this->faker->regexify('[A-Za-z0-9]{50}')]);
+
+        // Call method
+        switch ($option) {
+            case 'C':
+                $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+                                    ->post('api/users/' , $user->toArray());
+                break;
+            case 'U': 
+                $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+                                  ->put('api/users/'.$user->id , $user->toArray());
+                break;
+        }
+        
+        // Verify status 200 
+        $response->assertStatus(200);
+                     
+        // Verify values in response
+        $response->assertJson(['status' => false]);
+        $response->assertJson(['message' => 'The lastname may not be greater than 45 characters.']);
+    }
+
+    private function user_address_max($option = ''){
+        $this->checkOptionCRUD($option);      
+        //Authentication
+        $this->get_api_token();
+
+        // db config
+        $this->setDatabaseHas(false);
+
+        // Generate a user 
+        $user = factory(User::class)->create(['address' => $this->faker->regexify('[A-Za-z0-9]{200}')]);
+
+        // Call method
+        switch ($option) {
+            case 'C':
+                $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+                                    ->post('api/users/' , $user->toArray());
+                break;
+            case 'U': 
+                $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+                                  ->put('api/users/'.$user->id , $user->toArray());
+                break;
+        }
+        
+        // Verify status 200 
+        $response->assertStatus(200);
+                     
+        // Verify values in response
+        $response->assertJson(['status' => false]);
+        $response->assertJson(['message' => 'The address may not be greater than 100 characters.']);
+    }
+
+    private function user_phone_max($option = ''){
+        $this->checkOptionCRUD($option);      
+        //Authentication
+        $this->get_api_token();
+
+        // db config
+        $this->setDatabaseHas(false);
+
+        // Generate a user 
+        $user = factory(User::class)->create(['phone' => $this->faker->regexify('[A-Za-z0-9]{20}')]);
+
+        // Call method
+        switch ($option) {
+            case 'C':
+                $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+                                    ->post('api/users/' , $user->toArray());
+                break;
+            case 'U': 
+                $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+                                  ->put('api/users/'.$user->id , $user->toArray());
+                break;
+        }
+        
+        // Verify status 200 
+        $response->assertStatus(200);
+                     
+        // Verify values in response
+        $response->assertJson(['status' => false]);
+        $response->assertJson(['message' => 'The phone may not be greater than 15 characters.']);
     }
 
     private function user_identification_required($option = ''){
@@ -590,10 +772,8 @@ class UserTest extends TestCase
         $this->setDatabaseHas(false);
 
         // Generate a user 
-        $store = factory(Store::class)->create(['country_id' => 1]);
         $user = factory(User::class)->create();
-        $userNew = factory(User::class)->make(['identification' => $this->faker->randomNumber(),
-                                                'store_id' => $store->id]);
+        $userNew = factory(User::class,'brazilian')->make(['identification' => $this->faker->randomNumber()]);
         //Assign email
         $user->name = $userNew->name;
         $user->identification = $userNew->identification;
@@ -630,8 +810,8 @@ class UserTest extends TestCase
         $this->setDatabaseHas(false);
 
         // Generate a user 
-        $user = factory(User::class)->create(['password' => '']);
-        $userNew = factory(User::class)->make(['email' => $this->faker->regexify('[A-Z]{10}')]);
+        $user = factory(User::class,'brazilian')->create(['password' => '']);
+        $userNew = factory(User::class,'brazilian')->make(['email' => $this->faker->regexify('[A-Z]{10}')]);
         //Assign email
         $user->identification = $userNew->identification;
         $user->email = $userNew->email;
@@ -667,8 +847,8 @@ class UserTest extends TestCase
         $this->setDatabaseHas(false);
 
         // Generate a user 
-        $user = factory(User::class)->create();
-        $userNew = factory(User::class)->make();
+        $user = factory(User::class,'brazilian')->create();
+        $userNew = factory(User::class,'brazilian')->make();
         //Assign email
         $user->identification = $userNew->identification;
 
