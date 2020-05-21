@@ -37,7 +37,7 @@ php artisan make:factory PostFactory --model=Post
 
 php artisan tinker
 
-factory(App\User::class, 500)->create();
+factory(App\User::class)->create();
 
 - CREATE SEEDER
 
@@ -61,6 +61,10 @@ php artisan make:test UserTest --unit
 - CREATE POLICE
 
 php artisan make:policy PostPolicy
+
+- CREATE RULE
+
+php artisan make:rule RuleName
 
 
 
