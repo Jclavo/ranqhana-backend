@@ -16,7 +16,8 @@ class UserTest extends TestCase
         $this->setBaseRoute('users');
         $this->setBaseModel('App\User');
         $this->setFaker(); 
-        $this->setFieldsDatabaseHas(['id', 'name', 'identification', 'email', 'store_id', 'password']);  
+        $this->setFieldsDatabaseHas(['id', 'name', 'lastname', 'identification', 'email', 'store_id',
+                                     'password', 'address', 'phone', 'login']);  
     }
 
     //TEST FUNCTION create user
