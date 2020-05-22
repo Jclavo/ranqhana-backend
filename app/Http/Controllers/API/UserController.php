@@ -14,6 +14,7 @@ use Illuminate\Validation\Rule;
 
 //Utils
 use App\Utils\PaginationUtils;
+use App\Utils\UserUtils;
 
 //Actions
 use App\Actions\User\UserIdentificationValidByCountry;
@@ -55,10 +56,14 @@ class UserController extends ResponseController{
         $user = new User();
         
         $user->name = $request->name;
+        $user->lastname = $request->lastname;
+        $user->address = $request->address;
+        $user->phone = $request->phone;
         $user->identification = $request->identification;
         $user->email = $request->email;
         $user->password = bcrypt($request->identification);
         $user->store_id = $request->store_id;
+        $user->login = UserUtils::generateLogin($user->identification,$user->store_id);
         
         $user->save();
         
