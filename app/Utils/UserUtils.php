@@ -18,4 +18,9 @@ class UserUtils
         if($timezone == null) return 'UTC';
         return $timezone->timezone;
     }
+
+    static function generateLogin($identification,$store_id){
+        return $identification . $store_id;
+    }
+    
 }
