@@ -56,9 +56,9 @@ $factory->defineAs(User::class, 'brazilian', function (Faker $faker)  {
 });
 
 // Samples about state
-// $factory->state(User::class, 'password', [
-//     'password' => 'secret'
-// ]);
+$factory->state(User::class, 'password_empty', [
+    'password' => ''
+]);
 
 // factory(App\User::class,'brazilian')->states('password')->create();
 
