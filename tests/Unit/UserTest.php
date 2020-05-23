@@ -125,6 +125,38 @@ class UserTest extends TestCase
         $response->assertJson(['message' => 'User created successfully.']);
     }
 
+    public function test_user_create_same_email_ok_Brazil()
+    {       
+        //Authentication
+        $this->get_api_token();
+
+        // db config
+        $this->setDatabaseHas(true);
+
+        // Generate a user 
+        $user = factory(User::class,'brazilian')->create();
+        $userNew = factory(User::class,'brazilian')->make();
+        //Assign email
+        $user->name = $userNew->name;
+        $user->identification = $userNew->identification;
+        $user->store_id = $userNew->store_id;
+
+        // Call method
+        $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+                          ->post('api/users/' , $user->toArray());
+        
+        // Verify status 200 
+        $response->assertStatus(200);
+
+        //Verify in the database
+        $this->setResultResponse($response);
+        $this->checkRecordInDB();
+                     
+        // Verify values in response
+        $response->assertJson(['status' => true]);
+        $response->assertJson(['message' => 'User created successfully.']);
+    }
+
     public function test_user_create_ok_for_Brazil()
     {       
         //Authentication

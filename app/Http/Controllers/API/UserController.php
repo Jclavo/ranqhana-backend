@@ -44,12 +44,13 @@ class UserController extends ResponseController{
                                     $query->where('store_id', '=', $request->store_id);
                                 }),
                                 new Identification($request->store_id)],
-            'email' => 'email|unique:users',
+            'email' => ['nullable','email',
+                        Rule::unique('users')->where(function($query) use($request) {
+                            $query->where('store_id', '=', $request->store_id);
+                        })],
             'phone' => ['nullable', new PhoneCountry($request->store_id) ],
         ]);
-
-        // https://laravel.com/docs/7.x/validation#using-rule-objects
-        
+      
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
         }
@@ -94,14 +95,22 @@ class UserController extends ResponseController{
     public function update(int $id, Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'store_id' => 'required|exists:stores,id',
             'name' => 'required|max:45',
-            'identification' => ['required', 'numeric', 
-                                  Rule::unique('users')->ignore($id)],
+            'lastname' => 'required|max:45',
+            'address' => 'nullable|max:100',
+            'identification' => ['required', 'numeric' ,
+                                Rule::unique('users')->where(function($query) use($request) {
+                                    $query->where('store_id', '=', $request->store_id);
+                                })->ignore($id),
+                                new Identification($request->store_id)],
             'email' => ['nullable','email',
                         Rule::unique('users')->ignore($id)],
-            'store_id' => 'required|exists:stores,id',
+            
             'password' => 'nullable|min:8|max:45',
             'repassword' => 'nullable|min:8|max:45|same:password',
+            'phone' => ['nullable', new PhoneCountry($request->store_id)]
+
         ]);
         
         if ($validator->fails()) {
