@@ -80,7 +80,10 @@ class UserController extends ResponseController{
      */
     public function show($id)
     {
-        $user = User::findOrFail($id, ['id','name','identification','email','store_id']);
+        // $user = User::findOrFail($id, ['id','name','identification','email','store_id']);
+        $user = User::select('users.*','stores.name as store', 'countries.code as country_code')
+        ->join('stores', 'users.store_id', '=', 'stores.id')
+        ->join('countries', 'stores.country_id', '=', 'countries.id')->findOrFail($id);
         
         return $this->sendResponse($user->toArray(), 'User retrieved successfully.');
     }
@@ -105,22 +108,17 @@ class UserController extends ResponseController{
                                 })->ignore($id),
                                 new Identification($request->store_id)],
             'email' => ['nullable','email',
-                        Rule::unique('users')->ignore($id)],
-            
+                        Rule::unique('users')->where(function($query) use($request) {
+                            $query->where('store_id', '=', $request->store_id);
+                        })->ignore($id)],
+            'phone' => ['nullable', new PhoneCountry($request->store_id)],
             'password' => 'nullable|min:8|max:45',
-            'repassword' => 'nullable|min:8|max:45|same:password',
-            'phone' => ['nullable', new PhoneCountry($request->store_id)]
-
+            'repassword' => 'nullable|required_with:password|min:8|max:45|same:password',
         ]);
         
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
         }
-
-        // $store =  
-        $this->businessValidations([
-            new UserIdentificationValidByCountry(Store::findOrFail($request->store_id), $request->identification),
-        ]);
 
         $user = User::findOrFail($id);
 
@@ -132,14 +130,18 @@ class UserController extends ResponseController{
         }
         
         $user->name = $request->name;
+        $user->lastname = $request->lastname;
+        $user->address = $request->address;
+        $user->phone = $request->phone;
         $user->identification = $request->identification;
         $user->email = $request->email;
         $user->store_id = $request->store_id;
+        $user->login = UserUtils::generateLogin($user->identification,$user->store_id);
         //Update password if it has a value
         if(!empty($request->password)){
             $user->password = bcrypt($request->password);
         }
-        
+             
         $user->save();
 
         return $this->sendResponse($user->toArray(), 'User updated successfully.');  
@@ -186,9 +188,11 @@ class UserController extends ResponseController{
 
 
         $query = User::query();
-        $query->select('users.id','users.login','users.identification','users.name','users.lastname','users.email',
-                        'users.phone','users.address', 'users.store_id','stores.name as store')
-              ->join('stores', 'users.store_id', '=', 'stores.id');  
+        // $query->select('users.id','users.login','users.identification','users.name','users.lastname','users.email',
+        //                 'users.phone','users.address', 'users.store_id','stores.name as store')
+        $query->select('users.*','stores.name as store', 'countries.code as country_code')
+              ->join('stores', 'users.store_id', '=', 'stores.id')
+              ->join('countries', 'stores.country_id', '=', 'countries.id');    
        
         $query->where(function($q) use ($searchValue){
             $q->where('users.login', 'like', '%'. $searchValue .'%')

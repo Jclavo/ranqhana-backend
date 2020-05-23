@@ -94,67 +94,13 @@ class UserTest extends TestCase
     }
 
     public function test_user_create_same_identification_ok_Brazil()
-    {       
-        //Authentication
-        $this->get_api_token();
-
-        // db config
-        $this->setDatabaseHas(true);
-
-        // Generate a user 
-        $user = factory(User::class,'brazilian')->create();
-        $userNew = factory(User::class,'brazilian')->make();
-        //Assign email
-        $user->name = $userNew->name;
-        $user->email = $userNew->email;
-        $user->store_id = $userNew->store_id;
-
-        // Call method
-        $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
-                          ->post('api/users/' , $user->toArray());
-        
-        // Verify status 200 
-        $response->assertStatus(200);
-
-        //Verify in the database
-        $this->setResultResponse($response);
-        $this->checkRecordInDB();
-                     
-        // Verify values in response
-        $response->assertJson(['status' => true]);
-        $response->assertJson(['message' => 'User created successfully.']);
+    {    
+        $this->user_same_identification_ok_Brazil('C');
     }
 
     public function test_user_create_same_email_ok_Brazil()
-    {       
-        //Authentication
-        $this->get_api_token();
-
-        // db config
-        $this->setDatabaseHas(true);
-
-        // Generate a user 
-        $user = factory(User::class,'brazilian')->create();
-        $userNew = factory(User::class,'brazilian')->make();
-        //Assign email
-        $user->name = $userNew->name;
-        $user->identification = $userNew->identification;
-        $user->store_id = $userNew->store_id;
-
-        // Call method
-        $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
-                          ->post('api/users/' , $user->toArray());
-        
-        // Verify status 200 
-        $response->assertStatus(200);
-
-        //Verify in the database
-        $this->setResultResponse($response);
-        $this->checkRecordInDB();
-                     
-        // Verify values in response
-        $response->assertJson(['status' => true]);
-        $response->assertJson(['message' => 'User created successfully.']);
+    {   
+        $this->user_same_email_ok_Brazil('C');    
     }
 
     public function test_user_create_ok_for_Brazil()
@@ -194,6 +140,17 @@ class UserTest extends TestCase
     }
 
     //update function
+
+    public function test_user_update_store_id_required()
+    {   
+        $this->user_store_id_required('U');
+    }
+
+    public function test_user_update_store_id_exist()
+    {       
+        $this->user_store_id_exist('U');
+    }
+
     public function test_user_update_name_required()
     {       
         $this->user_name_required('U');   
@@ -204,10 +161,20 @@ class UserTest extends TestCase
         $this->user_name_too_long('U');
     }
 
-    // public function test_user_update_lastname_required()
-    // {       
-    //     $this->user_lastname_required('U');        
-    // }
+    public function test_user_update_lastname_required()
+    {       
+        $this->user_lastname_required('U');        
+    }
+
+    public function test_user_update_lastname_max()
+    {       
+        $this->user_lastname_max('U');        
+    }
+
+    public function test_user_update_address_max()
+    {       
+        $this->user_address_max('U');        
+    }
 
     public function test_user_update_identification_required()
     {   
@@ -224,10 +191,10 @@ class UserTest extends TestCase
        $this->user_identification_taken('U');
     }
 
-    // public function test_user_update_identification_lenght_for_Brazil()
-    // {       
-    //     $this->user_identification_lenght_for_Brazil('U');
-    // }
+    public function test_user_update_identification_lenght_for_Brazil()
+    {       
+        $this->user_identification_lenght_for_Brazil('U');
+    }
 
     public function test_user_update_email_format()
     {       
@@ -239,14 +206,14 @@ class UserTest extends TestCase
         $this->user_email_taken('U');
     }
 
-    public function test_user_update_store_id_required()
-    {   
-        $this->user_store_id_required('U');
+    public function test_user_update_same_identification_ok_Brazil()
+    {    
+        $this->user_same_identification_ok_Brazil('U');
     }
 
-    public function test_user_update_store_id_exist()
-    {       
-        $this->user_store_id_exist('U');
+    public function test_user_update_same_email_ok_Brazil()
+    {   
+        $this->user_same_email_ok_Brazil('U');    
     }
 
     public function test_user_update_password_length_min(){
@@ -257,7 +224,7 @@ class UserTest extends TestCase
         $this->setDatabaseHas(false);
 
         // Generate a user 
-        $user = factory(User::class)->create(['password' => $this->faker->regexify('[A-Za-z0-9]{7}')]);
+        $user = factory(User::class,'brazilian')->create(['password' => $this->faker->regexify('[A-Za-z0-9]{7}')]);
 
         // Call method
         $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
@@ -279,7 +246,7 @@ class UserTest extends TestCase
         $this->setDatabaseHas(false);
 
         // Generate a user 
-        $user = factory(User::class)->create(['password' => $this->faker->regexify('[A-Za-z0-9]{50}')]);
+        $user = factory(User::class,'brazilian')->create(['password' => $this->faker->regexify('[A-Za-z0-9]{50}')]);
 
         // Call method
         $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
@@ -301,7 +268,7 @@ class UserTest extends TestCase
         $this->setDatabaseHas(false);
 
         // Generate a user 
-        $user = factory(User::class)->create(['password' => $this->faker->regexify('[A-Za-z0-9]{10}')]);
+        $user = factory(User::class,'brazilian')->create(['password' => $this->faker->regexify('[A-Za-z0-9]{10}')]);
         $user->repassword = $this->faker->regexify('[A-Za-z0-9]{10}');
         // Call method
         $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
@@ -324,12 +291,9 @@ class UserTest extends TestCase
         $this->setDatabaseHas(false);
 
         // Generate a user 
-        $store = factory(Store::class)->create(['country_id' => 1]);
-        $user = factory(User::class)->create(['password' => '']);
+        $user = factory(User::class,'brazilian')->states('password_empty')->create();
         $invoice = factory(Invoice::class)->create(['user_id' => $user->id]);
-        $userUpdate = factory(User::class)->make(['identification' => $this->faker->regexify('[0-9]{11}'),
-                                                'store_id' => $store->id,
-                                                'password' => '' ]);
+        $userUpdate = factory(User::class,'brazilian')->states('password_empty')->make();
         //Assign email
         $user->name = $userUpdate->name;
         $user->identification = $userUpdate->identification;
@@ -357,11 +321,9 @@ class UserTest extends TestCase
         $this->setDatabaseHas(false);
 
         // Generate a user 
-        $store = factory(Store::class)->create(['country_id' => 1]);
-        $user = factory(User::class)->create(['store_id' => $store->id, 'password' => '']);
+        $user = factory(User::class,'brazilian')->states('password_empty')->create();
         $invoice = factory(Invoice::class)->create(['user_id' => $user->id]);
-        $userUpdate = factory(User::class)->make(['identification' => $this->faker->regexify('[0-9]{11}'),
-                                                   'password' => '' ]);
+        $userUpdate = factory(User::class,'brazilian')->states('password_empty')->make();
         //Assign email
         $user->name = $userUpdate->name;
         $user->identification = $userUpdate->identification;
@@ -388,11 +350,8 @@ class UserTest extends TestCase
         $this->setDatabaseHas(true);
 
         // Generate a user 
-        $store = factory(Store::class)->create(['country_id' => 1]);
-        $user = factory(User::class)->create();
-        $userUpdate = factory(User::class)->make(['identification' => $this->faker->regexify('[0-9]{11}'),
-                                                'store_id' => $store->id,
-                                                'password' => '' ]);
+        $user = factory(User::class,'brazilian')->create();
+        $userUpdate = factory(User::class,'brazilian')->states('password_empty')->make();
         //Assign email
         $user->name = $userUpdate->name;
         $user->identification = $userUpdate->identification;
@@ -400,9 +359,7 @@ class UserTest extends TestCase
         $user->store_id = $userUpdate->store_id;
 
         $oldPassword = $user->password;
-        $user->password = '';
-        // unset($user->password);
-        // $user->repassword = null;
+        $user->password = $userUpdate->password;
 
         // Call method
         $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
@@ -432,13 +389,13 @@ class UserTest extends TestCase
         $this->setDatabaseHas(true);
 
         // Generate a user 
-        $store = factory(Store::class)->create(['country_id' => 1]);
-        $user = factory(User::class)->create();
-        $userUpdate = factory(User::class)->make(['identification' => $this->faker->regexify('[0-9]{11}'),
-                                                'store_id' => $store->id,
-                                                'password' => $this->faker->regexify('[A-Za-z0-9]{10}')]);
+        $user = factory(User::class,'brazilian')->create();
+        $userUpdate = factory(User::class,'brazilian')->make(['password' => $this->faker->regexify('[A-Za-z0-9]{10}')]);
         //Assign email
         $user->name = $userUpdate->name;
+        $user->lastname = $userUpdate->lastname;
+        $user->address = $userUpdate->address;
+        $user->phone = $userUpdate->phone;
         $user->identification = $userUpdate->identification;
         $user->email = $userUpdate->email;
         $user->store_id = $userUpdate->store_id;
@@ -461,6 +418,7 @@ class UserTest extends TestCase
         $response->assertJson(['message' => 'User updated successfully.']);
     }
 
+    //DELETE
     public function test_user_softdelete_same()
     {       
         //Authentication
@@ -781,7 +739,7 @@ class UserTest extends TestCase
          $this->setDatabaseHas(false);
  
          // Generate a user 
-         $user = factory(User::class)->create();
+         $user = factory(User::class,'brazilian')->create();
  
         // Call method
         switch ($option) {
@@ -790,8 +748,9 @@ class UserTest extends TestCase
                                   ->post('api/users/' , $user->toArray());
                 break;
             case 'U':
-                $userUpdate = factory(User::class)->create();
+                $userUpdate = factory(User::class,'brazilian')->create();
                 $user->identification = $userUpdate->identification;
+                $user->store_id = $userUpdate->store_id;
                 $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
                                   ->put('api/users/' . $user->id , $user->toArray()); 
                 break;
@@ -901,7 +860,7 @@ class UserTest extends TestCase
                                   ->post('api/users/' , $user->toArray());
                 break;
             case 'U':
-                $userUpdate = factory(User::class)->create();
+                $userUpdate = factory(User::class,'brazilian')->create(['store_id' => $user->store_id]);
                 $user->email = $userUpdate->email;
                 $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
                                   ->put('api/users/' . $user->id , $user->toArray()); 
@@ -993,6 +952,86 @@ class UserTest extends TestCase
 
     }
 
+    private function user_same_identification_ok_Brazil($option = ''){
+        $this->checkOptionCRUD($option);
+        //Authentication
+        $this->get_api_token();
 
+        // db config
+        $this->setDatabaseHas(true);
+
+        // Generate a user 
+        $user = factory(User::class,'brazilian')->states('password_empty')->create();
+        $userNew = factory(User::class,'brazilian')->make();
+        //Assign email
+        $user->name = $userNew->name;
+        $user->email = $userNew->email;
+        $user->store_id = $userNew->store_id;
+
+        // Call method
+        switch ($option) {
+        case 'C':
+            $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+                                ->post('api/users/' , $user->toArray());
+            break;
+        case 'U':
+            // $userUpdate = factory(User::class)->create();
+            $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+                                ->put('api/users/' . $user->id , $user->toArray()); 
+            break;
+        }
+        
+        // Verify status 200 
+        $response->assertStatus(200);
+
+        //Verify in the database
+        $this->setResultResponse($response);
+        $this->checkRecordInDB();
+                        
+        // Verify values in response
+        $response->assertJson(['status' => true]);
+        // $response->assertJson(['message' => 'User created successfully.']);
+    }
+
+    private function user_same_email_ok_Brazil($option = ''){
+        $this->checkOptionCRUD($option);
+        //Authentication
+        $this->get_api_token();
+
+        // db config
+        $this->setDatabaseHas(true);
+
+        // Generate a user 
+        $user = factory(User::class,'brazilian')->states('password_empty')->create();
+        $userNew = factory(User::class,'brazilian')->states('password_empty')->make();
+        //Assign email
+        $user->name = $userNew->name;
+        $user->identification = $userNew->identification;
+        $user->store_id = $userNew->store_id;
+
+        // Call method
+        switch ($option) {
+            case 'C':
+                $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+                                    ->post('api/users/' , $user->toArray());
+                break;
+            case 'U':
+                // $userUpdate = factory(User::class)->create();
+                $response =  $this->withHeaders(['Authorization' => 'Bearer '. $this->getAPIToken()])
+                                    ->put('api/users/' . $user->id , $user->toArray()); 
+                break;
+        }
+        
+        // Verify status 200 
+        $response->assertStatus(200);
+
+        //Verify in the database
+        $this->setResultResponse($response);
+        $this->checkRecordInDB();
+                     
+        // Verify values in response
+        $response->assertJson(['status' => true]);
+        // $response->assertJsonFragment(['message' => 'successfully.']);
+    }
     
 }
