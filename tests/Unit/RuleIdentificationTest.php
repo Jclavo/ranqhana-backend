@@ -3,8 +3,6 @@
 namespace Tests\Unit;
 
 use App\User;
-use App\Country;
-use App\Store;
 use App\Rules\Identification;
 use Tests\TestCase;
 use Faker;
