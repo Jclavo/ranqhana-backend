@@ -49,6 +49,7 @@ $factory->defineAs(User::class, 'brazilian', function (Faker $faker)  {
             return factory(Store::class)->create(['country_id' => 1])->id;
         },
         'identification' => $faker->regexify('[0-9]{11}'),
+        'phone' => $faker->regexify('[0-9]{11}'),
     ]);
     $user['login'] = $user['identification'] . $user['store_id'];
     return $user;
