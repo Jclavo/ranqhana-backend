@@ -78,9 +78,9 @@ class UserTest extends TestCase
         $this->user_address_max('C');        
     }
 
-    public function test_user_create_phone_max()
+    public function test_user_create_phone_br_max()
     {       
-        $this->user_phone_max('C');        
+        $this->user_phone_br_max('C');        
     }
 
     public function test_user_create_email_format()
@@ -140,6 +140,9 @@ class UserTest extends TestCase
         $user->name = $userNew->name;
         $user->identification = $userNew->identification;
         $user->email = $userNew->email;
+        $user->lastname = $userNew->lastname;
+        $user->phone = $userNew->phone;
+        $user->address = $userNew->address;
         $user->store_id = $userNew->store_id;
 
         // Call method
@@ -635,7 +638,7 @@ class UserTest extends TestCase
         $response->assertJson(['message' => 'The address may not be greater than 100 characters.']);
     }
 
-    private function user_phone_max($option = ''){
+    private function user_phone_br_max($option = ''){
         $this->checkOptionCRUD($option);      
         //Authentication
         $this->get_api_token();
@@ -644,7 +647,13 @@ class UserTest extends TestCase
         $this->setDatabaseHas(false);
 
         // Generate a user 
-        $user = factory(User::class)->create(['phone' => $this->faker->regexify('[A-Za-z0-9]{20}')]);
+        $user = factory(User::class)->create();
+        $userNew = factory(User::class,'brazilian')->make(['phone' => $this->faker->regexify('[A-Za-z0-9]{20}')]);
+        //assign
+        $user->identification = $userNew->identification;
+        $user->email = $userNew->email;
+        $user->store_id = $userNew->store_id;
+        $user->phone = $userNew->phone;
 
         // Call method
         switch ($option) {
@@ -663,7 +672,7 @@ class UserTest extends TestCase
                      
         // Verify values in response
         $response->assertJson(['status' => false]);
-        $response->assertJson(['message' => 'The phone may not be greater than 15 characters.']);
+        $response->assertJson(['message' => 'The phone format does not match your store country.']);
     }
 
     private function user_identification_required($option = ''){

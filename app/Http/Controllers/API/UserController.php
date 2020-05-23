@@ -22,6 +22,7 @@ use App\Actions\User\UserIsFree;
 
 //Rules
 use App\Rules\Identification;
+use App\Rules\PhoneCountry;
 
 class UserController extends ResponseController{
 
@@ -38,13 +39,13 @@ class UserController extends ResponseController{
             'name' => 'required|max:45',
             'lastname' => 'required|max:45',
             'address' => 'nullable|max:100',
-            'phone' => 'nullable|max:15',
             'identification' => ['required', 'numeric' ,
                                 Rule::unique('users')->where(function($query) use($request) {
                                     $query->where('store_id', '=', $request->store_id);
                                 }),
                                 new Identification($request->store_id)],
             'email' => 'email|unique:users',
+            'phone' => ['nullable', new PhoneCountry($request->store_id) ],
         ]);
 
         // https://laravel.com/docs/7.x/validation#using-rule-objects
@@ -176,14 +177,18 @@ class UserController extends ResponseController{
 
 
         $query = User::query();
-        $query->select('users.id','users.name','users.identification','users.email','users.store_id','stores.name as store')
+        $query->select('users.id','users.login','users.identification','users.name','users.lastname','users.email',
+                        'users.phone','users.address', 'users.store_id','stores.name as store')
               ->join('stores', 'users.store_id', '=', 'stores.id');  
        
         $query->where(function($q) use ($searchValue){
-            $q->where('users.name', 'like', '%'. $searchValue .'%')
-              ->orWhere('users.identification', 'like', '%'. $searchValue .'%')
-              ->orWhere('users.email', 'like', $searchValue .'%');
-            //   ->orWhere('users.stock', 'like', $searchValue .'%');
+            $q->where('users.login', 'like', '%'. $searchValue .'%')
+              ->orwhere('users.identification', 'like', '%'. $searchValue .'%')
+              ->orwhere('users.name', 'like', '%'. $searchValue .'%')
+              ->orwhere('users.lastname', 'like', '%'. $searchValue .'%')
+              ->orWhere('users.email', 'like', $searchValue .'%')
+              ->orWhere('users.phone', 'like', $searchValue .'%')
+              ->orWhere('users.address', 'like', $searchValue .'%');
         });
 
         $results = $query->orderBy('users.'.$sortColumn, $sortDirection)
