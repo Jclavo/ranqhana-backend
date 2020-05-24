@@ -52,9 +52,12 @@ class StoreController extends ResponseController
      * @param  \App\Store  $store
      * @return \Illuminate\Http\Response
      */
-    public function show(Store $store)
+    public function show($id)
     {
-        //
+        $store = Store::select('stores.*','countries.code as country_code')
+                 ->join('countries', 'stores.country_id', '=', 'countries.id')->findOrFail($id);
+        
+        return $this->sendResponse($store->toArray(), 'Store retrieved successfully.');
     }
 
     /**
