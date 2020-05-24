@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule; 
+use Illuminate\Support\Str;
 
 //Utils
 use App\Utils\PaginationUtils;
@@ -209,5 +210,26 @@ class UserController extends ResponseController{
  
         return $this->sendResponse($results->items(), 'Users retrieved successfully.', $results->total() );
 
+    }
+
+    public function login(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'login' => 'required|exists:users,login',
+            'password' => 'required|min:8|max:45',
+        ]);
+        
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first());
+        }
+
+        if (!Auth::attempt($request->only('login',  'password'))) {
+            return $this->sendError('Invalid credentials');
+        }
+        
+        Auth::user()->api_token = Str::random(80);
+        Auth::user()->save();
+        
+        return $this->sendResponse(Auth::user()->toArray(), 'User logged successfully.');  
     }
 }
