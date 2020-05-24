@@ -13,14 +13,10 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::post('register', 'API\LoginController@register');
-Route::post('login', 'API\LoginController@login');
-
-Route::get('country', 'API\CountryController@index');
-
-
-// Route::middleware('auth:api')->get('getUserInformation', 'API\LoginController@getUserInformation');
-
+Route::post('login', 'API\UserController@login');
+Route::post('register', 'API\UserController@store');
+Route::get('stores/{user}', 'API\StoreController@show');
+    
 Route::middleware(['auth:api'])->group(function () {
 
     Route::get('getUserInformation', 'API\LoginController@getUserInformation');
@@ -49,8 +45,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('users/pagination', 'API\UserController@pagination');
 
     //Stores
+    Route::resource('stores', 'API\StoreController');
     Route::post('stores/pagination', 'API\StoreController@pagination');
-
-   
+  
 });
 
