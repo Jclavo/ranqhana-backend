@@ -135,7 +135,7 @@ abstract class TestCase extends TestCaseBase
     {
         // Generate an user object
         $user = factory(User::class,'brazilian')->create();
-        $user->password = 'secret';
+        $user->password = 'secret123';
         $user->country_code = '55'; 
 
         //Submit post request to create an user endpoint

@@ -28,7 +28,7 @@ $factory->define(User::class, function (Faker $faker) {
         'phone' => $faker->e164PhoneNumber,
         'login' => $faker->unique()->randomNumber(),
         'address' => $faker->address,
-        'password' => bcrypt('secret'),
+        'password' => bcrypt('secret123'),
         'api_token' => $faker->regexify('[A-Za-z0-9]{80}'),
         
     ]; 
