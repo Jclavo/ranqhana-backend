@@ -47,6 +47,9 @@ Route::middleware(['auth:api'])->group(function () {
     //Stores
     Route::resource('stores', 'API\StoreController');
     Route::post('stores/pagination', 'API\StoreController@pagination');
+
+    //Country
+    Route::resource('countries', 'API\CountryController');
   
 });
 
