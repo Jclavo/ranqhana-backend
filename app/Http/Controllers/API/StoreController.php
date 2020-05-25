@@ -32,7 +32,6 @@ class StoreController extends ResponseController
      */
     public function create()
     {
-        //
     }
 
     /**
@@ -43,7 +42,23 @@ class StoreController extends ResponseController
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:45',
+            'country_id' => 'required|exists:countries,id',
+        ]);
+        
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first());
+        }
+
+        $store = new Store();
+        $store->name = $request->name;
+        $store->country_id = $request->country_id;
+
+        $store->save();
+
+        return $this->sendResponse($store->toArray(), 'Store created successfully.');
+        
     }
 
     /**
@@ -78,9 +93,24 @@ class StoreController extends ResponseController
      * @param  \App\Store  $store
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Store $store)
+    public function update(int $id, Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:45',
+            'country_id' => 'required|exists:countries,id',
+        ]);
+        
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first());
+        }
+
+        $store = Store::findOrFail($id);;
+        $store->name = $request->name;
+        $store->country_id = $request->country_id;
+
+        $store->save();
+
+        return $this->sendResponse($store->toArray(), 'Store updated successfully.');
     }
 
     /**
@@ -89,9 +119,13 @@ class StoreController extends ResponseController
      * @param  \App\Store  $store
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Store $store)
+    public function destroy(int $id)
     {
-        //
+        $store = Store::findOrFail($id);
+        
+        $store->delete();
+
+        return $this->sendResponse($store->toArray(), 'Store deleted successfully.');
     }
 
 
@@ -115,7 +149,7 @@ class StoreController extends ResponseController
         $searchValue   = $request->searchValue;
 
         $query = Store::query();
-        $query->select('stores.id','stores.name', 'countries.code' , 'countries.name as country')
+        $query->select('stores.*', 'countries.code' , 'countries.name as country')
               ->join('countries', 'stores.country_id', '=', 'countries.id');  
        
         $query->where(function($q) use ($searchValue){

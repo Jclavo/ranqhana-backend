@@ -2,16 +2,18 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\BaseModel;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Store extends Model
+class Store extends BaseModel
 {
+    use SoftDeletes;
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'name'
+        'name', 'country_id'
     ];
 }
