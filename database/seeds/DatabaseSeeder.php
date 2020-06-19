@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
             InvoiceStagesTableSeeder::class,
             UnitsTableSeeder::class,
             
-            UsersTableSeeder::class,
+            // UsersTableSeeder::class,
             ItemsTableSeeder::class,
         ]);
     }
