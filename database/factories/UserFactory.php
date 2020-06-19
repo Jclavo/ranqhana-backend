@@ -21,38 +21,38 @@ use Illuminate\Support\Str;
 
 $factory->define(User::class, function (Faker $faker) {
     return [
-        'store_id' => Store::all()->random()->id,
-        'identification' => $faker->unique()->randomNumber(),
-        'name' => $faker->name,
-        'lastname' => $faker->name,
-        'email' => $faker->unique()->email,
-        'phone' => $faker->e164PhoneNumber,
         'login' => $faker->unique()->randomNumber(),
-        'address' => $faker->address,
         'password' => bcrypt('secret123'),
         'api_token' => $faker->regexify('[A-Za-z0-9]{80}'),
+
+
+        // 'store_id' => Store::all()->random()->id,
+        // 'identification' => $faker->unique()->randomNumber(),
+        // 'name' => $faker->name,
+        // 'lastname' => $faker->name,
+        // 'email' => $faker->unique()->email,
+        // 'phone' => $faker->e164PhoneNumber,
+        // 'address' => $faker->address,
         
     ]; 
 });
 
 $factory->defineAs(User::class, 'completed', function (Faker $faker)  {
     $user = factory(User::class)->raw();
-    $user['login'] = $user['identification'] . $user['store_id'];
+    // $user['login'] = $user['identification'] . $user['store_id'];
     return $user;
-    // return array_merge($user,[
-    //     'completed' => true
-    // ]);
 });
 
 $factory->defineAs(User::class, 'brazilian', function (Faker $faker)  {
     $user = factory(User::class)->raw([
-        'store_id' => function () {
-            return factory(Store::class)->create(['country_id' => 1])->id;
-        },
-        'identification' => $faker->regexify('[0-9]{11}'),
-        'phone' => $faker->regexify('[0-9]{11}'),
+        // 'store_id' => function () {
+        //     return factory(Store::class)->create(['country_id' => 1])->id;
+        // },
+        // 'identification' => $faker->regexify('[0-9]{11}'),
+        // 'phone' => $faker->regexify('[0-9]{11}'),
+        'login' => $faker->regexify('[0-9]{11}'),
     ]);
-    $user['login'] = $user['identification'] . $user['store_id'];
+    // $user['login'] = $user['identification'] . $user['store_id'];
     return $user;
 });
 
@@ -60,6 +60,59 @@ $factory->defineAs(User::class, 'brazilian', function (Faker $faker)  {
 $factory->state(User::class, 'password_empty', [
     'password' => ''
 ]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// $factory->define(User::class, function (Faker $faker) {
+//     return [
+//         'store_id' => Store::all()->random()->id,
+//         'identification' => $faker->unique()->randomNumber(),
+//         'name' => $faker->name,
+//         'lastname' => $faker->name,
+//         'email' => $faker->unique()->email,
+//         'phone' => $faker->e164PhoneNumber,
+//         'login' => $faker->unique()->randomNumber(),
+//         'address' => $faker->address,
+//         'password' => bcrypt('secret123'),
+//         'api_token' => $faker->regexify('[A-Za-z0-9]{80}'),
+        
+//     ]; 
+// });
+
+// $factory->defineAs(User::class, 'completed', function (Faker $faker)  {
+//     $user = factory(User::class)->raw();
+//     $user['login'] = $user['identification'] . $user['store_id'];
+//     return $user;
+// });
+
+// $factory->defineAs(User::class, 'brazilian', function (Faker $faker)  {
+//     $user = factory(User::class)->raw([
+//         'store_id' => function () {
+//             return factory(Store::class)->create(['country_id' => 1])->id;
+//         },
+//         'identification' => $faker->regexify('[0-9]{11}'),
+//         'phone' => $faker->regexify('[0-9]{11}'),
+//     ]);
+//     $user['login'] = $user['identification'] . $user['store_id'];
+//     return $user;
+// });
+
+// // Samples about state
+// $factory->state(User::class, 'password_empty', [
+//     'password' => ''
+// ]);
 
 // factory(App\User::class,'brazilian')->states('password')->create();
 
