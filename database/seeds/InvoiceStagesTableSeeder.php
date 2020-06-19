@@ -1,6 +1,7 @@
 <?php
 
-use App\InvoiceStage;
+use App\Models\InvoiceStage;
+
 use Illuminate\Database\Seeder;
 
 class InvoiceStagesTableSeeder extends Seeder

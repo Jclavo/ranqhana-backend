@@ -2,9 +2,10 @@
 
 namespace App\Providers;
 
-use App\Unit;
-use App\Item;
-use App\InvoiceDetail;
+use App\Models\Unit;
+use App\Models\Item;
+use App\Models\InvoiceDetail;
+
 use App\Policies\UnitPolicy;
 use App\Policies\ItemPolicy;
 use App\Policies\InvoiceDetailPolicy;

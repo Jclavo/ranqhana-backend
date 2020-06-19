@@ -4,7 +4,7 @@ namespace App\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 
-use App\Store;
+use App\Models\Store;
 
 class Identification implements Rule
 {

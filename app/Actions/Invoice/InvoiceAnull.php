@@ -2,8 +2,9 @@
 
 namespace App\Actions\Invoice;
 
-use App\Invoice;
-use App\Item;
+use App\Models\Invoice;
+use App\Models\Item;
+
 use Illuminate\Support\Facades\DB;
 use App\Actions\Item\ItemHasStock;
 

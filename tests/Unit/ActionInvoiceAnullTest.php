@@ -21,7 +21,7 @@ class ActionInvoiceAnullTest extends TestCase
     {
         parent::setUp();
         $this->seed();
-        $this->setBaseModel('App\Invoice');
+        $this->setBaseModel('App\Models\Invoice');
         $this->setFieldsDatabaseHas(['id', 'subtotal', 'taxes', 'discount', 'total', 'user_id', 'type_id', 'store_id', 'stage']);  
     }
 

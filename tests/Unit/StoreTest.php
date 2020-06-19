@@ -12,7 +12,7 @@ class StoreTest extends TestCase
         parent::setUp();
         $this->seed();
         $this->setBaseRoute('stores');
-        $this->setBaseModel('App\Store');
+        $this->setBaseModel('App\Models\Store');
         $this->setFaker(); 
         $this->setFieldsDatabaseHas(['id', 'name', 'country_id']);  
     }

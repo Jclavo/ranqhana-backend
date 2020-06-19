@@ -18,7 +18,7 @@ class InvoiceDetailTest extends TestCase
         parent::setUp();
         $this->seed();
         $this->setBaseRoute('invoiceDetails');
-        $this->setBaseModel('App\InvoiceDetail');
+        $this->setBaseModel('App\Models\InvoiceDetail');
         $this->setFaker();
         $this->setFieldsDatabaseHas(['id', 'item_id', 'quantity', 'price', 'total', 'invoice_id']);  
     }
