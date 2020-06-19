@@ -215,7 +215,7 @@ class UserController extends ResponseController{
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'login' => 'required|exists:users,login',
+            'login' => 'required|exists:mysql_roles.users,login',
             'password' => 'required|min:8|max:45',
         ]);
         
@@ -223,12 +223,17 @@ class UserController extends ResponseController{
             return $this->sendError($validator->errors()->first());
         }
 
-        if (!Auth::attempt($request->only('login',  'password'))) {
+        if (!Auth::attempt($request->only('login', 'password'))) {
             return $this->sendError('Invalid credentials');
         }
         
         Auth::user()->api_token = Str::random(80);
         Auth::user()->save();
+
+        //Get Company / Project information 
+        Auth::user()->company_project = Auth::user()->company_project();
+        Auth::user()->company = Auth::user()->company();
+        Auth::user()->project = Auth::user()->project();
         
         return $this->sendResponse(Auth::user()->toArray(), 'User logged successfully.');  
     }
