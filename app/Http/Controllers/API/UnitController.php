@@ -15,6 +15,14 @@ use App\Utils\PaginationUtils;
 
 class UnitController extends ResponseController
 {
+    function __construct()
+    {
+        $this->middleware('permission_in_role:units/read'); 
+        $this->middleware('permission_in_role:units/create', ['only' => ['store']]);
+        $this->middleware('permission_in_role:units/update', ['only' => ['update']]);
+        $this->middleware('permission_in_role:units/delete', ['only' => ['destroy']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
