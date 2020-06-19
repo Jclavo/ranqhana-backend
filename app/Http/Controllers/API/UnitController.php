@@ -46,12 +46,7 @@ class UnitController extends ResponseController
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'code' => ['required',
-                        'max:3',
-                        Rule::unique('units')->where(function($query) {
-                            $query->where('store_id', '=', Auth::user()->store_id);
-                        })
-                    ], 
+            'code' => ['required','max:3','unique:units'] 
         ]);
         
         if ($validator->fails()) {
@@ -63,7 +58,6 @@ class UnitController extends ResponseController
         $unit->code = strtoupper($request->code);
         $unit->description = $request->description;
         $request->fractioned ? $unit->fractioned = true : $unit->fractioned = false;
-        $unit->store_id = Auth::user()->store_id;
         $unit->save();
 
         return $this->sendResponse($unit->toArray(), 'Unit created successfully.');  
@@ -79,7 +73,7 @@ class UnitController extends ResponseController
     {
         $unit = Unit::findOrFail($id);
 
-        $this->authorize('isMyUnit', $unit);
+        // $this->authorize('isMyUnit', $unit);
         
         return $this->sendResponse($unit->toArray(), 'Unit retrieved successfully.');
     }
@@ -105,13 +99,8 @@ class UnitController extends ResponseController
     public function update(int $id, Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'code' => ['required',
-                        'max:3',
-                        Rule::unique('units')->where(function($query) use($id){
-                            $query->where('id', '<>', $id)
-                                  ->where('store_id', '=', Auth::user()->store_id);
-                        })  
-                    ],
+            'code' => ['required','max:3',
+                        Rule::unique('units')->ignore($id)],
         ]);
         
         if ($validator->fails()) {
@@ -119,8 +108,6 @@ class UnitController extends ResponseController
         }
 
         $unit = Unit::findOrFail($id);
-
-        $this->authorize('isMyUnit', $unit);
         
         $unit->code = strtoupper($request->code);
         $unit->description = $request->description;
@@ -140,8 +127,6 @@ class UnitController extends ResponseController
     public function destroy(int $id)
     {
         $unit = Unit::findOrFail($id);
-
-        $this->authorize('isMyUnit', $unit);
 
         $unit->delete();
 
@@ -168,8 +153,8 @@ class UnitController extends ResponseController
         $sortDirection = PaginationUtils::getSortDirection($request->sortDirection);
         $searchValue   = $request->searchValue;
 
-        $query = Unit::query();
 
+        $query = Unit::query();
         $query->select('units.*');
 
         $query->when((!empty($searchValue)), function ($q) use($searchValue) {
@@ -177,14 +162,9 @@ class UnitController extends ResponseController
                      ->orWhere('description', 'like', '%'. $searchValue .'%');
         });
 
-        $query->where('store_id', '=', 1)
-              ->orWhere('store_id', '=', Auth::user()->store_id);
-
-
         $results = $query->orderBy($sortColumn, $sortDirection)
                    ->paginate($pageSize);
-
-            
+    
         return $this->sendResponse($results->items(), 'Units retrieved successfully.', $results->total() );
 
     }

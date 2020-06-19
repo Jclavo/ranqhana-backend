@@ -17,9 +17,9 @@ class UnitTest extends TestCase
         $this->seed();    
         
         $this->setBaseRoute('units');
-        $this->setBaseModel('App\Unit');
+        $this->setBaseModel('App\Models\Unit');
         $this->setFaker();
-        $this->setFieldsDatabaseHas(['id', 'code', 'description', 'fractioned', 'store_id',]);  
+        $this->setFieldsDatabaseHas(['id', 'code', 'description', 'fractioned']);  
     
     }
 
@@ -116,11 +116,10 @@ class UnitTest extends TestCase
         $this->get_api_token();
 
         //Generate one
-        $unit = factory(Unit::class)->create(['store_id' => auth()->user()->store_id]);
+        $unit = factory(Unit::class)->create();
 
         //Action
-        $this->create(['code' => $unit->code,
-                       'store_id' => auth()->user()->store_id]);
+        $this->create(['code' => $unit->code]);
     }
 
     public function test_unit_create_ok_with_empty_not_mandatory_fields()
@@ -138,12 +137,11 @@ class UnitTest extends TestCase
         $this->get_api_token();
 
         //Generate one
-        $unit = factory(Unit::class)->create(['store_id' => auth()->user()->store_id]);
+        $unit = factory(Unit::class)->create();
 
         //Action
         $this->create(['description' => null,
-                       'fractioned' => 0,
-                       'store_id' => auth()->user()->store_id]);
+                       'fractioned' => 0]);
     }
 
     public function test_unit_create_ok()
@@ -161,30 +159,11 @@ class UnitTest extends TestCase
         $this->get_api_token();
 
         //Action
-        $this->create(['store_id' => auth()->user()->store_id]);
+        $this->create();
     }
 
 
     //TEST FUNCTION show
-
-    public function test_unit_show_from_another_store()
-    {     
-        // Set Database has
-        $this->setDatabaseHas(true);
-
-        //Set Json asserts
-        $assertsJson = array();
-        array_push($assertsJson,['status' => false]);
-        array_push($assertsJson,['message' => 'This action is unauthorized.']);
-        $this->setAssertJson($assertsJson);
-
-        //Authentication
-        $this->get_api_token();
-
-        //Action
-        // $this->create(['store_id' => auth()->user()->store_id]);
-        $this->readBy();
-    }
 
     public function test_unit_show_ok()
     {     
@@ -201,7 +180,7 @@ class UnitTest extends TestCase
         $this->get_api_token();
 
         //Action
-        $this->readBy(['store_id' => auth()->user()->store_id]);
+        $this->readBy();
 
     }
 
@@ -225,24 +204,6 @@ class UnitTest extends TestCase
         $this->update(['code' => '']);
     }
 
-    public function test_unit_update_from_another_store()
-    {
-        // Set Database has
-        $this->setDatabaseHas(false);
-
-        //Set Json asserts
-        $assertsJson = array();
-        array_push($assertsJson,['status' => false]);
-        array_push($assertsJson,['message' => 'This action is unauthorized.']);
-        $this->setAssertJson($assertsJson);
-
-        //Authentication
-        $this->get_api_token();
-
-        //Action
-        $this->update();
-    }
-
     public function test_unit_update_code_repeated()
     {
         // Set Database has
@@ -258,13 +219,10 @@ class UnitTest extends TestCase
         $this->get_api_token();
 
         //Generate one
-        $unit = factory(Unit::class)->create(['store_id' => auth()->user()->store_id]);
+        $unit = factory(Unit::class)->create();
 
         //Action
-        $this->update(['code' => $unit->code,
-                       'store_id' => auth()->user()->store_id],
-                       ['store_id' => auth()->user()->store_id] //attribute mandatory
-                    );
+        $this->update(['code' => $unit->code]);
     }
 
     public function test_unit_update_ok_with_empty_not_mandatory_fields()
@@ -282,14 +240,11 @@ class UnitTest extends TestCase
         $this->get_api_token();
 
         //Generate one
-        $unit = factory(Unit::class)->create(['store_id' => auth()->user()->store_id]);
+        $unit = factory(Unit::class)->create();
 
         //Action
         $this->update(['description' => null,
-                       'fractioned' => 0,
-                       'store_id' => auth()->user()->store_id],
-                       ['store_id' => auth()->user()->store_id]
-                );
+                       'fractioned' => 0]);
     }
 
     public function test_unit_update_ok()
@@ -307,31 +262,10 @@ class UnitTest extends TestCase
         $this->get_api_token();
 
         //Action
-        $this->update(['store_id' => auth()->user()->store_id],
-                      ['store_id' => auth()->user()->store_id] //attribute mandatory 
-                    );   
+        $this->update();   
     }
 
     //TEST FUNCTION delete
-
-    public function test_unit_delete_from_another_store()
-    {
-        // Set Database has
-        $this->setDatabaseHas(true);
-
-        //Set Json asserts
-        $assertsJson = array();
-        array_push($assertsJson,['status' => false]);
-        array_push($assertsJson,['message' => 'This action is unauthorized.']);
-        $this->setAssertJson($assertsJson);
-
-        //Authentication
-        $this->get_api_token();
-
-        //Action
-        $this->destroy();
-         
-    }
 
     public function test_unit_delete_ok()
     {
@@ -348,6 +282,6 @@ class UnitTest extends TestCase
         $this->get_api_token();
 
         //Action
-        $this->destroy(['store_id' => auth()->user()->store_id]);   
+        $this->destroy();   
     }
 }
