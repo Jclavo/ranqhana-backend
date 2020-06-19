@@ -1,9 +1,9 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\BaseModel;
+use App\Models\BaseModel;
 
 class Invoice extends BaseModel 
 {

@@ -2,8 +2,9 @@
 
 namespace App\Policies;
 
-use App\User;
-use App\InvoiceDetail;
+use App\Models\User;
+use App\Models\InvoiceDetail;
+
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class InvoiceDetailPolicy

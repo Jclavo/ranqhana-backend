@@ -1,6 +1,7 @@
 <?php
 
-namespace App;
+namespace App\Models;
+
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection as BaseCollection;  
 use Illuminate\Database\Eloquent\Model as Eloquent;

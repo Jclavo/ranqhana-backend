@@ -15,7 +15,7 @@ class UserTest extends TestCase
         parent::setUp();
         $this->seed();
         $this->setBaseRoute('users');
-        $this->setBaseModel('App\User');
+        $this->setBaseModel('App\Models\User');
         $this->setFaker(); 
         $this->setFieldsDatabaseHas(['id', 'name', 'lastname', 'identification', 'email', 'store_id',
                                      'password', 'address', 'phone', 'login']);  

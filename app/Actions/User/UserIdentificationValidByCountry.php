@@ -2,7 +2,7 @@
 
 namespace App\Actions\User;
 
-use App\User;
+use App\Models\User;
 
 class UserIdentificationValidByCountry
 {

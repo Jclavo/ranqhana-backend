@@ -1,8 +1,8 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
-use App\BaseModel;
+use App\Models\BaseModel;
 
 class InvoiceDetail extends BaseModel
 {

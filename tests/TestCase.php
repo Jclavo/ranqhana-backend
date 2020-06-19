@@ -2,8 +2,9 @@
 
 namespace Tests;
 
-use App\User;
-use App\Store;
+use App\Models\User;
+use App\Models\Store;
+
 use Illuminate\Support\Facades\Auth as Auth;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Tests\TestCaseBase;
