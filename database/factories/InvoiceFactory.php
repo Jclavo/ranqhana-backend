@@ -2,10 +2,11 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Invoice;
-use App\InvoiceTypes;
-use App\User;
-use App\Store;
+use App\Models\Invoice;
+use App\Models\InvoiceTypes;
+use App\Models\User;
+use App\Models\Store;
+
 use Faker\Generator as Faker;
 
 $factory->define(Invoice::class, function (Faker $faker) {

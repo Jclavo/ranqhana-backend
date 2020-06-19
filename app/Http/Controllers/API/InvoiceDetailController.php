@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\API;
 
-use App\InvoiceDetail;
-use App\Invoice;
-use App\Item;
+use App\Models\InvoiceDetail;
+use App\Models\Invoice;
+use App\Models\Item;
 
 use App\Actions\Item\ItemHasStock;
 use App\Actions\Item\ItemIsStocked;

@@ -2,9 +2,10 @@
 
 namespace Tests\Unit;
 
-use App\Invoice;
-use App\InvoiceDetail;
-use App\Item;
+use App\Models\Invoice;
+use App\Models\InvoiceDetail;
+use App\Models\Item;
+
 use App\Actions\Invoice\InvoiceAnull;
 use Tests\TestCase;
 

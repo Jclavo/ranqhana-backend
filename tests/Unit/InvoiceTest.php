@@ -2,7 +2,8 @@
 
 namespace Tests\Unit;
 
-use App\Invoice;
+use App\Models\Invoice;
+
 use Tests\TestCase;
 
 class InvoiceTest extends TestCase

@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Item;
-use App\Price;
-use App\Unit;
-use App\Invoice;
+use App\Models\Item;
+use App\Models\Price;
+use App\Models\Unit;
+use App\Models\Invoice;
+
 use Illuminate\Http\Request;
 use App\Http\Controllers\ResponseController;
 use Illuminate\Support\Facades\Validator;

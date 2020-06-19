@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Store;
+use App\Models\Store;
 use Tests\TestCase;
 
 class StoreTest extends TestCase

@@ -2,9 +2,9 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Item;
-use App\Store;
-use App\Unit;
+use App\Models\Item;
+use App\Models\Store;
+use App\Models\Unit;
 use Faker\Generator as Faker;
 
 $factory->define(Item::class, function (Faker $faker) {

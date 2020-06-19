@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Country;
+use App\Models\Country;
 use App\Http\Controllers\ResponseController;
 use Illuminate\Http\Request;
 

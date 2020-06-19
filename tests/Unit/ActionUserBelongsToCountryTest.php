@@ -2,9 +2,10 @@
 
 namespace Tests\Unit;
 
-use App\User;
-use App\Country;
-use App\Store;
+use App\Models\User;
+use App\Models\Country;
+use App\Models\Store;
+
 use App\Actions\User\UserBelongsToCountry;
 use Tests\TestCase;
 

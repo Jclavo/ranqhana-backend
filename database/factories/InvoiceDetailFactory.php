@@ -2,9 +2,10 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\InvoiceDetail;
-use App\Invoice;
-use App\Item;
+use App\Models\InvoiceDetail;
+use App\Models\Invoice;
+use App\Models\Item;
+
 use Faker\Generator as Faker;
 
 $factory->define(InvoiceDetail::class, function (Faker $faker) {

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
-use App\User;
-use App\Store;
+use App\Models\User;
+use App\Models\Store;
 
 use App\Http\Controllers\ResponseController;
 

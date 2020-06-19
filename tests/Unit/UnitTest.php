@@ -2,8 +2,9 @@
 
 namespace Tests\Unit;
 
-use App\User;
-use App\Unit;
+use App\Models\User;
+use App\Models\Unit;
+
 use Illuminate\Support\Facades\Auth as Auth;
 use Tests\TestCase;
 

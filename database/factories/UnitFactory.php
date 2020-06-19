@@ -2,8 +2,9 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Unit;
-use App\Store;
+use App\Models\Unit;
+use App\Models\Store;
+
 use Faker\Generator as Faker;
 
 $factory->define(Unit::class, function (Faker $faker) {

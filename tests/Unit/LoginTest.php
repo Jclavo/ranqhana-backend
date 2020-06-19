@@ -4,9 +4,9 @@ namespace Tests\Unit;
 
 use Tests\TestCase;
 
-use App\User;
-use App\Country;
-use App\Store;
+use App\Models\User;
+use App\Models\Country;
+use App\Models\Store;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class LoginTest extends TestCase

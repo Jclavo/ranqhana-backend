@@ -2,8 +2,8 @@
 
 namespace Tests\Unit;
 
-use App\Country;
-// use Illuminate\Foundation\Testing\DatabaseMigrations;
+use App\Models\Country;
+
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

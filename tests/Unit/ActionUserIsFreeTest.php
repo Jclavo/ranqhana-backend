@@ -2,8 +2,9 @@
 
 namespace Tests\Unit;
 
-use App\User;
-use App\Invoice;
+use App\Models\User;
+use App\Models\Invoice;
+
 use App\Actions\User\UserIsFree;
 use Tests\TestCase;
 

@@ -2,7 +2,8 @@
 
 namespace Tests\Unit;
 
-use App\User;
+use App\Models\User;
+
 use App\Rules\Identification;
 use Tests\TestCase;
 use Faker;

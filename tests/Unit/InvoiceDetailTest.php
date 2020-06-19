@@ -2,11 +2,11 @@
 
 namespace Tests\Unit;
 
-use App\InvoiceDetail; 
-use App\Item;
-use App\Invoice;
-use App\Store;
-use App\Unit;
+use App\Models\InvoiceDetail; 
+use App\Models\Item;
+use App\Models\Invoice;
+use App\Models\Store;
+use App\Models\Unit;
 
 use Carbon\Carbon;
 use Tests\TestCase;

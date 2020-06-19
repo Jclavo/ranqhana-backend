@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Invoice;
-use App\InvoiceDetail;
-use App\User;
+use App\Models\Invoice;
+use App\Models\InvoiceDetail;
+use App\Models\User;
+
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ResponseController;
 use Illuminate\Http\Request;

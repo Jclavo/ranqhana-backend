@@ -2,7 +2,8 @@
 
 namespace Tests\Unit;
 
-use App\User;
+use App\Models\User;
+
 use App\Utils\UserUtils;
 
 use Tests\TestCase;

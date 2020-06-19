@@ -2,7 +2,7 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\InvoiceTypes;
+use App\Models\InvoiceTypes;
 use Faker\Generator as Faker;
 
 $factory->define(InvoiceTypes::class, function (Faker $faker) {

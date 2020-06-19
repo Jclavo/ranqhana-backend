@@ -2,10 +2,11 @@
 
 namespace Tests\Unit;
 
-use App\Item;
-use App\User;
-use App\Price;
-use App\Invoice;
+use App\Models\Item;
+use App\Models\User;
+use App\Models\Price;
+use App\Models\Invoice;
+
 use Tests\TestCase;
 use App\Http\Controllers\API\ItemController;
 
