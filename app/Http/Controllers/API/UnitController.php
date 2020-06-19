@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\ResponseController;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule; 
+use Illuminate\Validation\Rule;
+
+//Utils
+use App\Utils\PaginationUtils;
 
 class UnitController extends ResponseController
 {
@@ -150,27 +153,20 @@ class UnitController extends ResponseController
      */
     public function pagination(Request $request)
     {
-        $sortArray = array("asc", "ASC", "desc", "DESC");
 
-        // SearchOptions values
-        $per_page = $request->per_page;
-        $sortColumn = $request->sortColumn;
-        $sortDirection = $request->sortDirection;
-        $searchValue = $request->searchValue;
+        $validator = Validator::make($request->all(), [
+            'pageSize' => 'numeric|gt:0',
+        ]);
 
-        // Initialize values if they are empty.
-        if (empty($per_page)) {
-            $per_page = 20;
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first());
         }
 
-        if (!in_array($sortDirection, $sortArray)) {
-            $sortDirection = "DESC";
-            $sortColumn = "updated_at";
-        }
-        
-        if (empty($sortColumn)) {
-               $sortColumn = "updated_at";
-        }
+       // SearchOptions values
+        $pageSize      = PaginationUtils::getPageSize($request->pageSize);
+        $sortColumn    = PaginationUtils::getSortColumn($request->sortColumn,'units');
+        $sortDirection = PaginationUtils::getSortDirection($request->sortDirection);
+        $searchValue   = $request->searchValue;
 
         $query = Unit::query();
 
@@ -186,7 +182,7 @@ class UnitController extends ResponseController
 
 
         $results = $query->orderBy($sortColumn, $sortDirection)
-        ->paginate($per_page);
+                   ->paginate($pageSize);
 
             
         return $this->sendResponse($results->items(), 'Units retrieved successfully.', $results->total() );
