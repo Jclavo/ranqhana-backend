@@ -12,9 +12,9 @@ class UnitsTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(Unit::class)->create(['code' => 'KG','description' => 'Kilograms']);
-        factory(Unit::class)->create(['code' => 'BX','description' => 'Boxes']);
-        factory(Unit::class)->create(['code' => 'BT','description' => 'Bottles']);
-        factory(Unit::class)->create(['code' => 'UN','description' => 'Unit']);
+        factory(Unit::class)->create(['code' => 'KG','description' => 'Kilograms', 'fractioned' => true]);
+        factory(Unit::class)->create(['code' => 'BX','description' => 'Boxes', 'fractioned' => false]);
+        factory(Unit::class)->create(['code' => 'BT','description' => 'Bottles', 'fractioned' => false]);
+        factory(Unit::class)->create(['code' => 'UN','description' => 'Unit', 'fractioned' => false]);
     }
 }
