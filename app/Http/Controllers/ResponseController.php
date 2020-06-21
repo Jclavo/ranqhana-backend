@@ -8,7 +8,7 @@ class ResponseController extends Controller
 {
     public function sendResponse($result, $message, $records = 0)
     {
-        $response = ['status' => true, 'result' => $result, 'message' => $message, 'records' => $records];
+        $response = ['status' => true, 'result' => $result, 'message' => $message, 'records' => count($result)];
         
         return response()->json($response, 200);
     }
