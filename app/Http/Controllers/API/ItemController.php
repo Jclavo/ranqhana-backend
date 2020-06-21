@@ -18,6 +18,15 @@ use App\Utils\PaginationUtils;
 
 class ItemController extends ResponseController
 {
+
+    function __construct()
+    {
+        $this->middleware('permission_in_role:items/read'); 
+        $this->middleware('permission_in_role:items/create', ['only' => ['store']]);
+        $this->middleware('permission_in_role:items/update', ['only' => ['update']]);
+        $this->middleware('permission_in_role:items/delete', ['only' => ['destroy']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
