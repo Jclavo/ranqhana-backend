@@ -65,6 +65,7 @@ class User extends Authenticatable
         return User::select('company_project.*')
                      ->join('company_project','users.company_project_id','=','company_project.id')
                      ->where('users.company_project_id','=',$this->company_project_id)
+                     ->distinct()
                      ->get();
     }
 
@@ -78,6 +79,7 @@ class User extends Authenticatable
                               ->where('users.company_project_id','=',$this->company_project_id);
                     })
                     ->join('companies','company_project.company_id','=','companies.id')
+                    ->distinct()
                     ->get();
     }
 
@@ -92,6 +94,7 @@ class User extends Authenticatable
                               ->where('users.company_project_id','=',$this->company_project_id);
                     })
                     ->join('projects','company_project.project_id','=','projects.id')
+                    ->distinct()
                     ->get();
     }
 }
