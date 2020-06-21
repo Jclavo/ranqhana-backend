@@ -51,6 +51,9 @@ $factory->defineAs(User::class, 'brazilian', function (Faker $faker)  {
         // 'identification' => $faker->regexify('[0-9]{11}'),
         // 'phone' => $faker->regexify('[0-9]{11}'),
         'login' => $faker->regexify('[0-9]{11}'),
+        // 'company_project_id' => $faker->unique()->randomNumber(1),
+        'company_project_id' => 1,
+
     ]);
     // $user['login'] = $user['identification'] . $user['store_id'];
     return $user;
