@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Models\User;
+use App\Models\RanqhanaUser;
 use App\Models\Store;
 
 use App\Http\Controllers\ResponseController;
@@ -235,6 +236,16 @@ class UserController extends ResponseController{
         Auth::user()->company = Auth::user()->company();
         Auth::user()->project = Auth::user()->project();
         
+
+        //Update or Create User in Local Table
+        // $ranqhanaUser = RanqhanaUser::updateOrCreate(
+        //     ['user_id' => Auth::user()->id, 'company_project_id' => Auth::user()->company_project_id],
+        //     ['updated_at' => Carbon::now()]
+        // );
+        $ranqhanaUser = RanqhanaUser::updateOrCreate(
+            ['user_id' => Auth::user()->id, 'company_project_id' => Auth::user()->company_project_id]
+        );
+
         return $this->sendResponse(Auth::user()->toArray(), 'User logged successfully.');  
     }
 }
