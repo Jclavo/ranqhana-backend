@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-// use App\Models\BaseModel;
-// use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -40,10 +38,21 @@ class Item extends BaseModel
     }
 
     /**
-     * 
-     */
-    
+     * Get the user that owns the user.
+    */
+    public function user()
+    {
+        return $this->belongsTo('App\Models\RanqhanaUser');
+    }
 
+    /**
+     * Get the unit associated with the item.
+     */
+    public function unit()
+    {
+        return $this->belongsTo('App\Model\Unit');
+    }
+    
 
     //Custom functions
     public function getStockAttribute(){
