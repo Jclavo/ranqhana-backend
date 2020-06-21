@@ -50,7 +50,15 @@ class Item extends BaseModel
      */
     public function unit()
     {
-        return $this->belongsTo('App\Model\Unit');
+        return $this->belongsTo('App\Models\Unit');
+    }
+
+    /**
+     * Get the prices for the Item.
+     */
+    public function prices()
+    {
+        return $this->hasMany('App\Models\Price');
     }
     
 

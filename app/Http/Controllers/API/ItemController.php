@@ -69,7 +69,7 @@ class ItemController extends ResponseController
         $item->save();
 
         //Add price
-        // $this->savePrice($item->price,$item->id);
+        $item->prices()->create(['price' => $request->price]);
 
         return $this->sendResponse($item->toArray(), 'Item created successfully.');  
     }
@@ -134,7 +134,7 @@ class ItemController extends ResponseController
         $item->save();
 
         //Add price
-        // $this->savePrice($item->price,$item->id);
+        $item->prices()->updateOrCreate(['price' => $request->price]);
         
         return $this->sendResponse($item->toArray(), 'Item updated successfully.');
     }
@@ -204,108 +204,5 @@ class ItemController extends ResponseController
         return $this->sendResponse($results->items(), 'Items retrieved successfully.', $results->total() );
 
     }
-
-    // public function savePrice($price_item, $item_id){
-
-    //     $addFlag = false;
-
-    //     $lastPrice = Price::where('item_id', $item_id)
-    //                         ->orderBy('created_at', 'DESC')
-    //                         ->first();
-
-
-        
-    //     if(empty($lastPrice)){
-    //         $addFlag = true;
-    //     }
-    //     else if($lastPrice->price != $price_item ){
-    //         $addFlag = true;
-    //     }
-        
-    //     if($price_item <= 0){
-    //         $addFlag = false;
-    //     }
-
-    //     $price = null;
-    //     if($addFlag){
-
-    //         $price = new Price();
-    //         $price->price = $price_item;
-    //         $price->item_id = $item_id;
-            
-    //         $price->save();
-    //     }
-    //     return $price;
-    // }
-
-    // public function updateStock($id, $quantity){
-
-    //     $item = Item::find($id);
-
-    //     if (is_null($item)) {
-    //         return $this->sendError('Item not found.');
-    //         // return false;
-    //     }
-
-    //     if($quantity > $item->stock){
-    //         return $this->sendError('There is not stock for product ' . $id);
-    //         // return false;
-    //     }
-
-    //     $item->stock = $item->stock - $quantity;
-    //     $item->save();
-        
-    //     // return true;
-    //     return $this->sendResponse($item->toArray(), 'Stock updated.');
-
-    // }
-
-    /**
-     * To get "Items" according invoice type
-     */
-
-    // public function getForInvoiceType(int $invoiceType)
-    // {
-    //     $validator = Validator::make(['invoiceType' =>$invoiceType], [
-    //         'invoiceType' => 'required|exists:invoice_types,id',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return $this->sendError($validator->errors()->first());
-    //     }
-
-    //     $invoice = new Invoice();
-
-    //     $query = Item::query();
-
-    //     $query->select('items.*', 'units.code as unit', 'units.fractioned')
-    //             ->join('stores', function ($join){
-    //                 $join->on('stores.id', '=', 'items.store_id')
-    //                     ->where('items.store_id', '=', Auth::user()->store_id);
-    //             })
-    //             ->leftJoin('units', function ($join){
-    //                 $join->on('units.id', '=', 'items.unit_id')
-    //                     ->latest();
-    //             })
-    //             ->where('store_id', '=', Auth::user()->store_id);
-
-    //     $query->when(($invoiceType == $invoice->getTypeForPurchase()), function ($q)  {
-    //         return $q->where('stocked', true );
-    //     });
-
-    //     $item = $query->take(10);
-
-    //     return $this->sendResponse($item, 'Items retrieved successfully.');
-
-    //     // $invoice = Invoice::findOrFail($id);
-
-    //     // $this->businessValidations([
-    //     //     new BelongsToStore(Auth::user(), [$invoice]),
-    //     // ]);
-
-    //     // $this->businessActions([ new InvoiceAnull($invoice)]);
-
-    //     // return $this->sendResponse($invoice->toArray(), 'Invoice Anulled successfully.');
-    // }
 
 }
