@@ -19,8 +19,22 @@ $factory->define(Item::class, function (Faker $faker) {
 
         'unit_id' => Unit::all()->random()->id,
         'user_id' => RanqhanaUser::all()->random()->id,
-        // 'user_id' => Auth::check() ? Auth::user()->getLocalUserID() : RanqhanaUser::all()->random()->id,
 
     ];
 });
 // 'stocked' => intval($faker->boolean(100)),
+
+$factory->defineAs(Item::class, 'stocked', function (Faker $faker)  {
+    $item = factory(Item::class)->raw([
+        'stocked' => true,
+    ]);
+    return $item;
+});
+
+$factory->defineAs(Item::class, 'Nostocked', function (Faker $faker)  {
+    $item = factory(Item::class)->raw([
+        'stock' => 0,
+        'stocked' => false,
+    ]);
+    return $item;
+});
