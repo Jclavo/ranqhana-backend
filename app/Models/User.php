@@ -105,7 +105,7 @@ class User extends Authenticatable
      */
     public function getLocalUserID(){
         $RanqhanaUserResult = RanqhanaUser::
-                                where('user_id','=',$this->id)
+                                where('external_user_id','=',$this->id)
                                 ->where('company_project_id','=',$this->company_project_id)
                                 ->pluck('id');
 

@@ -243,7 +243,7 @@ class UserController extends ResponseController{
         //     ['updated_at' => Carbon::now()]
         // );
         $ranqhanaUser = RanqhanaUser::updateOrCreate(
-            ['user_id' => Auth::user()->id, 'company_project_id' => Auth::user()->company_project_id]
+            ['external_user_id' => Auth::user()->id, 'company_project_id' => Auth::user()->company_project_id]
         );
 
         Auth::user()->local_user_id = Auth::user()->getLocalUserID();

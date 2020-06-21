@@ -12,6 +12,6 @@ class RanqhanaUsersSeeder extends Seeder
      */
     public function run()
     {
-        factory(RanqhanaUser::class)->create(['user_id' => 2, 'company_project_id' => 2]);
+        factory(RanqhanaUser::class)->create(['external_user_id' => 2, 'company_project_id' => 2]);
     }
 }
