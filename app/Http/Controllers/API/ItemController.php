@@ -11,8 +11,10 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\ResponseController;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Schema;
-// use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+
+//Utils
+use App\Utils\PaginationUtils;
 
 class ItemController extends ResponseController
 {
@@ -23,9 +25,9 @@ class ItemController extends ResponseController
      */ 
     public function index()
     {
-        $item = Item::all();
+        // $item = Item::all();
             
-        return $this->sendResponse($item->toArray(), 'Items retrieved successfully.');
+        // return $this->sendResponse($item->toArray(), 'Items retrieved successfully.');
     }
 
     /**
@@ -61,13 +63,13 @@ class ItemController extends ResponseController
         $item->name = $request->name;
         $item->description = $request->description;
         $item->price = $request->price;
-        $item->unit_id = $request->unit_id;
         $request->stocked ? $item->stocked = $request->stocked : $item->stocked = false; 
-        $item->store_id = Auth::user()->store_id;
+        $item->unit_id = $request->unit_id;
+        $item->user_id = Auth::user()->getLocalUserID();
         $item->save();
 
         //Add price
-        $this->savePrice($item->price,$item->id);
+        // $this->savePrice($item->price,$item->id);
 
         return $this->sendResponse($item->toArray(), 'Item created successfully.');  
     }
@@ -81,8 +83,6 @@ class ItemController extends ResponseController
     public function show($id)
     {
         $item = Item::findOrFail($id);
-
-        $this->authorize('isMyItem', $item);
                 
         return $this->sendResponse($item->toArray(), 'Item retrieved successfully.');
     }
@@ -118,7 +118,6 @@ class ItemController extends ResponseController
         }
        
         $item = Item::findOrFail($id);
-        $this->authorize('isMyItem', $item);
         
         $item->name = $request->name;
         $item->description = $request->description;
@@ -135,7 +134,7 @@ class ItemController extends ResponseController
         $item->save();
 
         //Add price
-        $this->savePrice($item->price,$item->id);
+        // $this->savePrice($item->price,$item->id);
         
         return $this->sendResponse($item->toArray(), 'Item updated successfully.');
     }
@@ -150,8 +149,6 @@ class ItemController extends ResponseController
     {
         $item = Item::findOrFail($id);
         
-        $this->authorize('isMyItem', $item);
-
         $item->delete();
 
         return $this->sendResponse($item->toArray(), 'Item deleted successfully.');
@@ -159,59 +156,30 @@ class ItemController extends ResponseController
 
 
     /**
-     * 
+     * Pagination
      */
     public function pagination(Request $request)
     {
-        // $validator = Validator::make($request->all(), [
-        //     'invoice_type_id' => 'exists:invoice_types,id',
-        // ]);
+        
+        $validator = Validator::make($request->all(), [
+            'pageSize' => 'numeric|gt:0',
+        ]);
 
-
-        // if ($validator->fails()) {
-        //     return $this->sendError($validator->errors()->first());
-        // }
-
-        $sortArray = array("asc", "ASC", "desc", "DESC");
-
-        // $store_id = $request->store_id;
-        // // SearchOptions values
-        // $per_page = $request->searchOption['per_page'];
-        // $sortColumn = $request->searchOption['sortColumn'];
-        // $sortDirection = $request->searchOption['sortDirection'];
-        // $searchValue = $request->searchOption['searchValue'];
-
-        $invoice = new Invoice();
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first());
+        }
 
         // SearchOptions values
-        $per_page      = $request->per_page;
-        $sortColumn    = $request->sortColumn;
-        $sortDirection = $request->sortDirection;
+        $pageSize      = PaginationUtils::getPageSize($request->pageSize);
+        $sortColumn    = PaginationUtils::getSortColumn($request->sortColumn,'items');
+        $sortDirection = PaginationUtils::getSortDirection($request->sortDirection);
         $searchValue   = $request->searchValue;
+            
+        $invoice = new Invoice();
         $invoice_type_id  = $request->invoice_type_id;
-        $store_id      = Auth::user()->store_id;
-
-        // Initialize values if they are empty.
-        if (empty($per_page)) {
-            $per_page = 20;
-        }
-
-        if (!in_array($sortDirection, $sortArray)) {
-            $sortDirection = "DESC";
-            $sortColumn = "updated_at";
-        }
-        
-        //if(Schema::hasColumn('items', $sortColumn ) === false) ;
-        if (empty($sortColumn)) {
-               $sortColumn = "updated_at";
-        }
 
         $query = Item::query();
         $query->select('items.*', 'units.code as unit', 'units.fractioned')
-              ->join('stores', function ($join) use($store_id){
-                    $join->on('stores.id', '=', 'items.store_id')
-                         ->where('items.store_id', '=', $store_id);
-                })
               ->leftJoin('units', function ($join){
                     $join->on('units.id', '=', 'items.unit_id')
                          ->latest();
@@ -230,67 +198,67 @@ class ItemController extends ResponseController
 
         
         $results = $query->orderBy($sortColumn, $sortDirection)
-                         ->paginate($per_page);
+                         ->paginate($pageSize);
 
             
         return $this->sendResponse($results->items(), 'Items retrieved successfully.', $results->total() );
 
     }
 
-    public function savePrice($price_item, $item_id){
+    // public function savePrice($price_item, $item_id){
 
-        $addFlag = false;
+    //     $addFlag = false;
 
-        $lastPrice = Price::where('item_id', $item_id)
-                            ->orderBy('created_at', 'DESC')
-                            ->first();
+    //     $lastPrice = Price::where('item_id', $item_id)
+    //                         ->orderBy('created_at', 'DESC')
+    //                         ->first();
 
 
         
-        if(empty($lastPrice)){
-            $addFlag = true;
-        }
-        else if($lastPrice->price != $price_item ){
-            $addFlag = true;
-        }
+    //     if(empty($lastPrice)){
+    //         $addFlag = true;
+    //     }
+    //     else if($lastPrice->price != $price_item ){
+    //         $addFlag = true;
+    //     }
         
-        if($price_item <= 0){
-            $addFlag = false;
-        }
+    //     if($price_item <= 0){
+    //         $addFlag = false;
+    //     }
 
-        $price = null;
-        if($addFlag){
+    //     $price = null;
+    //     if($addFlag){
 
-            $price = new Price();
-            $price->price = $price_item;
-            $price->item_id = $item_id;
+    //         $price = new Price();
+    //         $price->price = $price_item;
+    //         $price->item_id = $item_id;
             
-            $price->save();
-        }
-        return $price;
-    }
+    //         $price->save();
+    //     }
+    //     return $price;
+    // }
 
-    public function updateStock($id, $quantity){
+    // public function updateStock($id, $quantity){
 
-        $item = Item::find($id);
+    //     $item = Item::find($id);
 
-        if (is_null($item)) {
-            return $this->sendError('Item not found.');
-            // return false;
-        }
+    //     if (is_null($item)) {
+    //         return $this->sendError('Item not found.');
+    //         // return false;
+    //     }
 
-        if($quantity > $item->stock){
-            return $this->sendError('There is not stock for product ' . $id);
-            // return false;
-        }
+    //     if($quantity > $item->stock){
+    //         return $this->sendError('There is not stock for product ' . $id);
+    //         // return false;
+    //     }
 
-        $item->stock = $item->stock - $quantity;
-        $item->save();
+    //     $item->stock = $item->stock - $quantity;
+    //     $item->save();
         
-        // return true;
-        return $this->sendResponse($item->toArray(), 'Stock updated.');
+    //     // return true;
+    //     return $this->sendResponse($item->toArray(), 'Stock updated.');
 
-    }
+    // }
 
     /**
      * To get "Items" according invoice type

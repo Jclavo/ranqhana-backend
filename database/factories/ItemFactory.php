@@ -3,23 +3,24 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use App\Models\Item;
-use App\Models\Store;
 use App\Models\Unit;
+use App\Models\RanqhanaUser;
+use Illuminate\Support\Facades\Auth;
+
 use Faker\Generator as Faker;
 
 $factory->define(Item::class, function (Faker $faker) {
     return [
         'name' => $faker->name,
-        // 'description' => $faker->text(),
-        'price' => $faker->randomNumber(2, $strict = true),
+        'description' => $faker->text(),
         'stock' => $faker->randomNumber(3, $strict = true),
-        'unit_id' => Unit::all()->random()->id,
-        // 'stocked' => intval($faker->boolean(100)),
+        'price' => $faker->randomNumber(2, $strict = true),
         'stocked' => intval($faker->boolean),
-        // 'store_id' => Store::all()->random()->id,
-        'store_id' => function () {
-            return factory(Store::class)->create()->id;
-        }
+
+        'unit_id' => Unit::all()->random()->id,
+        'user_id' => RanqhanaUser::all()->random()->id,
+        // 'user_id' => Auth::check() ? Auth::user()->getLocalUserID() : RanqhanaUser::all()->random()->id,
 
     ];
 });
+// 'stocked' => intval($faker->boolean(100)),

@@ -12,15 +12,15 @@ class ItemsTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(Item::class, 100)->create();
+        // factory(Item::class, 100)->create();
         factory(Item::class)->create(
-            ['name' => 'pastillas', 'price' => 5, 'stock' => 200, 'stocked' => true, 'store_id' => 1 ]
+            ['name' => 'pastillas', 'price' => 5, 'stock' => 200, 'stocked' => true]
         );
         factory(Item::class)->create(
-            ['name' => 'gaseosa', 'price' => 8, 'stock' => 500, 'stocked' => true, 'store_id' => 1 ]
+            ['name' => 'gaseosa', 'price' => 8, 'stock' => 500, 'stocked' => true ]
         );
         factory(Item::class)->create(
-            ['name' => 'marmita', 'price' => 12, 'stock' => 0, 'stocked' => false, 'store_id' => 1 ]
+            ['name' => 'marmita', 'price' => 12, 'stock' => 0, 'stocked' => false ]
         );
     }
 }

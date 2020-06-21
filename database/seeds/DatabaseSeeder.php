@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
             // InvoiceStagesTableSeeder::class,
             UnitsTableSeeder::class,
             RanqhanaUsersSeeder::class,
-            // ItemsTableSeeder::class,
+            ItemsTableSeeder::class,
         ]);
     }
 }
