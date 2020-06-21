@@ -7,6 +7,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use App\Models\RanqhanaUser;
+
 class User extends Authenticatable
 {
     use Notifiable;
@@ -96,5 +98,18 @@ class User extends Authenticatable
                     ->join('projects','company_project.project_id','=','projects.id')
                     ->distinct()
                     ->get();
+    }
+
+    /**
+     * Get ID from Local User table
+     */
+    public function getLocalUserID(){
+        $RanqhanaUserResult = RanqhanaUser::
+                                where('user_id','=',$this->id)
+                                ->where('company_project_id','=',$this->company_project_id)
+                                ->pluck('id');
+
+        if($RanqhanaUserResult == null) return null;
+        return $RanqhanaUserResult[0];
     }
 }

@@ -246,6 +246,8 @@ class UserController extends ResponseController{
             ['user_id' => Auth::user()->id, 'company_project_id' => Auth::user()->company_project_id]
         );
 
+        Auth::user()->local_user_id = Auth::user()->getLocalUserID();
+
         return $this->sendResponse(Auth::user()->toArray(), 'User logged successfully.');  
     }
 }
