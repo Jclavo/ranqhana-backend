@@ -30,9 +30,11 @@ class Item extends BaseModel
         parent::boot();
 
         static::addGlobalScope('mine', function (Builder $builder) {
-            $builder->select('items.*')
-                     ->join('ranqhana_users','user_id', '=', 'ranqhana_users.id')
-                    ->where('ranqhana_users.company_project_id', '=', Auth::user()->company_project_id);
+            $builder->whereIn('user_id', function($query){
+                        $query->select('ranqhana_users.id')
+                            ->from('ranqhana_users')
+                            ->where('ranqhana_users.company_project_id', '=', Auth::user()->company_project_id);
+                    });
 
         });
     }
