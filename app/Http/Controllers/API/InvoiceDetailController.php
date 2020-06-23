@@ -51,10 +51,10 @@ class InvoiceDetailController extends ResponseController
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'item_id'    => 'required|exists:items,id',
             'quantity'   => 'required|numeric|gt:0|digits_between:1,5',
-            'invoice_id' => 'required|exists:invoices,id',
             'price'    =>   'numeric|gt:0|regex:/^[0-9]{1,5}+(?:\.[0-9]{1,2})?$/',
+            'item_id'    => 'required|exists:items,id',
+            'invoice_id' => 'required|exists:invoices,id',
         ]);
 
         if ($validator->fails()) {
@@ -126,23 +126,31 @@ class InvoiceDetailController extends ResponseController
      * @param  \App\InvoiceDetail  $invoiceDetail
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($invoice_id)
     {
-        $invoiceDetails = InvoiceDetail::select('invoice_details.*', 'items.name as item', 'units.code as unit')
-                        ->join('invoices', function ($join) use($id){
-                            $join->on('invoice_details.invoice_id', '=', 'invoices.id')
-                                ->where('invoices.id', '=', $id)
-                                ->where('invoices.store_id','=', Auth::user()->store_id);
-                        })
-                        ->join('items', 'invoice_details.item_id', '=', 'items.id')
-                        ->join('units', 'items.unit_id', '=', 'units.id')
-                        ->get();
+
+        $invoiceDetails = InvoiceDetail::whereHas('invoice', function ($query) use($invoice_id) {
+            $query->where('invoices.id', '=', $invoice_id);
+        })
+        ->with(['item.unit'])
+        ->get();
+
+
+        // $invoiceDetails = InvoiceDetail::select('invoice_details.*', 'items.name as item', 'units.code as unit')
+        //                 ->join('invoices', function ($join) use($invoice_id){
+        //                     $join->on('invoice_details.invoice_id', '=', 'invoices.id')
+        //                         ->where('invoices.id', '=', $invoice_id);
+        //                 })
+        //                 ->join('items', 'invoice_details.item_id', '=', 'items.id')
+        //                 ->join('units', 'items.unit_id', '=', 'units.id')
+        //                 ->get();
 
         if($invoiceDetails->isEmpty()){
             return $this->sendError('Invoice details not found.');
         }else{
             return $this->sendResponse($invoiceDetails, 'Invoice details retrieved successfully.');
         }
+        // return $this->sendResponse($invoiceDetails, 'Invoice details retrieved successfully.');
     }
 
     /**

@@ -27,14 +27,29 @@ class Invoice extends BaseModel
 
 
     //Relationships
+
+    /**
+     * Get the "Type" associated with the "Invoice".
+     */
     public function type()
     {
         return $this->belongsTo('App\Models\InvoiceTypes');
     }
 
+    /**
+     * Get the "Stage" associated with the "Invoice".
+     */
     public function stage()
     {
         return $this->belongsTo('App\Models\InvoiceStages');
+    }
+
+    /**
+     * Get the "Invoice details" for the "Invoice"
+    */
+    public function details()
+    {
+        return $this->hasMany('App\Models\InvoiceDetail');
     }
 
 

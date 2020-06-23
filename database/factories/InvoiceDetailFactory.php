@@ -16,15 +16,11 @@ $factory->define(InvoiceDetail::class, function (Faker $faker) {
     $total    = $quantity * $price;
 
     return [
-        'item_id' => function () {
-            return factory(Item::class)->create()->id;
-        },
+        'item_id' => Item::all()->random()->id,
         'quantity' => $quantity,
         'price' => $price,
         'total' => 0,
-        'invoice_id' => function () {
-            return factory(Invoice::class)->create()->id;
-        },
+        'invoice_id' => Invoice::all()->random()->id,
     ];
 });
 
@@ -40,8 +36,6 @@ $factory->defineAs(InvoiceDetail::class,'full', function (Faker $faker) {
         'quantity' => $quantity,
         'price' => $price,
         'total' => $total,
-        'invoice_id' => function () {
-            return factory(Invoice::class)->create()->id;
-        },
+        'invoice_id' => Invoice::all()->random()->id,
     ];
 });
