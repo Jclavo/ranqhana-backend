@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\InvoiceStage;
+use App\Models\InvoiceStages;
 
 use Illuminate\Database\Seeder;
 
@@ -13,8 +13,8 @@ class InvoiceStagesTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(InvoiceStage::class)->create(['code' => 'P', 'description' => 'Paid']);
-        factory(InvoiceStage::class)->create(['code' => 'A', 'description' => 'Anulled']);
-        factory(InvoiceStage::class)->create(['code' => 'I', 'description' => 'Initial']);
+        factory(InvoiceStages::class)->create(['code' => 'P', 'description' => 'Paid']);
+        factory(InvoiceStages::class)->create(['code' => 'A', 'description' => 'Anulled']);
+        factory(InvoiceStages::class)->create(['code' => 'I', 'description' => 'Initial']);
     }
 }

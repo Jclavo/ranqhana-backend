@@ -2,10 +2,10 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Models\InvoiceStage;
+use App\Models\InvoiceStages;
 use Faker\Generator as Faker;
 
-$factory->define(InvoiceStage::class, function (Faker $faker) {
+$factory->define(InvoiceStages::class, function (Faker $faker) {
     return [
         'code' => $faker->name,
         'description' => $faker->text(),
