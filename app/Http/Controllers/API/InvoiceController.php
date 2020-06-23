@@ -17,8 +17,12 @@ use Illuminate\Validation\Rule;
 
 use App\Http\Controllers\API\ItemController;
 use Carbon\Carbon;
+
+//Utils
+use App\Utils\PaginationUtils;
 use App\Utils\CustomCarbon;
 use App\Utils\UserUtils;
+
 
 class InvoiceController extends ResponseController
 {
@@ -61,28 +65,27 @@ class InvoiceController extends ResponseController
             return $this->sendError($validator->errors()->first());
         }
 
-        $sellInvoice = new Invoice();
+        $invoice = new Invoice();
         
-        $sellInvoice->serie    = $request->serie;
-        $sellInvoice->subtotal = $request->subtotal;
-        $sellInvoice->taxes    = $request->taxes;
-        $sellInvoice->discount = $request->discount;
-        $sellInvoice->total    = $sellInvoice->subtotal + $sellInvoice->taxes - $sellInvoice->discount;
-        $sellInvoice->type_id  = $request->type_id;
-        $sellInvoice->user_id  = Auth::user()->id;
-        $sellInvoice->store_id  = Auth::user()->store_id;
+        $invoice->serie    = $request->serie;
+        $invoice->subtotal = $request->subtotal;
+        $invoice->taxes    = $request->taxes;
+        $invoice->discount = $request->discount;
+        $invoice->total    = $invoice->calculateTotal();
 
         //Validate that total is not negative
-        if($sellInvoice->total < 0){
-            return $this->sendError($sellInvoice->toArray(), 'Invoice total is negative.');       
+        if($invoice->total < 0){
+            return $this->sendError($invoice->toArray(), 'Invoice total is negative.');       
         }
 
-        //Update stage
-        $sellInvoice->setStagePaid();
+        //Set FKs
+        $invoice->type_id  = $request->type_id;
+        $invoice->user_id = Auth::user()->getLocalUserID();
+        $invoice->setStagePaid();
         
-        $sellInvoice->save();
+        $invoice->save();
 
-        return $this->sendResponse($sellInvoice->toArray(), 'Sell invoice created successfully.');  
+        return $this->sendResponse($invoice->toArray(), 'Sell invoice created successfully.');  
     }
 
     /**
@@ -93,18 +96,9 @@ class InvoiceController extends ResponseController
      */
     public function show($id)
     {
-        $invoice = Invoice::select('invoices.*','stores.name as store', 'invoice_types.description as type')
-                   ->join('stores', 'invoices.store_id', '=', 'stores.id')
-                   ->join('invoice_types', 'invoices.type_id', '=', 'invoice_types.id')
-                   ->where('invoices.id','=', $id)
-                   ->where('invoices.store_id','=', Auth::user()->store_id)
-                   ->get();
-
-        if($invoice->isEmpty()){
-            return $this->sendError('Invoice not found.');
-        }else{
-            return $this->sendResponse($invoice, 'Invoice retrieved successfully.');
-        }
+        $invoice = Invoice::with(['type','stage'])->findOrFail($id);
+                
+        return $this->sendResponse($invoice->toArray(), 'Invoice retrieved successfully.');
     }
 
     /**
@@ -129,12 +123,7 @@ class InvoiceController extends ResponseController
     {
         $invoice = Invoice::findOrFail($id);
 
-        $this->businessValidations([
-            new BelongsToStore(Auth::user(), [$invoice]),
-        ]);
-
         $invoice->serie    = $request->serie;
-        // $sellInvoice->client   = $request->client;
 
         $invoice->save();
 
@@ -158,69 +147,51 @@ class InvoiceController extends ResponseController
     public function pagination(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            // 'subtotal' => 'required|numeric|gt:0',
-            // 'taxes' => 'numeric|gte:0|lt:subtotal',
-            // 'discount' => 'numeric|gte:0|lt:subtotal',
             'type_id' => 'required|exists:invoice_types,id',
+            'pageSize' => 'numeric|gt:0',
         ]);
 
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
         }
 
-        $sortArray = array("asc", "ASC", "desc", "DESC");
-
-        // SearchOptions values
-        $per_page      = $request->per_page;
-        $sortColumn    = $request->sortColumn;
-        $sortDirection = $request->sortDirection;
+       // SearchOptions values
+        $pageSize      = PaginationUtils::getPageSize($request->pageSize);
+        $sortColumn    = PaginationUtils::getSortColumn($request->sortColumn,'units');
+        $sortDirection = PaginationUtils::getSortDirection($request->sortDirection);
         $searchValue   = $request->searchValue;
+
         $fromDate      = $request->fromDate;
         $toDate        = $request->toDate;
         $type_id       = $request->type_id;
-
-        // Initialize values if they are empty.
-        if (empty($per_page)) {
-            $per_page = 20;
-        }
-
-        if (!in_array($sortDirection, $sortArray)) {
-            $sortDirection = "DESC";
-            $sortColumn = "created_at";
-        }
-
-        if (empty($sortColumn)) {
-            $sortColumn = "created_at";
-        }
         
-        if (empty($type)) {
-            $type = "S";
-        }
+        // if (empty($type)) {
+        //     $type = "S";
+        // }
 
         $query = Invoice::query();
 
         $query->select('invoices.*');
 
-        $query->where('type_id', '=', $type_id)
-              ->where('store_id', '=', Auth::user()->store_id);
+        $query->where('type_id', '=', $type_id);
 
         $query->when((!empty($searchValue)), function ($q) use($searchValue) {
             return $q->where('serie', 'like', '%'. $searchValue .'%')
                      ->orWhere('total', 'like', '%'. $searchValue .'%');
         });
 
-        $query->when((!empty($fromDate)) && (!empty($toDate)) , function ($q) use($fromDate,$toDate) {
+        // $query->when((!empty($fromDate)) && (!empty($toDate)) , function ($q) use($fromDate,$toDate) {
 
-            $timezome = UserUtils::getTimezone(Auth::user());
-            //change date format
-            $fromDate = CustomCarbon::UTCtoCountryTZ($fromDate,'00:00:00', $timezome);
-            $toDate = CustomCarbon::UTCtoCountryTZ($toDate,'23:59:59', $timezome);
+        //     $timezome = UserUtils::getTimezone(Auth::user());
+        //     //change date format
+        //     $fromDate = CustomCarbon::UTCtoCountryTZ($fromDate,'00:00:00', $timezome);
+        //     $toDate = CustomCarbon::UTCtoCountryTZ($toDate,'23:59:59', $timezome);
 
-            return $q->whereBetween('created_at',[ $fromDate." 00:00:00", $toDate." 23:59:59"]);
-        });
+        //     return $q->whereBetween('created_at',[ $fromDate." 00:00:00", $toDate." 23:59:59"]);
+        // });
 
         $results = $query->orderBy($sortColumn, $sortDirection)
-                         ->paginate($per_page);
+                         ->paginate($pageSize);       
  
         return $this->sendResponse($results->items(), 'Invoices retrieved successfully.', $results->total() );
 
@@ -233,10 +204,6 @@ class InvoiceController extends ResponseController
     public function anull(int $id)
     {
         $invoice = Invoice::findOrFail($id);
-
-        $this->businessValidations([
-            new BelongsToStore(Auth::user(), [$invoice]),
-        ]);
 
         $this->businessActions([ new InvoiceAnull($invoice)]);
 
@@ -272,15 +239,15 @@ class InvoiceController extends ResponseController
               ->where('store_id', '=', Auth::user()->store_id);
 
 
-        $query->when((!empty($fromDate)) && (!empty($toDate)) , function ($q) use($fromDate,$toDate) {
+        // $query->when((!empty($fromDate)) && (!empty($toDate)) , function ($q) use($fromDate,$toDate) {
 
-            $timezome = UserUtils::getTimezone(Auth::user());
-            //change date format
-            $fromDate = CustomCarbon::UTCtoCountryTZ($fromDate,'00:00:00', $timezome);
-            $toDate = CustomCarbon::UTCtoCountryTZ($toDate,'23:59:59', $timezome);
+        //     $timezome = UserUtils::getTimezone(Auth::user());
+        //     //change date format
+        //     $fromDate = CustomCarbon::UTCtoCountryTZ($fromDate,'00:00:00', $timezome);
+        //     $toDate = CustomCarbon::UTCtoCountryTZ($toDate,'23:59:59', $timezome);
 
-            return $q->whereBetween('created_at',[$fromDate, $toDate]);
-        });
+        //     return $q->whereBetween('created_at',[$fromDate, $toDate]);
+        // });
 
        
         $rawQuery = $query->get()

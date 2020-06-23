@@ -16,8 +16,7 @@ class InvoiceTest extends TestCase
         $this->setBaseRoute('invoices');
         $this->setBaseModel('App\Models\Invoice');
         $this->setFaker(); 
-        // $this->setFieldsDatabaseHas(['id', 'subtotal', 'created_at']);
-        $this->setFieldsDatabaseHas(['id', 'subtotal', 'taxes', 'discount', 'total', 'user_id', 'type_id', 'store_id', 'stage']);  
+        $this->setFieldsDatabaseHas(['id', 'subtotal', 'taxes', 'discount', 'total', 'type_id', 'stage_id', 'user_id']);  
     }
 
 
@@ -38,23 +37,6 @@ class InvoiceTest extends TestCase
         $this->get_api_token();
 
         $this->create(['subtotal' => '']);
-    }
-
-    public function test_sell_invoice_create_subtotal_must_be_a_number()
-    {
-        $this->setDatabaseHas(false);
-
-        //Set Json asserts
-        $assertsJson = array();
-        array_push($assertsJson,['status' => false]);
-        array_push($assertsJson,['result' => []]);
-        array_push($assertsJson,['message' => 'The subtotal must be a number.']);
-        $this->setAssertJson($assertsJson);
-
-        //Authentication
-        $this->get_api_token();
-
-        $this->create(['subtotal' => $this->faker->lexify('?')]);
     }
 
     public function test_sell_invoice_create_subtotal_must_be_a_number_gt0()
@@ -234,8 +216,7 @@ class InvoiceTest extends TestCase
         //Authentication
         $this->get_api_token();
 
-        $this->create(['type_id' => 1, 'serie' => null, 'taxes' => null, 'discount' => null,
-                       'user_id' => auth()->user()->id, 'store_id' => auth()->user()->store_id ]);
+        $this->create(['type_id' => 1, 'serie' => null, 'taxes' => null, 'discount' => null]);
     }
 
     public function test_sell_invoice_create_ok()
@@ -253,31 +234,11 @@ class InvoiceTest extends TestCase
         //Authentication
         $this->get_api_token();
 
-        $this->create(['type_id' => 1, 'user_id' => auth()->user()->id, 'store_id' => auth()->user()->store_id]);
+        $this->create(['type_id' => 1]);
     }
 
 
     // FUNCTION: update
-
-    public function test_invoice_update_from_another_store()
-    {
-        // Set Database has
-        $this->setDatabaseHas(false);
-
-        //Set Json asserts
-        $assertsJson = array();
-        array_push($assertsJson,['status' => false]);
-        array_push($assertsJson,['message' => 'Invoice does not belong to current store.']);
-        $this->setAssertJson($assertsJson);
-
-        //Authentication
-        $this->get_api_token();
-
-        //Action
-        $this->update(['serie' => $this->faker->lexify('???')],
-                      ['serie' => ''] //attribute mandatory 
-                    );   
-    }
 
     public function test_invoice_update_ok()
     {
@@ -295,7 +256,7 @@ class InvoiceTest extends TestCase
 
         //Action
         $this->update(['serie' => $this->faker->lexify('???')],
-                      ['serie' => '', 'store_id' => auth()->user()->store_id] //attribute mandatory 
+                      ['serie' => ''] //attribute mandatory 
                     );   
     }
 

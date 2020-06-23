@@ -14,7 +14,7 @@ class Invoice extends BaseModel
      * @var array
      */
     protected $fillable = [
-        'serie', 'subtotal', 'taxes', 'discount', 'total', 'type_id', 'stage', 'user_id'
+        'serie', 'subtotal', 'taxes', 'discount', 'total', 'type_id', 'stage_id', 'user_id'
     ];
 
     /**
@@ -25,19 +25,44 @@ class Invoice extends BaseModel
         //  'discount' => 'decimal:2',
     ];
 
-    //Custom functions
-    // public function getStockAttribute(){
-    //     return $this->attributes['stock'];
-    // }
 
-    public function setStageAnulled()
+    //Relationships
+    public function type()
     {
-        $this->stage = 'A';
+        return $this->belongsTo('App\Models\InvoiceTypes');
     }
 
-    public function setStagePaid()
+    public function stage()
     {
-        $this->stage = 'P';
+        return $this->belongsTo('App\Models\InvoiceStages');
+    }
+
+
+
+    //Custom functions
+    public function calculateTotal(){
+        return (($this->subtotal + $this->taxes) - $this->discount);
+    }
+
+    //Setter and Getters
+    public function setStagePaid() // stage = 'P';
+    {
+        $this->stage_id = 1;
+    }
+
+    public function setStageAnulled() // stage = 'A';
+    {
+        $this->stage_id = 2;
+    }
+
+    public function getStagePaid()
+    {
+        return 1;
+    }
+
+    public function getStageAnulled()
+    {
+        return 2;
     }
 
     public function getType(){
