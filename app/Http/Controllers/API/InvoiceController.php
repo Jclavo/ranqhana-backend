@@ -172,6 +172,8 @@ class InvoiceController extends ResponseController
         $query = Invoice::query();
 
         $query->select('invoices.*');
+        $query->whereHas('details');
+        $query->with('stage');
 
         $query->where('type_id', '=', $type_id);
 
