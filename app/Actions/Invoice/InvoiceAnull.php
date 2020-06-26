@@ -21,7 +21,7 @@ class InvoiceAnull
     
     public function execute()
     {
-        if($this->invoice->stage == 'A') return false; 
+        if($this->invoice->stage_id == $this->invoice->getStageAnulled()) return false; 
 
         $invoice_id = $this->invoice->id;
         $results = Invoice::
