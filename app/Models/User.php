@@ -100,6 +100,29 @@ class User extends Authenticatable
                     ->get();
     }
 
+
+    /**
+     * Get the country thay owns the company from user.
+     */
+    public function country(){
+        return User::select('countries.*')
+                    ->join('company_project', function ($join){
+                        $join->on('users.company_project_id','=','company_project.id')
+                              ->where('users.company_project_id','=',$this->company_project_id);
+                    })
+                    ->join('companies','company_project.company_id','=','companies.id')
+                    ->join('countries','companies.country_id','=','countries.id')
+                    ->distinct()
+                    ->first();
+    }
+
+    public function getTimezone(){
+        $country = $this->country();
+        return $country->timezone;
+    }
+
+
+
     /**
      * Get ID from Local User table
      */
