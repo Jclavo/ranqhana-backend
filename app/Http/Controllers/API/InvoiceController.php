@@ -21,7 +21,6 @@ use Carbon\Carbon;
 //Utils
 use App\Utils\PaginationUtils;
 use App\Utils\CustomCarbon;
-use App\Utils\UserUtils;
 
 
 class InvoiceController extends ResponseController
@@ -182,15 +181,15 @@ class InvoiceController extends ResponseController
                      ->orWhere('total', 'like', '%'. $searchValue .'%');
         });
 
-        // $query->when((!empty($fromDate)) && (!empty($toDate)) , function ($q) use($fromDate,$toDate) {
+        $query->when((!empty($fromDate)) && (!empty($toDate)) , function ($q) use($fromDate,$toDate) {
 
-        //     $timezome = UserUtils::getTimezone(Auth::user());
-        //     //change date format
-        //     $fromDate = CustomCarbon::UTCtoCountryTZ($fromDate,'00:00:00', $timezome);
-        //     $toDate = CustomCarbon::UTCtoCountryTZ($toDate,'23:59:59', $timezome);
+            $timezome =Auth::user()->getTimezone();
+            //change date format
+            $fromDate = CustomCarbon::UTCtoCountryTZ($fromDate,'00:00:00', $timezome);
+            $toDate = CustomCarbon::UTCtoCountryTZ($toDate,'23:59:59', $timezome);
 
-        //     return $q->whereBetween('created_at',[ $fromDate." 00:00:00", $toDate." 23:59:59"]);
-        // });
+            return $q->whereBetween('created_at',[ $fromDate." 00:00:00", $toDate." 23:59:59"]);
+        });
 
         $results = $query->orderBy($sortColumn, $sortDirection)
                          ->paginate($pageSize);       
@@ -237,25 +236,24 @@ class InvoiceController extends ResponseController
         $query = Invoice::query();
 
         $query->select('invoices.total','invoices.created_at')
-              ->where('type_id', '=', $type_id)
-              ->where('store_id', '=', Auth::user()->store_id);
+              ->where('type_id', '=', $type_id);
 
 
-        // $query->when((!empty($fromDate)) && (!empty($toDate)) , function ($q) use($fromDate,$toDate) {
+        $query->when((!empty($fromDate)) && (!empty($toDate)) , function ($q) use($fromDate,$toDate) {
 
-        //     $timezome = UserUtils::getTimezone(Auth::user());
-        //     //change date format
-        //     $fromDate = CustomCarbon::UTCtoCountryTZ($fromDate,'00:00:00', $timezome);
-        //     $toDate = CustomCarbon::UTCtoCountryTZ($toDate,'23:59:59', $timezome);
+            $timezome = Auth::user()->getTimezone();
+            //change date format
+            $fromDate = CustomCarbon::UTCtoCountryTZ($fromDate,'00:00:00', $timezome);
+            $toDate = CustomCarbon::UTCtoCountryTZ($toDate,'23:59:59', $timezome);
 
-        //     return $q->whereBetween('created_at',[$fromDate, $toDate]);
-        // });
+            return $q->whereBetween('created_at',[$fromDate, $toDate]);
+        });
 
        
         $rawQuery = $query->get()
                     ->groupBy(function($date) use($searchBy){
                         //Only in hours case 
-                        $timezome = UserUtils::getTimezone(Auth::user());
+                        $timezome = Auth::user()->getTimezone();
                         $date = Carbon::createFromFormat('Y-m-d H:i:s', $date->created_at, 'UTC');
                         $date->setTimezone($timezome); 
 
