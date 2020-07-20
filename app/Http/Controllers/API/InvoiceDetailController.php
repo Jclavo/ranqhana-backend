@@ -186,4 +186,5 @@ class InvoiceDetailController extends ResponseController
     {
         //
     }
+
 }
