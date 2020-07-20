@@ -186,16 +186,17 @@ class UserController extends ResponseController{
         $sortColumn    = PaginationUtils::getSortColumn($request->sortColumn,'users');
         $sortDirection = PaginationUtils::getSortDirection($request->sortDirection);
         $searchValue   = $request->searchValue;
-        $store_id      = Auth::user()->store_id;
+
 
 
         $query = User::query();
         // $query->select('users.id','users.login','users.identification','users.name','users.lastname','users.email',
         //                 'users.phone','users.address', 'users.store_id','stores.name as store')
-        $query->select('users.*','stores.name as store', 'countries.code as country_code')
-              ->join('stores', 'users.store_id', '=', 'stores.id')
-              ->join('countries', 'stores.country_id', '=', 'countries.id');    
-       
+        // $query->select('users.*','stores.name as store', 'countries.code as country_code')
+        //       ->join('stores', 'users.store_id', '=', 'stores.id')
+        //       ->join('countries', 'stores.country_id', '=', 'countries.id');    
+        $query->select('users.*');
+
         $query->where(function($q) use ($searchValue){
             $q->where('users.login', 'like', '%'. $searchValue .'%')
               ->orwhere('users.identification', 'like', '%'. $searchValue .'%')
@@ -235,6 +236,8 @@ class UserController extends ResponseController{
         Auth::user()->company_project = Auth::user()->company_project();
         Auth::user()->company = Auth::user()->company();
         Auth::user()->project = Auth::user()->project();
+        Auth::user()->country = Auth::user()->country();
+        Auth::user()->timezone = Auth::user()->getTimezone();
         
 
         //Update or Create User in Local Table
