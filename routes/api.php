@@ -28,10 +28,6 @@ Route::middleware(['auth:api'])->group(function () {
     Route::resource('invoices', 'API\InvoiceController');
     Route::post('invoices/pagination', 'API\InvoiceController@pagination');
     Route::get('invoices/anull/{invoice}', 'API\InvoiceController@anull');
-    Route::post('invoices/graphicReport', 'API\InvoiceController@graphicReport');
-    // sell invoice
-    // Route::post('sellInvoices', 'API\InvoiceController@createSellInvoice');
-    //Route::post('invoiceDetails', 'API\InvoiceController@createInvoiceDetail');
 
     //Invoice details
     Route::resource('invoiceDetails', 'API\InvoiceDetailController');
@@ -50,6 +46,11 @@ Route::middleware(['auth:api'])->group(function () {
 
     //Country
     Route::resource('countries', 'API\CountryController');
+
+    //Report
+    Route::post('reports/invoiceMoney', 'API\ReportController@invoiceMoney');
+    Route::post('reports/popularProducts', 'API\ReportController@popularProducts');
+
   
 });
 
