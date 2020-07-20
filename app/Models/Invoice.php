@@ -59,6 +59,33 @@ class Invoice extends BaseModel
         return (($this->subtotal + $this->taxes) - $this->discount);
     }
 
+    //Getter (statics)
+
+    static function getStagePaid()
+    {
+        return 1;
+    }
+
+    static function getStageAnulled()
+    {
+        return 2;
+    }
+
+    static function getTypeForSell(){
+        return 1;
+    }
+
+    static function getTypeForPurchase(){
+        return 2;
+    }
+
+    
+    //Getter 
+    public function getType(){
+        return $this->type_id;
+    }
+
+
     //Setter and Getters
     public function setStagePaid() // stage = 'P';
     {
@@ -70,26 +97,6 @@ class Invoice extends BaseModel
         $this->stage_id = 2;
     }
 
-    public function getStagePaid()
-    {
-        return 1;
-    }
 
-    public function getStageAnulled()
-    {
-        return 2;
-    }
-
-    public function getType(){
-        return $this->type_id;
-    }
-
-    public function getTypeForSell(){
-        return 1;
-    }
-
-    public function getTypeForPurchase(){
-        return 2;
-    }
  
 }
