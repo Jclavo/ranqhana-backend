@@ -51,6 +51,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('reports/invoiceMoney', 'API\ReportController@invoiceMoney');
     Route::post('reports/popularProducts', 'API\ReportController@popularProducts');
 
+    //Stock Types
+    Route::resource('stockTypes', 'API\StockTypeController');
   
 });
 
