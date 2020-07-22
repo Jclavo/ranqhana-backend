@@ -45,7 +45,11 @@ php artisan make:seeder UsersTableSeeder
 
 - RUN specific SEED
 
-artisan db:seed --class=UserTableSeeder
+php artisan db:seed --class=UserTableSeeder
+
+- HACK TO RELOAD SEEDER
+
+composer dump-autoload
 
 - CREATE TEST
 
