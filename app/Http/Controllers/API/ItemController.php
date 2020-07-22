@@ -61,6 +61,8 @@ class ItemController extends ResponseController
             'name' => 'required',
             'price' => 'required|numeric|between:0.00,99999.99',
             'unit_id' => 'required|exists:units,id',
+            'stocks' => 'nullable|array',
+            'stocks.*' => 'nullable|exists:stock_types,id'
         ]);
         
         if ($validator->fails()) {
@@ -79,6 +81,9 @@ class ItemController extends ResponseController
 
         //Add price
         $item->prices()->create(['price' => $request->price]);
+
+        //add stock types
+        $item->stock_types()->sync($request->stocks ?? []);
 
         return $this->sendResponse($item->toArray(), 'Item created successfully.');  
     }
@@ -120,6 +125,8 @@ class ItemController extends ResponseController
             'name' => 'required',
             'price' => 'required|numeric|between:0.00,99999.99',
             'unit_id' => 'required|exists:units,id',
+            'stocks' => 'nullable|array',
+            'stocks.*' => 'nullable|exists:stock_types,id'
         ]);
         
         if ($validator->fails()) {
@@ -144,7 +151,10 @@ class ItemController extends ResponseController
 
         //Add price
         $item->prices()->updateOrCreate(['price' => $request->price]);
-        
+
+        //add stock types
+        $item->stock_types()->sync($request->stocks ?? []);
+
         return $this->sendResponse($item->toArray(), 'Item updated successfully.');
     }
 
