@@ -55,6 +55,18 @@ class Item extends BaseModel
         return $this->belongsTo('App\Models\Unit');
     }
 
+     /**
+     * The items that belong to the stock type.
+     */
+    public function stock_types()
+    {
+        return $this->belongsToMany('App\Models\StockType');
+                    // ->using('App\Models\CompanyProject')
+                    // ->withTimestamps()
+                    // ->withPivot('id')
+                    // ->orderBy('name');
+    }
+
     /**
      * Get the prices for the Item.
      */
