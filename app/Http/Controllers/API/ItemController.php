@@ -96,7 +96,7 @@ class ItemController extends ResponseController
      */
     public function show($id)
     {
-        $item = Item::findOrFail($id);
+        $item = Item::with('stock_types')->findOrFail($id); //get stocks
                 
         return $this->sendResponse($item->toArray(), 'Item retrieved successfully.');
     }
@@ -214,6 +214,9 @@ class ItemController extends ResponseController
               ->orWhere('items.price', 'like', $searchValue .'%')
               ->orWhere('items.stock', 'like', $searchValue .'%');
         });
+
+        //get stocks
+        $query->with('stock_types');
 
         
         $results = $query->orderBy($sortColumn, $sortDirection)
