@@ -182,6 +182,7 @@ class ItemController extends ResponseController
         
         $validator = Validator::make($request->all(), [
             'pageSize' => 'numeric|gt:0',
+            'stock_type' => 'nullable|exists:stock_types,id'
         ]);
 
         if ($validator->fails()) {
@@ -193,9 +194,10 @@ class ItemController extends ResponseController
         $sortColumn    = PaginationUtils::getSortColumn($request->sortColumn,'items');
         $sortDirection = PaginationUtils::getSortDirection($request->sortDirection);
         $searchValue   = $request->searchValue;
+        $stock_type_id    = $request->stock_type_id;
             
         $invoice = new Invoice();
-        $invoice_type_id  = $request->invoice_type_id;
+        $stock_type  = $request->stock_type;
 
         $query = Item::query();
         $query->select('items.*', 'units.code as unit', 'units.fractioned')
@@ -203,11 +205,15 @@ class ItemController extends ResponseController
                     $join->on('units.id', '=', 'items.unit_id')
                          ->latest();
                 });
-        
-        $query->when((!empty($invoice_type_id) && $invoice_type_id == $invoice->getTypeForPurchase()), function ($q) {
-            return $q->where('items.stocked', '=', true );
-        });
 
+        //Filter by stock types
+        $query->when((!empty($stock_type_id) ), function ($q) use($stock_type_id) {
+            return $q->join('item_stock_type', function ($join) use($stock_type_id){
+                        $join->on('item_stock_type.item_id', '=', 'items.id')
+                             ->where('item_stock_type.stock_type_id', '=' ,$stock_type_id);
+                    });
+        });
+        
         $query->where(function($q) use ($searchValue){
             $q->where('items.name', 'like', '%'. $searchValue .'%')
               ->orWhere('items.description', 'like', '%'. $searchValue .'%')
