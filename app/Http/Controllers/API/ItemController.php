@@ -61,8 +61,8 @@ class ItemController extends ResponseController
             'name' => 'required',
             'price' => 'required|numeric|between:0.00,99999.99',
             'unit_id' => 'required|exists:units,id',
-            'stocks' => 'nullable|array',
-            'stocks.*' => 'nullable|exists:stock_types,id'
+            'stock_types' => 'nullable|array',
+            'stock_types.*' => 'nullable|exists:stock_types,id'
         ]);
         
         if ($validator->fails()) {
@@ -83,7 +83,7 @@ class ItemController extends ResponseController
         $item->prices()->create(['price' => $request->price]);
 
         //add stock types
-        $item->stock_types()->sync($request->stocks ?? []);
+        $item->stock_types()->sync($request->stock_types ?? []);
 
         return $this->sendResponse($item->toArray(), 'Item created successfully.');  
     }
@@ -96,7 +96,7 @@ class ItemController extends ResponseController
      */
     public function show($id)
     {
-        $item = Item::with('stock_types')->findOrFail($id); //get stocks
+        $item = Item::with('stock_types')->findOrFail($id); //get stock_types
                 
         return $this->sendResponse($item->toArray(), 'Item retrieved successfully.');
     }
@@ -125,8 +125,8 @@ class ItemController extends ResponseController
             'name' => 'required',
             'price' => 'required|numeric|between:0.00,99999.99',
             'unit_id' => 'required|exists:units,id',
-            'stocks' => 'nullable|array',
-            'stocks.*' => 'nullable|exists:stock_types,id'
+            'stock_types' => 'nullable|array',
+            'stock_types.*' => 'nullable|exists:stock_types,id'
         ]);
         
         if ($validator->fails()) {
@@ -153,7 +153,7 @@ class ItemController extends ResponseController
         $item->prices()->updateOrCreate(['price' => $request->price]);
 
         //add stock types
-        $item->stock_types()->sync($request->stocks ?? []);
+        $item->stock_types()->sync($request->stock_types ?? []);
 
         return $this->sendResponse($item->toArray(), 'Item updated successfully.');
     }
@@ -221,7 +221,7 @@ class ItemController extends ResponseController
               ->orWhere('items.stock', 'like', $searchValue .'%');
         });
 
-        //get stocks
+        //get stock_types
         $query->with('stock_types');
 
         
