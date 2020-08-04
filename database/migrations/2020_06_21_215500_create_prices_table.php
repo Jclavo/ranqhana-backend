@@ -17,8 +17,8 @@ class CreatePricesTable extends Migration
             $table->bigIncrements('id');
             $table->decimal('price',7,2);
 
-            $table->unsignedBigInteger('item_id')->nullable(true);
-            $table->foreign('item_id')->references('id')->on('items');
+            $table->unsignedBigInteger('priceable_id');
+            $table->string('priceable_type');
             
             $table->timestamps();
         });

@@ -72,7 +72,8 @@ class Item extends BaseModel
      */
     public function prices()
     {
-        return $this->hasMany('App\Models\Price');
+        // return $this->hasMany('App\Models\Price');
+        return $this->morphMany('App\Models\Price', 'priceable');
     }
     
 
