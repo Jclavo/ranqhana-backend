@@ -16,5 +16,7 @@ class UnitsTableSeeder extends Seeder
         factory(Unit::class)->create(['code' => 'BX','description' => 'Boxes', 'fractioned' => false]);
         factory(Unit::class)->create(['code' => 'BT','description' => 'Bottles', 'fractioned' => false]);
         factory(Unit::class)->create(['code' => 'UN','description' => 'Unit', 'fractioned' => false]);
+        factory(Unit::class)->create(['code' => 'BG','description' => 'Bag', 'fractioned' => false]);
+        factory(Unit::class)->create(['code' => 'PK','description' => 'Package', 'fractioned' => false]);
     }
 }
