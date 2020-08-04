@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateItemStockTypeTable extends Migration
+class CreateStockTypeablesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,24 +13,18 @@ class CreateItemStockTypeTable extends Migration
      */
     public function up()
     {
-        Schema::create('item_stock_type', function (Blueprint $table) {
-            $table->bigIncrements('id');
-
-            $table->unsignedBigInteger('item_id');
+        Schema::create('stock_typeables', function (Blueprint $table) {
             $table->unsignedBigInteger('stock_type_id');
-
-            $table->timestamps();
-
-            $table->foreign('item_id')
-            ->references('id')
-            ->on('items')
-            ->onDelete('cascade');
 
             $table->foreign('stock_type_id')
             ->references('id')
             ->on('stock_types')
             ->onDelete('cascade');
 
+            $table->unsignedBigInteger('stock_typeable_id');
+            $table->string('stock_typeable_type');
+
+            $table->timestamps();
         });
     }
 
@@ -41,6 +35,6 @@ class CreateItemStockTypeTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('item_stock_type');
+        Schema::dropIfExists('stock_typeables');
     }
 }

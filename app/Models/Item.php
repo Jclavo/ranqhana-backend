@@ -60,11 +60,7 @@ class Item extends BaseModel
      */
     public function stock_types()
     {
-        return $this->belongsToMany('App\Models\StockType');
-                    // ->using('App\Models\CompanyProject')
-                    // ->withTimestamps()
-                    // ->withPivot('id')
-                    // ->orderBy('name');
+        return $this->morphToMany('App\Models\StockType', 'stock_typeable');
     }
 
     /**
@@ -72,7 +68,6 @@ class Item extends BaseModel
      */
     public function prices()
     {
-        // return $this->hasMany('App\Models\Price');
         return $this->morphMany('App\Models\Price', 'priceable');
     }
     

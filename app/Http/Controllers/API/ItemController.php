@@ -12,6 +12,7 @@ use App\Http\Controllers\ResponseController;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 
 //Utils
 use App\Utils\PaginationUtils;
@@ -208,9 +209,10 @@ class ItemController extends ResponseController
 
         //Filter by stock types
         $query->when((!empty($stock_type_id) ), function ($q) use($stock_type_id) {
-            return $q->join('item_stock_type', function ($join) use($stock_type_id){
-                        $join->on('item_stock_type.item_id', '=', 'items.id')
-                             ->where('item_stock_type.stock_type_id', '=' ,$stock_type_id);
+            return $q->join('stock_typeables', function ($join) use($stock_type_id){
+                        $join->on('stock_typeables.stock_typeable_id', '=', 'items.id')
+                             ->where('stock_typeables.stock_type_id', $stock_type_id)
+                             ->where('stock_typeables.stock_typeable_type', Item::class);
                     });
         });
         

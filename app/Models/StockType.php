@@ -7,15 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class StockType extends Model
 {
     
-     /**
-     * The items that belong to the stock type.
+    /**
+     * Get all of the items that are assigned this stock type.
      */
     public function items()
     {
-        return $this->belongsToMany('App\Models\Item');
-                    // ->using('App\Models\CompanyProject')
-                    // ->withTimestamps()
-                    // ->withPivot('id')
-                    // ->orderBy('name');
+        return $this->morphedByMany('App\Models\Item', 'stock_typeable');
     }
 }
