@@ -37,7 +37,7 @@ php artisan make:factory PostFactory --model=Post
 
 php artisan tinker
 
-factory(App\User::class)->create();
+factory(App\Models\User::class)->create();
 
 - CREATE SEEDER
 
