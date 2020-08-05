@@ -21,6 +21,7 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::get('getUserInformation', 'API\LoginController@getUserInformation');
 
+    //Item
     Route::post('items/pagination', 'API\ItemController@pagination');
     Route::resource('items', 'API\ItemController');
 
@@ -53,6 +54,10 @@ Route::middleware(['auth:api'])->group(function () {
 
     //Stock Types
     Route::resource('stockTypes', 'API\StockTypeController');
+
+    //Services
+    Route::post('services/pagination', 'API\ServiceController@pagination');
+    Route::resource('services', 'API\ServiceController');
   
 });
 
