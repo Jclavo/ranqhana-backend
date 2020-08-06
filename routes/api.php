@@ -25,6 +25,16 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('items/pagination', 'API\ItemController@pagination');
     Route::resource('items', 'API\ItemController');
 
+    // Item - Product
+    Route::post('items/products', 'API\ItemController@storeProduct');
+    Route::put('items/products/{item}', 'API\ItemController@updateProduct');
+
+    // Item - Product
+    // Route::post('items/services', 'API\ItemController@storeService');
+    // Route::put('items/services/{service}', 'API\ItemController@updateService');
+
+
+
     // Invoice
     Route::resource('invoices', 'API\InvoiceController');
     Route::post('invoices/pagination', 'API\InvoiceController@pagination');
@@ -56,8 +66,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::resource('stockTypes', 'API\StockTypeController');
 
     //Services
-    Route::post('services/pagination', 'API\ServiceController@pagination');
-    Route::resource('services', 'API\ServiceController');
+    // Route::post('services/pagination', 'API\ServiceController@pagination');
+    // Route::resource('services', 'API\ServiceController');
   
 });
 
