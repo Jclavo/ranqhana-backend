@@ -73,6 +73,7 @@ class Item extends BaseModel
     
 
     //Custom functions
+
     public function getStockAttribute(){
         return $this->attributes['stock'];
     }
@@ -94,6 +95,18 @@ class Item extends BaseModel
 
     public function isStocked(){
         return $this->stocked;
+    }
+
+    //Getter (statics)
+
+    static function getTypeProduct()
+    {
+        return 1;
+    }
+
+    static function getTypeService()
+    {
+        return 2;
     }
 }
  
