@@ -3,9 +3,6 @@
 namespace App\Http\Controllers\API;
 
 use App\Models\Item;
-use App\Models\Price;
-use App\Models\Unit;
-use App\Models\Invoice;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\ResponseController;
@@ -65,7 +62,8 @@ class ItemController extends ResponseController
         
         $validator = Validator::make($request->all(), [
             'pageSize' => 'numeric|gt:0',
-            'stock_type' => 'nullable|exists:stock_types,id'
+            'stock_type_id' => 'nullable|exists:stock_types,id',
+            'type_id' => 'nullable|exists:item_types,id'
         ]);
 
         if ($validator->fails()) {
@@ -77,27 +75,16 @@ class ItemController extends ResponseController
         $sortColumn    = PaginationUtils::getSortColumn($request->sortColumn,'items');
         $sortDirection = PaginationUtils::getSortDirection($request->sortDirection);
         $searchValue   = $request->searchValue;
-        $stock_type_id    = $request->stock_type_id;
+        $stock_type_id = $request->stock_type_id;
+        $type_id       = $request->type_id;
             
-        $invoice = new Invoice();
-        $stock_type  = $request->stock_type;
-
         $query = Item::query();
         $query->select('items.*', 'units.code as unit', 'units.fractioned')
               ->leftJoin('units', function ($join){
-                    $join->on('units.id', '=', 'items.unit_id')
-                         ->latest();
+                    $join->on('units.id', '=', 'items.unit_id');
+                        //  ->latest();
                 });
 
-        //Filter by stock types
-        $query->when((!empty($stock_type_id) ), function ($q) use($stock_type_id) {
-            return $q->join('stock_typeables', function ($join) use($stock_type_id){
-                        $join->on('stock_typeables.stock_typeable_id', '=', 'items.id')
-                             ->where('stock_typeables.stock_type_id', $stock_type_id)
-                             ->where('stock_typeables.stock_typeable_type', Item::class);
-                    });
-        });
-        
         $query->where(function($q) use ($searchValue){
             $q->where('items.name', 'like', '%'. $searchValue .'%')
               ->orWhere('items.description', 'like', '%'. $searchValue .'%')
@@ -105,6 +92,20 @@ class ItemController extends ResponseController
               ->orWhere('items.stock', 'like', $searchValue .'%');
         });
 
+        //Filter by types
+        $query->when((!empty($type_id) ), function ($q) use($type_id) {
+            $q->where('items.type_id', $type_id );
+        });
+
+        //Filter by stock types
+        $query->when((!empty($stock_type_id) ), function ($q) use($stock_type_id) {
+            return $q->join('stock_typeables', function ($join) use($stock_type_id){
+                        $join->on('stock_typeables.stock_typeable_id', '=', 'items.id')
+                                ->where('stock_typeables.stock_type_id', $stock_type_id)
+                                ->where('stock_typeables.stock_typeable_type', Item::class);
+                    });
+        });
+                
         //get stock_types
         $query->with('stock_types');
 
