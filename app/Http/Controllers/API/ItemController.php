@@ -149,7 +149,7 @@ class ItemController extends ResponseController
         $request->stocked ? $item->stocked = $request->stocked : $item->stocked = false; 
         $item->unit_id = $request->unit_id;
         $item->user_id = Auth::user()->getLocalUserID();
-        $item->type_id = $item->getTypeProduct();
+        $item->type_id = Item::getTypeProduct();
         $item->save();
 
         //Add price
@@ -182,7 +182,7 @@ class ItemController extends ResponseController
             return $this->sendError($validator->errors()->first());
         }
        
-        $item = Item::findOrFail($id);
+        $item = Item::where('type_id', Item::getTypeProduct())->findOrFail($id); 
         
         $item->name = $request->name;
         $item->description = $request->description;
@@ -206,5 +206,90 @@ class ItemController extends ResponseController
 
         return $this->sendResponse($item->toArray(), 'Item updated successfully.');
     }
+
+
+    /**
+    * SERVICES Methods
+    */
+
+    /**
+     * Store a newly created SERVICE resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function storeService(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'price' => 'required|numeric|between:0.00,99999.99',
+            'description' => 'nullable|max:200',
+            'stock_types' => 'nullable|array',
+            'stock_types.*' => 'nullable|exists:stock_types,id'
+        ]);
+        
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first());
+        }
+
+        $service = new Item();
+        
+        $service->name = $request->name;
+        $service->description = $request->description;
+        $service->price = $request->price;
+        $service->stocked = false;
+        $service->user_id = Auth::user()->getLocalUserID();
+        $service->type_id = Item::getTypeService();
+        $service->save();
+
+        //Add price
+        $service->prices()->create(['price' => $request->price]);
+
+        //add stock types
+        $service->stock_types()->sync($request->stock_types ?? []);
+
+        return $this->sendResponse($service->toArray(), 'Service created successfully.');  
+    }
+
+    /**
+     * Update the specified SERVICE resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Service  $service
+     * @return \Illuminate\Http\Response
+     */
+    public function updateService(int $id, Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'price' => 'required|numeric|between:0.00,99999.99',
+            'description' => 'nullable|max:200',
+            'stock_types' => 'nullable|array',
+            'stock_types.*' => 'nullable|exists:stock_types,id'
+        ]);
+        
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first());
+        }
+
+        $service = Item::where('type_id', Item::getTypeService())->findOrFail($id); 
+        
+        $service->name = $request->name;
+        $service->description = $request->description;
+        $service->price = $request->price;
+        $service->user_id = Auth::user()->getLocalUserID();
+        $service->save();
+
+        //Add price
+        $service->prices()->create(['price' => $request->price]);
+
+        //add stock types
+        $service->stock_types()->sync($request->stock_types ?? []);
+
+        return $this->sendResponse($service->toArray(), 'Service updated successfully.');  
+        
+    }
+
+
 
 }

@@ -30,9 +30,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('items/products/{item}', 'API\ItemController@updateProduct');
 
     // Item - Product
-    // Route::post('items/services', 'API\ItemController@storeService');
-    // Route::put('items/services/{service}', 'API\ItemController@updateService');
-
+    Route::post('items/services', 'API\ItemController@storeService');
+    Route::put('items/services/{service}', 'API\ItemController@updateService');
 
 
     // Invoice
