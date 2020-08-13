@@ -62,7 +62,7 @@ class ItemController extends ResponseController
         
         $validator = Validator::make($request->all(), [
             'pageSize' => 'numeric|gt:0',
-            'stock_type_id' => 'nullable|exists:stock_types,id',
+            // 'stock_type_id' => 'nullable|exists:stock_types,id',
             'type_id' => 'nullable|exists:item_types,id'
         ]);
 
@@ -82,7 +82,6 @@ class ItemController extends ResponseController
         $query->select('items.*', 'units.code as unit', 'units.fractioned')
               ->leftJoin('units', function ($join){
                     $join->on('units.id', '=', 'items.unit_id');
-                        //  ->latest();
                 });
 
         $query->where(function($q) use ($searchValue){
@@ -93,12 +92,12 @@ class ItemController extends ResponseController
         });
 
         //Filter by types
-        $query->when((!empty($type_id) ), function ($q) use($type_id) {
+        $query->when(( $type_id > 0 ), function ($q) use($type_id) {
             $q->where('items.type_id', $type_id );
         });
 
         //Filter by stock types
-        $query->when((!empty($stock_type_id) ), function ($q) use($stock_type_id) {
+        $query->when(( $stock_type_id > 0 ), function ($q) use($stock_type_id) {
             return $q->join('stock_typeables', function ($join) use($stock_type_id){
                         $join->on('stock_typeables.stock_typeable_id', '=', 'items.id')
                                 ->where('stock_typeables.stock_type_id', $stock_type_id)
@@ -107,7 +106,7 @@ class ItemController extends ResponseController
         });
                 
         //get stock_types
-        $query->with('stock_types');
+        $query->with(['stock_types','type']);
 
         
         $results = $query->orderBy($sortColumn, $sortDirection)
