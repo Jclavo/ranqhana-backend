@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 use Illuminate\Support\Facades\Auth;
 
+use App\Models\ItemType;
+
 class Item extends BaseModel
 {
     use SoftDeletes;
@@ -69,6 +71,14 @@ class Item extends BaseModel
     public function prices()
     {
         return $this->morphMany('App\Models\Price', 'priceable');
+    }
+
+    /**
+     * Get the "Type" associated with the "Invoice".
+     */
+    public function type()
+    {
+        return $this->belongsTo(ItemType::class);
     }
     
 
