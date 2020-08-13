@@ -70,6 +70,11 @@ php artisan make:policy PostPolicy
 
 php artisan make:rule RuleName
 
+- GENERATE NEW KEY
+
+php artisan key:generate
+php artisan config:cache
+
 
 
 
