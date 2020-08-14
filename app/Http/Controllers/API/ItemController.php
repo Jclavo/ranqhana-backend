@@ -237,7 +237,7 @@ class ItemController extends ResponseController
         $service->name = $request->name;
         $service->description = $request->description;
         $service->price = $request->price;
-        $service->stocked = false;
+        $service->stocked = true;
         $service->user_id = Auth::user()->getLocalUserID();
         $service->type_id = Item::getTypeService();
         $service->save();
