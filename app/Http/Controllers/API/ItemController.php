@@ -63,7 +63,7 @@ class ItemController extends ResponseController
         $validator = Validator::make($request->all(), [
             'pageSize' => 'numeric|gt:0',
             // 'stock_type_id' => 'nullable|exists:stock_types,id',
-            'type_id' => 'nullable|exists:item_types,id'
+            // 'type_id' => 'nullable|exists:item_types,id'
         ]);
 
         if ($validator->fails()) {
