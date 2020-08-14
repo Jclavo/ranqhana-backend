@@ -74,11 +74,11 @@ class InvoiceDetailController extends ResponseController
                 new ItemHasStock($item , $request->quantity),
             ], [ new InvoiceAnull($invoice)]);
         }
-        // else if($invoiceType == $typePurchase){
-        //     $this->businessValidations([
-        //         new ItemIsStocked($item),
-        //     ], [ new InvoiceAnull($invoice)]);
-        // }
+        else if($invoiceType == $typePurchase){
+            $this->businessValidations([
+                new ItemIsStocked($item),
+            ], [ new InvoiceAnull($invoice)]);
+        }
 
 
         $this->businessValidations([
