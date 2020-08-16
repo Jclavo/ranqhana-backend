@@ -119,9 +119,22 @@ class InvoiceController extends ResponseController
      */
     public function update(int $id, Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'serie' => 'nullable|max:10',
+        ]);
+
+        // $validator->sometimes('external_user_id', 'exists:companies,id', function ($input) {
+        //     return $input->company_id > 0;
+        // });
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first());
+        }
+
         $invoice = Invoice::findOrFail($id);
 
-        $invoice->serie    = $request->serie;
+        $invoice->serie             = $request->serie;
+        $invoice->external_user_id  = $request->external_user_id;
 
         $invoice->save();
 
