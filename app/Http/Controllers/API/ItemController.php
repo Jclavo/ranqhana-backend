@@ -19,10 +19,18 @@ class ItemController extends ResponseController
 
     function __construct()
     {
-        $this->middleware('permission_in_role:items/read'); 
-        $this->middleware('permission_in_role:items/create', ['only' => ['store']]);
-        $this->middleware('permission_in_role:items/update', ['only' => ['update']]);
-        $this->middleware('permission_in_role:items/delete', ['only' => ['destroy']]);
+        //General
+        $this->middleware('permission_in_role:services-list/pagination|products-list/pagination' , ['only' => ['pagination']]);
+        $this->middleware('permission_in_role:services-list/delete|products-list/delete', ['only' => ['destroy']]);
+        
+        //Products
+        $this->middleware('permission_in_role:service/create', ['only' => ['storeService']]);
+        $this->middleware('permission_in_role:service/update', ['only' => ['updateService']]);
+        
+        //Services
+        $this->middleware('permission_in_role:product/create', ['only' => ['storeProduct']]);
+        $this->middleware('permission_in_role:product/update', ['only' => ['updateProduct']]);
+
     }
 
     /**
