@@ -15,4 +15,19 @@ class ItemType extends Model
     protected $fillable = [
         'name'
     ];
+
+
+    /**
+     * Getter (statics)
+     */
+
+    static function getTypeProduct()
+    {
+        return 1;
+    }
+
+    static function getTypeService()
+    {
+        return 2;
+    }
 }
