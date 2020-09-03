@@ -57,7 +57,7 @@ class StoreController extends ResponseController
 
         $store->save();
 
-        return $this->sendResponse($store->toArray(), 'Store created successfully.');
+        return $this->sendResponse($store->toArray(), __('messages.crud.create'));
         
     }
 
@@ -72,7 +72,7 @@ class StoreController extends ResponseController
         $store = Store::select('stores.*','countries.code as country_code')
                  ->join('countries', 'stores.country_id', '=', 'countries.id')->findOrFail($id);
         
-        return $this->sendResponse($store->toArray(), 'Store retrieved successfully.');
+        return $this->sendResponse($store->toArray(), __('messages.crud.read'));
     }
 
     /**
@@ -110,7 +110,7 @@ class StoreController extends ResponseController
 
         $store->save();
 
-        return $this->sendResponse($store->toArray(), 'Store updated successfully.');
+        return $this->sendResponse($store->toArray(), __('messages.crud.update'));
     }
 
     /**
@@ -125,7 +125,7 @@ class StoreController extends ResponseController
         
         $store->delete();
 
-        return $this->sendResponse($store->toArray(), 'Store deleted successfully.');
+        return $this->sendResponse($store->toArray(), __('messages.crud.delete'));
     }
 
 
@@ -159,7 +159,7 @@ class StoreController extends ResponseController
         $results = $query->orderBy('stores.'.$sortColumn, $sortDirection)
                          ->paginate($pageSize);
  
-        return $this->sendResponse($results->items(), 'Stores retrieved successfully.', $results->total() );
+        return $this->sendResponse($results->items(), __('messages.crud.pagination'), $results->total() );
 
     }
 }
