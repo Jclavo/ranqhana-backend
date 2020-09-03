@@ -117,7 +117,7 @@ class InvoiceDetailController extends ResponseController
         }
         $item->save();
 
-        return $this->sendResponse($invoiceDetail->toArray(), 'Invoice detail created successfully.');
+        return $this->sendResponse($invoiceDetail->toArray(), __('messages.create'));
     
     }
 
@@ -147,11 +147,10 @@ class InvoiceDetailController extends ResponseController
         //                 ->get();
 
         if($invoiceDetails->isEmpty()){
-            return $this->sendError('Invoice details not found.');
+            return $this->sendError(__('messages.invoice.detail-not-found'));
         }else{
-            return $this->sendResponse($invoiceDetails, 'Invoice details retrieved successfully.');
+            return $this->sendResponse($invoiceDetails, __('messages.read'));
         }
-        // return $this->sendResponse($invoiceDetails, 'Invoice details retrieved successfully.');
     }
 
     /**
