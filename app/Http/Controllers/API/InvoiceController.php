@@ -73,7 +73,7 @@ class InvoiceController extends ResponseController
 
         //Validate that total is not negative
         if($invoice->total < 0){
-            return $this->sendError($invoice->toArray(), 'Invoice total is negative.');       
+            return $this->sendError($invoice->toArray(),  __('messages.invoice.total-negative'));       
         }
 
         //Set FKs
@@ -83,7 +83,7 @@ class InvoiceController extends ResponseController
         
         $invoice->save();
 
-        return $this->sendResponse($invoice->toArray(), 'Sell invoice created successfully.');  
+        return $this->sendResponse($invoice->toArray(), __('messages.crud.create'));  
     }
 
     /**
@@ -96,7 +96,7 @@ class InvoiceController extends ResponseController
     {
         $invoice = Invoice::with(['type','stage'])->findOrFail($id);
                 
-        return $this->sendResponse($invoice->toArray(), 'Invoice retrieved successfully.');
+        return $this->sendResponse($invoice->toArray(), __('messages.crud.read'));
     }
 
     /**
@@ -138,7 +138,7 @@ class InvoiceController extends ResponseController
 
         $invoice->save();
 
-        return $this->sendResponse($invoice->toArray(), 'Invoice updated successfully.');  
+        return $this->sendResponse($invoice->toArray(), __('messages.crud.update'));  
     }
 
     /**
@@ -206,7 +206,7 @@ class InvoiceController extends ResponseController
         $results = $query->orderBy($sortColumn, $sortDirection)
                          ->paginate($pageSize);       
  
-        return $this->sendResponse($results->items(), 'Invoices retrieved successfully.', $results->total() );
+        return $this->sendResponse($results->items(), __('messages.crud.pagination'), $results->total() );
 
     }
      
@@ -220,10 +220,6 @@ class InvoiceController extends ResponseController
 
         $this->businessActions([ new InvoiceAnull($invoice)]);
 
-        return $this->sendResponse($invoice->toArray(), 'Invoice Anulled successfully.');
+        return $this->sendResponse($invoice->toArray(), __('messages.invoice.anull'));
     }
-
-
-
-    
 }
