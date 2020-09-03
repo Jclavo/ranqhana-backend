@@ -24,5 +24,10 @@ return [
         'has-stock' => 'The item has stock. It can not be modified.',
         'has-no-stock' => 'There is not enough stock available.',
         
-    ]
+    ],
+
+    'identification' => [
+        'length' => 'The identification must be :digits characters for your store country.',
+    ],
+    
 ];

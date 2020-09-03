@@ -22,5 +22,11 @@ return [
     'item' => [
         'has-stock' => 'O item tem stock, não pode ser modificado.',
         'has-no-stock' => 'O item não tem stock.',
-    ]
+    ],
+
+    'identification' => [
+        'length' => 'Sua identificação deve ter :digits caractere acorde o pais de sua empresa.',
+    ],
+
+
 ];

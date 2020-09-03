@@ -63,6 +63,6 @@ class Identification implements Rule
      */
     public function message()
     {
-        return 'The identification must be ' . $this->digitsCountry . ' characters for your store country.';
+        return __('messages.identification.length', ['digits' => $this->digitsCountry]);
     }
 }
