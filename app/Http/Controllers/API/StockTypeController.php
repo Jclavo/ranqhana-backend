@@ -17,7 +17,7 @@ class StockTypeController extends ResponseController
     {
         $stockTypes = StockType::all();
       
-        return $this->sendResponse($stockTypes, 'Stock Types retrieved successfully.');
+        return $this->sendResponse($stockTypes, __('messages.crud.read'));
     }
 
     /**
