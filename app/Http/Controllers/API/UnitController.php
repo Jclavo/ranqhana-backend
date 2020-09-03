@@ -9,6 +9,7 @@ use App\Http\Controllers\ResponseController;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+// use Illuminate\Support\Facades\App;
 
 //Utils
 use App\Utils\PaginationUtils;
@@ -21,6 +22,7 @@ class UnitController extends ResponseController
         $this->middleware('permission_in_role:units/create', ['only' => ['store']]);
         $this->middleware('permission_in_role:units/update', ['only' => ['update']]);
         $this->middleware('permission_in_role:units/delete', ['only' => ['destroy']]);
+
     }
 
     /**
@@ -68,7 +70,7 @@ class UnitController extends ResponseController
         $request->fractioned ? $unit->fractioned = true : $unit->fractioned = false;
         $unit->save();
 
-        return $this->sendResponse($unit->toArray(), 'Unit created successfully.');  
+        return $this->sendResponse($unit->toArray(), __('messages.create'));  
     }
 
     /**
@@ -80,10 +82,8 @@ class UnitController extends ResponseController
     public function show($id)
     {
         $unit = Unit::findOrFail($id);
-
-        // $this->authorize('isMyUnit', $unit);
         
-        return $this->sendResponse($unit->toArray(), 'Unit retrieved successfully.');
+        return $this->sendResponse($unit->toArray(), __('messages.read'));
     }
 
     /**
@@ -123,7 +123,7 @@ class UnitController extends ResponseController
 
         $unit->save();
 
-        return $this->sendResponse($unit->toArray(), 'Unit updated successfully.');  
+        return $this->sendResponse($unit->toArray(), __('messages.update'));  
     }
 
     /**
@@ -138,7 +138,7 @@ class UnitController extends ResponseController
 
         $unit->delete();
 
-        return $this->sendResponse($unit->toArray(), 'Unit deleted successfully.');
+        return $this->sendResponse($unit->toArray(), __('messages.delete'));
     }
 
     /**
@@ -173,8 +173,8 @@ class UnitController extends ResponseController
         $results = $query->orderBy($sortColumn, $sortDirection)
                    ->paginate($pageSize);
     
-        return $this->sendResponse($results->items(), 'Units retrieved successfully.', $results->total() );
-
+        return $this->sendResponse($results->items(), __('messages.pagination'), $results->total() );
+        
     }
 
 }
