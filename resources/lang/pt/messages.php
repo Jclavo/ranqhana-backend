@@ -28,5 +28,8 @@ return [
         'length' => 'Sua identificação deve ter :digits caractere acorde o pais de sua empresa.',
     ],
 
+    'phone' => [
+        'format' => 'O formato do telefone não está certo acorde o pais de sua empresa.',
+    ],
 
 ];

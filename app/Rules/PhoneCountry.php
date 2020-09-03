@@ -59,6 +59,6 @@ class PhoneCountry implements Rule
      */
     public function message()
     {
-        return 'The phone format does not match your store country.';
+        return __('messages.phone.format');
     }
 }

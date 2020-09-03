@@ -29,5 +29,9 @@ return [
     'identification' => [
         'length' => 'The identification must be :digits characters for your store country.',
     ],
+
+    'phone' => [
+        'format' => 'The phone format does not match your store country.',
+    ],
     
 ];
