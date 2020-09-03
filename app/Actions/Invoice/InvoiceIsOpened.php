@@ -26,6 +26,6 @@ class InvoiceIsOpened
     
     public function message()
     {
-        return 'Invoice is out the date range.';
+        return __('messages.invoice.out-date');
     }
 }

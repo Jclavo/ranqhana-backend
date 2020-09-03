@@ -22,6 +22,6 @@ class InvoiceHasEnoughSubtotal
     
     public function message()
     {
-        return 'Invoice Detail total is greater than Invoice subtotal.';
+        return __('messages.invoice.detail-gt-subtotal');
     }
 }

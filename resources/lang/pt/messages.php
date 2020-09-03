@@ -14,9 +14,13 @@ return [
         'total-negative' => 'O total é negativo.',
         'anull' => 'Fatura anulada com éxito.',
         'detail-not-found' => 'Detalhe da fatura não achado.',
+        'already-anulled' => 'A Fatura já foi anulada.',
+        'detail-gt-subtotal' => 'O Detalhe da fatura é maior o que o subtotal.',
+        'out-date' => 'A fatura está fora do intervalo de datas.',
     ],
 
     'item' => [
-        'has-stock' => 'O item tem stock, não pode ser modificado.'
+        'has-stock' => 'O item tem stock, não pode ser modificado.',
+        'has-no-stock' => 'O item não tem stock.',
     ]
 ];

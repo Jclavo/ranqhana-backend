@@ -11,10 +11,13 @@ use App\Actions\Item\ItemHasStock;
 class InvoiceAnull
 {
     protected $invoice;
-    protected $failMessage = 'Invoice has already been anulled';
+    protected $failMessage;
 
     public function __construct($invoice)
     {
+        //set localization
+        $this->failMessage = __('messages.invoice.already-anulled');
+
         // $this->invoice = Invoice::findOrFail($invoice_id); 
         $this->invoice = $invoice; 
     }
@@ -53,7 +56,7 @@ class InvoiceAnull
                     $item->decreaseStock($result->quantity);
                 }
                 else{
-                    $this->failMessage = 'There is not enough stock available.';
+                    $this->failMessage = __('messages.invoice.has-no-stock');
                     DB::rollBack();
                     return false;
                 }
