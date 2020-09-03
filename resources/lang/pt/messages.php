@@ -13,5 +13,10 @@ return [
     'invoice' => [
         'total-negative' => 'O total é negativo.',
         'anull' => 'Fatura anulada com éxito.',
+        'detail-not-found' => 'Detalhe da fatura não achado.',
+    ],
+
+    'item' => [
+        'has-stock' => 'O item tem stock, não pode ser modificado.'
     ]
 ];
