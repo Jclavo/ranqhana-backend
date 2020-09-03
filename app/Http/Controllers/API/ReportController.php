@@ -102,7 +102,7 @@ class ReportController extends ResponseController
             array_push($results,['X' => $key, 'Y' => $rawQuery[$key]]);
         }
                     
-        return $this->sendResponse($results, 'Invoices retrieved successfully.' );
+        return $this->sendResponse($results, __('messages.crud.pagination') );
 
     }
 
@@ -152,7 +152,7 @@ class ReportController extends ResponseController
         $query = $query->get();
 
 
-        return $this->sendResponse($query, 'Invoices retrieved successfully.' );
+        return $this->sendResponse($query,  __('messages.crud.pagination') );
 
     }
 }
