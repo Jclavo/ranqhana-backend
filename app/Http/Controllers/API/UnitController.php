@@ -70,7 +70,7 @@ class UnitController extends ResponseController
         $request->fractioned ? $unit->fractioned = true : $unit->fractioned = false;
         $unit->save();
 
-        return $this->sendResponse($unit->toArray(), __('messages.create'));  
+        return $this->sendResponse($unit->toArray(), __('messages.crud.create'));  
     }
 
     /**
@@ -83,7 +83,7 @@ class UnitController extends ResponseController
     {
         $unit = Unit::findOrFail($id);
         
-        return $this->sendResponse($unit->toArray(), __('messages.read'));
+        return $this->sendResponse($unit->toArray(), __('messages.crud.read'));
     }
 
     /**
@@ -123,7 +123,7 @@ class UnitController extends ResponseController
 
         $unit->save();
 
-        return $this->sendResponse($unit->toArray(), __('messages.update'));  
+        return $this->sendResponse($unit->toArray(), __('messages.crud.update'));  
     }
 
     /**
@@ -138,7 +138,7 @@ class UnitController extends ResponseController
 
         $unit->delete();
 
-        return $this->sendResponse($unit->toArray(), __('messages.delete'));
+        return $this->sendResponse($unit->toArray(), __('messages.crud.delete'));
     }
 
     /**
@@ -173,7 +173,7 @@ class UnitController extends ResponseController
         $results = $query->orderBy($sortColumn, $sortDirection)
                    ->paginate($pageSize);
     
-        return $this->sendResponse($results->items(), __('messages.pagination'), $results->total() );
+        return $this->sendResponse($results->items(), __('messages.crud.pagination'), $results->total() );
         
     }
 
