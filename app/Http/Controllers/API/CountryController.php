@@ -17,7 +17,7 @@ class CountryController extends ResponseController
     {
         $countries = Country::all();
       
-        return $this->sendResponse($countries, __('messages.pagination'));
+        return $this->sendResponse($countries, __('messages.crud.pagination'));
     }
 
     /**
