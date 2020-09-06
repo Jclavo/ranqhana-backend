@@ -33,8 +33,14 @@ class UnitController extends ResponseController
     public function index()
     {
         // $units = Unit::all();
+        
+        //get fields with translations
+        $units = Unit::all()->map(function ($unit) {
+            $unit->translate($unit);
+            return $unit;
+        });
             
-        // return $this->sendResponse($units->toArray(), 'Units retrieved successfully.');
+        return $this->sendResponse($units->toArray(), 'Units retrieved successfully.');
     }
 
     /**
@@ -82,6 +88,9 @@ class UnitController extends ResponseController
     public function show($id)
     {
         $unit = Unit::findOrFail($id);
+
+        //get fields with translations
+        $unit->translate($unit);
         
         return $this->sendResponse($unit->toArray(), __('messages.crud.read'));
     }
@@ -172,8 +181,15 @@ class UnitController extends ResponseController
 
         $results = $query->orderBy($sortColumn, $sortDirection)
                    ->paginate($pageSize);
-    
-        return $this->sendResponse($results->items(), __('messages.crud.pagination'), $results->total() );
+
+        
+        //get fields with translations
+        $resultsTranslated = $results->map(function ($unit) {
+            $unit->translate($unit);
+            return $unit;
+        });
+
+        return $this->sendResponse($resultsTranslated->toArray(), __('messages.crud.pagination'), $results->total());
         
     }
 
