@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             ItemsTableSeeder::class,
             InvoiceTypesTableSeeder::class,
             InvoiceStagesTableSeeder::class,
+            LocaleSeeder::class,
         ]);
     }
 }
