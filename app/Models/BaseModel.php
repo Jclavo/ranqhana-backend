@@ -7,7 +7,12 @@ use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Support\Facades\DB;
 
+use App\Traits\LanguageTrait;
+use App\Override\QueryBuilder;
+
 class BaseModel extends Eloquent {
+
+    use LanguageTrait;
 
     /**
      * Overwrite the function setAttribute
@@ -80,65 +85,20 @@ class BaseModel extends Eloquent {
         return $carbonInstance->toISOString();
     }
 
-
-
-    // public function getAttribute($key)
-    // {
-    //     if (array_key_exists($key, $this->relations)) {
-    //         return parent::getAttribute($key);
-    //     } else {
-    //         return parent::getAttribute(Str::snake($key));
-    //     }
-    // }
-
-    // public function setAttribute($key, $value)
-    // {
-    //     return parent::setAttribute(Str::snake($key), $value);
-    // }
+    /**
+     * Overwrite method from Builder
+     */
 
     /**
-     * Cast an attribute to a native PHP type.
+     * Create a new Eloquent query builder for the model.
      *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return mixed
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    // protected function castAttribute($key, $value)
-    // {   
-    //     return parent::castAttribute($key, -1);
-    //     if (! is_null($value)) {
-    //         return parent::castAttribute($key, $value);
-    //         //return $this->traitcastAttribute($key, $value);
-    //     }
 
-    //     switch ($this->getCastType($key)) {
-    //         case 'int':
-    //         case 'integer':
-    //             return (int) 0;
-    //         case 'real':
-    //         case 'float':
-    //         case 'double':
-    //             return (float) 0;
-    //         case 'string':
-    //             return ''; 
-    //         case 'bool':
-    //         case 'boolean':
-    //             return false;
-    //         case 'object':
-    //         case 'array':
-    //         case 'json':
-    //             return [];
-    //         case 'collection':
-    //             return new BaseCollection();
-    //         case 'date':
-    //             return $this->asDate('0000-00-00');
-    //         case 'datetime':
-    //             return $this->asDateTime('0000-00-00');
-    //         case 'timestamp':
-    //             return $this->asTimestamp('0000-00-00');
-    //         default:
-    //             return $value;
-    //     }
-    // }
+    public function newEloquentBuilder($query) 
+    { 
+        return new QueryBuilder($query); 
+    }
 
 }
