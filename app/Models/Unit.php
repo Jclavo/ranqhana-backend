@@ -5,12 +5,10 @@ namespace App\Models;
 use App\Models\BaseModel;
 use App\Models\Translation;
 
-use App\Traits\LanguageTrait;
 use Illuminate\Support\Facades\App;
 
 class Unit extends BaseModel
 {
-    use LanguageTrait;
     /** 
      * The attributes that are mass assignable.
      *
