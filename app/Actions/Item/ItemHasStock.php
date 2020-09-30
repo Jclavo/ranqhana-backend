@@ -4,13 +4,20 @@ namespace App\Actions\Item;
 
 use App\Models\ItemType;
 
+//Services
+use App\Services\LanguageService;
+
 class ItemHasStock
 {
     protected $item;
     protected $quantity;
+    protected $languageService;
 
     public function __construct($item, $quantity)
     {
+        //initialize language service
+        $this->languageService = new LanguageService();
+    
         $this->item = $item;
         $this->quantity = $quantity;
     }    
@@ -30,6 +37,7 @@ class ItemHasStock
     
     public function message()
     {
-        return 'There is not stock for item ' . $this->item->id;
+        // return 'There is not stock for item ' . $this->item->id;
+        return $this->languageService->getSystemMessage('item.has-no-stock') . ' : ' . $this->item->id;
     }
 }

@@ -4,6 +4,9 @@ namespace App\Actions\Invoice;
 
 use Carbon\Carbon;
 
+//Services
+use App\Services\LanguageService;
+
 class InvoiceIsOpened
 {
     protected $invoice;

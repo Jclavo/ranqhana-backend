@@ -2,12 +2,19 @@
 
 namespace App\Actions\Item;
 
+//Services
+use App\Services\LanguageService;
+
 class ItemIsStocked
 {
     protected $item;
+    protected $languageService;
 
     public function __construct($item)
     {
+        //initialize language service
+        $this->languageService = new LanguageService();
+
         $this->item = $item;
     }
 
@@ -20,6 +27,6 @@ class ItemIsStocked
 
     public function message()
     {
-        return 'Item ' . $this->item->id . ' does not have stock.';
+        return $this->languageService->getSystemMessage('item.has-no-stock') . ' : ' . $this->item->id;
     }
 }
