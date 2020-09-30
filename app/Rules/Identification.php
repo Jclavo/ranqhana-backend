@@ -10,10 +10,14 @@ class Identification implements Rule
 {
     protected $store_id;
     protected $digitsCountry = 0;
+    protected $languageService;
 
     public function __construct($store_id = 0)
     {
         $this->store_id = $store_id;
+
+        //initialize language service
+	    $this->languageService = new LanguageService();
     }
 
     /**
@@ -63,6 +67,7 @@ class Identification implements Rule
      */
     public function message()
     {
-        return __('messages.identification.length', ['digits' => $this->digitsCountry]);
+        // return __('messages.identification.length', ['digits' => $this->digitsCountry]);
+        return $this->languageService->getSystemMessage('identification.length');
     }
 }

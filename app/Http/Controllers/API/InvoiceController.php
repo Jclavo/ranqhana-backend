@@ -21,9 +21,19 @@ use App\Actions\BelongsToStore;
 use App\Utils\PaginationUtils;
 use App\Utils\CustomCarbon;
 
+//Services
+use App\Services\LanguageService;
 
 class InvoiceController extends ResponseController
 {
+    private $languageService = null;
+
+    function __construct()
+    {
+        //initialize language service
+        $this->languageService = new LanguageService();
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -73,7 +83,7 @@ class InvoiceController extends ResponseController
 
         //Validate that total is not negative
         if($invoice->total < 0){
-            return $this->sendError($invoice->toArray(),  __('messages.invoice.total-negative'));       
+            return $this->sendError($invoice->toArray(),  $this->languageService->getSystemMessage('invoice.total-negative'));       
         }
 
         //Set FKs
@@ -83,7 +93,7 @@ class InvoiceController extends ResponseController
         
         $invoice->save();
 
-        return $this->sendResponse($invoice->toArray(), __('messages.crud.create'));  
+        return $this->sendResponse($invoice->toArray(), $this->languageService->getSystemMessage('crud.create'));  
     }
 
     /**
@@ -96,7 +106,7 @@ class InvoiceController extends ResponseController
     {
         $invoice = Invoice::with(['type','stage'])->findOrFail($id);
                 
-        return $this->sendResponse($invoice->toArray(), __('messages.crud.read'));
+        return $this->sendResponse($invoice->toArray(), $this->languageService->getSystemMessage('crud.read'));
     }
 
     /**
@@ -138,7 +148,7 @@ class InvoiceController extends ResponseController
 
         $invoice->save();
 
-        return $this->sendResponse($invoice->toArray(), __('messages.crud.update'));  
+        return $this->sendResponse($invoice->toArray(), $this->languageService->getSystemMessage('crud.update'));  
     }
 
     /**
@@ -206,7 +216,7 @@ class InvoiceController extends ResponseController
         $results = $query->orderBy($sortColumn, $sortDirection)
                          ->paginate($pageSize);       
  
-        return $this->sendResponse($results->items(), __('messages.crud.pagination'), $results->total() );
+        return $this->sendResponse($results->items(), $this->languageService->getSystemMessage('crud.pagination'), $results->total() );
 
     }
      
@@ -220,6 +230,6 @@ class InvoiceController extends ResponseController
 
         $this->businessActions([ new InvoiceAnull($invoice)]);
 
-        return $this->sendResponse($invoice->toArray(), __('messages.invoice.anull'));
+        return $this->sendResponse($invoice->toArray(), $this->languageService->getSystemMessage('invoice.anull'));
     }
 }

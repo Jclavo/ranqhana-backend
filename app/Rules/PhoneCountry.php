@@ -5,13 +5,20 @@ namespace App\Rules;
 use Illuminate\Contracts\Validation\Rule;
 use App\Models\Store;
 
+//Services
+use App\Services\LanguageService;
+
 class PhoneCountry implements Rule
 {
     protected $store_id;
+    protected $languageService;
 
     public function __construct($store_id = 0)
     {
         $this->store_id = $store_id;
+
+        //initialize language service
+	    $this->languageService = new LanguageService();
     }
 
     /**
@@ -59,6 +66,6 @@ class PhoneCountry implements Rule
      */
     public function message()
     {
-        return __('messages.phone.format');
+        return $this->languageService->getSystemMessage('phone.format');
     }
 }

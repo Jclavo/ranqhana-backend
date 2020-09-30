@@ -13,8 +13,19 @@ use Illuminate\Support\Facades\Validator;
 //Utils
 use App\Utils\PaginationUtils;
 
+//Services
+use App\Services\LanguageService;
+
 class StoreController extends ResponseController
 {
+    private $languageService = null;
+
+    function __construct()
+    {
+        //initialize language service
+        $this->languageService = new LanguageService();
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -57,7 +68,7 @@ class StoreController extends ResponseController
 
         $store->save();
 
-        return $this->sendResponse($store->toArray(), __('messages.crud.create'));
+        return $this->sendResponse($store->toArray(), $this->languageService->getSystemMessage('crud.create'));
         
     }
 
@@ -72,7 +83,7 @@ class StoreController extends ResponseController
         $store = Store::select('stores.*','countries.code as country_code')
                  ->join('countries', 'stores.country_id', '=', 'countries.id')->findOrFail($id);
         
-        return $this->sendResponse($store->toArray(), __('messages.crud.read'));
+        return $this->sendResponse($store->toArray(), $this->languageService->getSystemMessage('crud.read'));
     }
 
     /**
@@ -110,7 +121,7 @@ class StoreController extends ResponseController
 
         $store->save();
 
-        return $this->sendResponse($store->toArray(), __('messages.crud.update'));
+        return $this->sendResponse($store->toArray(), $this->languageService->getSystemMessage('crud.update'));
     }
 
     /**
@@ -125,7 +136,7 @@ class StoreController extends ResponseController
         
         $store->delete();
 
-        return $this->sendResponse($store->toArray(), __('messages.crud.delete'));
+        return $this->sendResponse($store->toArray(), $this->languageService->getSystemMessage('crud.delete'));
     }
 
 
@@ -159,7 +170,7 @@ class StoreController extends ResponseController
         $results = $query->orderBy('stores.'.$sortColumn, $sortDirection)
                          ->paginate($pageSize);
  
-        return $this->sendResponse($results->items(), __('messages.crud.pagination'), $results->total() );
+        return $this->sendResponse($results->items(), $this->languageService->getSystemMessage('crud.pagination'), $results->total() );
 
     }
 }

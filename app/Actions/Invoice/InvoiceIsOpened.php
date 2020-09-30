@@ -8,11 +8,15 @@ class InvoiceIsOpened
 {
     protected $invoice;
     protected $currentDate;
+    protected $languageService;
 
     public function __construct($invoice)
     {
         $this->invoice = $invoice;
         $this->currentDate = Carbon::now();
+
+        //initialize language service
+	    $this->languageService = new LanguageService();
     }    
     
     public function passes()
@@ -26,6 +30,6 @@ class InvoiceIsOpened
     
     public function message()
     {
-        return __('messages.invoice.out-date');
+        return $this->languageService->getSystemMessage('invoice.out-date');
     }
 }

@@ -3,11 +3,21 @@
 namespace App\Http\Controllers\API;
 
 use App\Models\StockType;
-
 use App\Http\Controllers\ResponseController;
+
+//Services
+use App\Services\LanguageService;
 
 class StockTypeController extends ResponseController
 {
+    private $languageService = null;
+
+    function __construct()
+    {
+        //initialize language service
+        $this->languageService = new LanguageService();
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -17,7 +27,7 @@ class StockTypeController extends ResponseController
     {
         $stockTypes = StockType::all();
       
-        return $this->sendResponse($stockTypes, __('messages.crud.read'));
+        return $this->sendResponse($stockTypes, $this->languageService->getSystemMessage('crud.create'));
     }
 
     /**

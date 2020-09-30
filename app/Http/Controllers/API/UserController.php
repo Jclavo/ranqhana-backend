@@ -26,7 +26,18 @@ use App\Actions\User\UserIsFree;
 use App\Rules\Identification;
 use App\Rules\PhoneCountry;
 
+//Services
+use App\Services\LanguageService;
+
 class UserController extends ResponseController{
+
+    private $languageService = null;
+
+    function __construct()
+    {
+        //initialize language service
+        $this->languageService = new LanguageService();
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -71,7 +82,7 @@ class UserController extends ResponseController{
         
         $user->save();
         
-        return $this->sendResponse($user->toArray(), 'User created successfully.');  
+        return $this->sendResponse($user->toArray(), $this->languageService->getSystemMessage('crud.create'));  
     }
 
     /**
@@ -87,7 +98,7 @@ class UserController extends ResponseController{
         ->join('stores', 'users.store_id', '=', 'stores.id')
         ->join('countries', 'stores.country_id', '=', 'countries.id')->findOrFail($id);
         
-        return $this->sendResponse($user->toArray(), 'User retrieved successfully.');
+        return $this->sendResponse($user->toArray(), $this->languageService->getSystemMessage('crud.read'));
     }
 
         /**
@@ -146,7 +157,7 @@ class UserController extends ResponseController{
              
         $user->save();
 
-        return $this->sendResponse($user->toArray(), 'User updated successfully.');  
+        return $this->sendResponse($user->toArray(), $this->languageService->getSystemMessage('crud.update'));  
     }
 
     /**
@@ -165,7 +176,7 @@ class UserController extends ResponseController{
         
         $user->delete();
 
-        return $this->sendResponse($user->toArray(), 'User deleted successfully.');
+        return $this->sendResponse($user->toArray(), $this->languageService->getSystemMessage('crud.delete'));
     }
 
     /**
@@ -251,6 +262,6 @@ class UserController extends ResponseController{
 
         Auth::user()->local_user_id = Auth::user()->getLocalUserID();
 
-        return $this->sendResponse(Auth::user()->toArray(), 'User logged successfully.');  
+        return $this->sendResponse(Auth::user()->toArray(), $this->languageService->getSystemMessage('crud.pagination'));  
     }
 }

@@ -8,15 +8,22 @@ use App\Models\Item;
 use Illuminate\Support\Facades\DB;
 use App\Actions\Item\ItemHasStock;
 
+//Services
+use App\Services\LanguageService;
+
 class InvoiceAnull
 {
     protected $invoice;
     protected $failMessage;
+    protected $languageService;
 
     public function __construct($invoice)
     {
+        //initialize language service
+        $this->languageService = new LanguageService();
+    
         //set localization
-        $this->failMessage = __('messages.invoice.already-anulled');
+        $this->failMessage = $this->languageService->getSystemMessage('invoice.already-anulled');
 
         // $this->invoice = Invoice::findOrFail($invoice_id); 
         $this->invoice = $invoice; 
@@ -56,7 +63,7 @@ class InvoiceAnull
                     $item->decreaseStock($result->quantity);
                 }
                 else{
-                    $this->failMessage = __('messages.invoice.has-no-stock');
+                    $this->failMessage = $this->languageService->getSystemMessage('invoice.has-no-stock');
                     DB::rollBack();
                     return false;
                 }

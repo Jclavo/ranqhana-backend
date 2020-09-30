@@ -20,9 +20,19 @@ use App\Models\User;
 //Utils
 use App\Utils\CustomCarbon;
 
+//Services
+use App\Services\LanguageService;
+
 class ReportController extends ResponseController
 {
-    
+    private $languageService = null;
+
+    function __construct()
+    {
+        //initialize language service
+        $this->languageService = new LanguageService();
+    }
+
     /**
      * Invoice (Sales/Purchase) quantity per day/week/month/year
      */
@@ -102,7 +112,7 @@ class ReportController extends ResponseController
             array_push($results,['X' => $key, 'Y' => $rawQuery[$key]]);
         }
                     
-        return $this->sendResponse($results, __('messages.crud.pagination') );
+        return $this->sendResponse($results, $this->languageService->getSystemMessage('crud.pagination') );
 
     }
 
@@ -152,7 +162,7 @@ class ReportController extends ResponseController
         $query = $query->get();
 
 
-        return $this->sendResponse($query,  __('messages.crud.pagination') );
+        return $this->sendResponse($query, $this->languageService->getSystemMessage('crud.pagination'));
 
     }
 }

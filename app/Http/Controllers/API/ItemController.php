@@ -14,9 +14,13 @@ use Illuminate\Database\Eloquent\Builder;
 //Utils
 use App\Utils\PaginationUtils;
 
+//Services
+use App\Services\LanguageService;
+
 class ItemController extends ResponseController
 {
-
+    private $languageService = null;
+    
     function __construct()
     {
         //General
@@ -31,6 +35,8 @@ class ItemController extends ResponseController
         $this->middleware('permission_in_role:product/create', ['only' => ['storeProduct']]);
         $this->middleware('permission_in_role:product/update', ['only' => ['updateProduct']]);
 
+        //initialize language service
+	    $this->languageService = new LanguageService();
     }
 
     /**
@@ -43,7 +49,7 @@ class ItemController extends ResponseController
     {
         $item = Item::with('stock_types')->findOrFail($id); //get stock_types
                 
-        return $this->sendResponse($item->toArray(), __('messages.crud.read'));
+        return $this->sendResponse($item->toArray(), $this->languageService->getSystemMessage('crud.read'));
     }
 
     /**
@@ -58,7 +64,7 @@ class ItemController extends ResponseController
         
         $item->delete();
 
-        return $this->sendResponse($item->toArray(), __('messages.crud.delete'));
+        return $this->sendResponse($item->toArray(), $this->languageService->getSystemMessage('crud.delete'));
     }
 
 
@@ -121,7 +127,7 @@ class ItemController extends ResponseController
                          ->paginate($pageSize);
 
             
-        return $this->sendResponse($results->items(), __('messages.crud.pagination'), $results->total() );
+        return $this->sendResponse($results->items(), $this->languageService->getSystemMessage('crud.pagination'), $results->total() );
 
     }
 
@@ -166,7 +172,7 @@ class ItemController extends ResponseController
         //add stock types
         $item->stock_types()->sync($request->stock_types ?? []);
 
-        return $this->sendResponse($item->toArray(), __('messages.crud.create'));  
+        return $this->sendResponse($item->toArray(), $this->languageService->getSystemMessage('crud.create'));  
     }
 
     /**
@@ -201,7 +207,7 @@ class ItemController extends ResponseController
         
 
         if(!$item->stocked && $item->stock > 0){
-            return $this->sendError(__('messages.item.has-stock'));
+            return $this->sendError($this->languageService->getSystemMessage('item.has-stock'));
         }
      
         $item->save();
@@ -212,7 +218,7 @@ class ItemController extends ResponseController
         //add stock types
         $item->stock_types()->sync($request->stock_types ?? []);
 
-        return $this->sendResponse($item->toArray(), __('messages.crud.update'));
+        return $this->sendResponse($item->toArray(), $this->languageService->getSystemMessage('crud.update'));
     }
 
 
@@ -256,7 +262,7 @@ class ItemController extends ResponseController
         //add stock types
         $service->stock_types()->sync($request->stock_types ?? []);
 
-        return $this->sendResponse($service->toArray(), __('messages.crud.create'));  
+        return $this->sendResponse($service->toArray(), $this->languageService->getSystemMessage('crud.create'));  
     }
 
     /**
@@ -294,7 +300,7 @@ class ItemController extends ResponseController
         //add stock types
         $service->stock_types()->sync($request->stock_types ?? []);
 
-        return $this->sendResponse($service->toArray(), __('messages.crud.update'));  
+        return $this->sendResponse($service->toArray(), $this->languageService->getSystemMessage('crud.update'));  
         
     }
 

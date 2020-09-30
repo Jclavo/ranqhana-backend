@@ -19,9 +19,19 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule; 
 
+//Services
+use App\Services\LanguageService;
 
 class InvoiceDetailController extends ResponseController
 {
+    private $languageService = null;
+
+    function __construct()
+    {
+        //initialize language service
+        $this->languageService = new LanguageService();
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -117,7 +127,7 @@ class InvoiceDetailController extends ResponseController
         }
         $item->save();
 
-        return $this->sendResponse($invoiceDetail->toArray(), __('messages.create'));
+        return $this->sendResponse($invoiceDetail->toArray(),$this->languageService->getSystemMessage('crud.create'));
     
     }
 
@@ -147,9 +157,9 @@ class InvoiceDetailController extends ResponseController
         //                 ->get();
 
         if($invoiceDetails->isEmpty()){
-            return $this->sendError(__('messages.invoice.detail-not-found'));
+            return $this->sendError($this->languageService->getSystemMessage('invoice.detail-not-found'));
         }else{
-            return $this->sendResponse($invoiceDetails, __('messages.read'));
+            return $this->sendResponse($invoiceDetails, $this->languageService->getSystemMessage('.read'));
         }
     }
 

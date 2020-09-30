@@ -6,8 +6,19 @@ use App\Models\Country;
 use App\Http\Controllers\ResponseController;
 use Illuminate\Http\Request;
 
+//Services
+use App\Services\LanguageService;
+
 class CountryController extends ResponseController
 {
+    private $languageService = null;
+
+    function __construct()
+    {
+        //initialize language service
+        $this->languageService = new LanguageService();
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -17,7 +28,7 @@ class CountryController extends ResponseController
     {
         $countries = Country::all();
       
-        return $this->sendResponse($countries, __('messages.crud.pagination'));
+        return $this->sendResponse($countries, $this->languageService->getSystemMessage('crud.pagination'));
     }
 
     /**

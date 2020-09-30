@@ -13,8 +13,13 @@ use Illuminate\Validation\Rule;
 //Utils
 use App\Utils\PaginationUtils;
 
+//Services
+use App\Services\LanguageService;
+
 class UnitController extends ResponseController
 {
+    private $languageService = null;
+
     function __construct()
     {
         $this->middleware('permission_in_role:units/read'); 
@@ -22,6 +27,8 @@ class UnitController extends ResponseController
         $this->middleware('permission_in_role:units/update', ['only' => ['update']]);
         $this->middleware('permission_in_role:units/delete', ['only' => ['destroy']]);
 
+        //initialize language service
+        $this->languageService = new LanguageService();
     }
 
     /**
@@ -31,9 +38,9 @@ class UnitController extends ResponseController
      */
     public function index()
     {
-        $units = Unit::all();
+        // $units = Unit::all();
         
-        return $this->sendResponse($units->toArray(), 'Units retrieved successfully.');
+        // return $this->sendResponse($units->toArray(), 'Units retrieved successfully.');
     }
 
     /**
@@ -69,7 +76,7 @@ class UnitController extends ResponseController
         $request->fractioned ? $unit->fractioned = true : $unit->fractioned = false;
         $unit->save();
 
-        return $this->sendResponse($unit->toArray(), __('messages.crud.create'));  
+        return $this->sendResponse($unit->toArray(), $this->languageService->getSystemMessage('crud.create'));  
     }
 
     /**
@@ -82,7 +89,7 @@ class UnitController extends ResponseController
     {
         $unit = Unit::findOrFail($id);
         
-        return $this->sendResponse($unit->toArray(), __('messages.crud.read'));
+        return $this->sendResponse($unit->toArray(), $this->languageService->getSystemMessage('crud.read'));
     }
 
     /**
@@ -122,7 +129,7 @@ class UnitController extends ResponseController
 
         $unit->save();
 
-        return $this->sendResponse($unit->toArray(), __('messages.crud.update'));  
+        return $this->sendResponse($unit->toArray(),$this->languageService->getSystemMessage('crud.update'));  
     }
 
     /**
@@ -137,7 +144,7 @@ class UnitController extends ResponseController
 
         $unit->delete();
 
-        return $this->sendResponse($unit->toArray(), __('messages.crud.delete'));
+        return $this->sendResponse($unit->toArray(), $this->languageService->getSystemMessage('crud.delete'));
     }
 
     /**
@@ -171,10 +178,8 @@ class UnitController extends ResponseController
 
         $results = $query->orderBy($sortColumn, $sortDirection)
                    ->paginate($pageSize);
-
-        
-        return $this->sendResponse($results->items(), __('messages.crud.pagination'), $results->total());
-   
+       
+        return $this->sendResponse($results->items(), $this->languageService->getSystemMessage('crud.pagination'), $results->total());
     }
 
 }
