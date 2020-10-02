@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 
-use Illuminate\Support\Facades\Auth;
-
 use App\Models\ItemType;
+
+use App\Scopes\Belongs2CompanyScope;
 
 class Item extends BaseModel
 {
@@ -31,14 +31,7 @@ class Item extends BaseModel
     {
         parent::boot();
 
-        static::addGlobalScope('mine', function (Builder $builder) {
-            $builder->whereIn('user_id', function($query){
-                        $query->select('ranqhana_users.id')
-                            ->from('ranqhana_users')
-                            ->where('ranqhana_users.company_project_id', '=', Auth::user()->company_project_id);
-                    });
-
-        });
+        static::addGlobalScope(new Belongs2CompanyScope);
     }
 
     /**

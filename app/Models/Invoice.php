@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\BaseModel;
 
+use App\Scopes\Belongs2CompanyScope;
+
 class Invoice extends BaseModel 
 {
     use SoftDeletes;
@@ -24,6 +26,18 @@ class Invoice extends BaseModel
         // 'subtotal' => 'decimal:2',
         //  'discount' => 'decimal:2',
     ];
+
+    /**
+     * The "booting" method of the model.
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope(new Belongs2CompanyScope);
+    }
 
 
     //Relationships
