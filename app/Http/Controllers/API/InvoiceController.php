@@ -77,9 +77,9 @@ class InvoiceController extends ResponseController
         
         $invoice->serie    = $request->serie;
         $invoice->subtotal = $request->subtotal;
-        $invoice->taxes    = $request->taxes;
         $invoice->discount = $request->discount;
         $invoice->total    = $invoice->calculateTotal();
+        $invoice->taxes    = $invoice->total * ( Auth::user()->getCountryTax() / 100 );
 
         //Validate that total is not negative
         if($invoice->total < 0){

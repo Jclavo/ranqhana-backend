@@ -70,7 +70,8 @@ class Invoice extends BaseModel
 
     //Custom functions
     public function calculateTotal(){
-        return (($this->subtotal + $this->taxes) - $this->discount);
+        // return (($this->subtotal + $this->taxes) - $this->discount);
+        return ($this->subtotal - $this->discount);
     }
 
     //Getter (statics)

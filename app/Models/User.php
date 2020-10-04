@@ -116,9 +116,20 @@ class User extends Authenticatable
                     ->first();
     }
 
+    /**
+     * Get country's timezone
+     */
     public function getTimezone(){
         $country = $this->country();
         return $country->timezone;
+    }
+
+    /**
+     * Get country's tax
+     */
+    public function getCountryTax(){
+        $country = $this->country();
+        return $country->tax;
     }
 
 
