@@ -64,6 +64,9 @@ Route::middleware(['auth:api'])->group(function () {
     //Stock Types
     Route::resource('stockTypes', 'API\StockTypeController');
 
+    //Images
+    Route::resource('images', 'API\ImageController');
+
     //Services
     // Route::post('services/pagination', 'API\ServiceController@pagination');
     // Route::resource('services', 'API\ServiceController');
