@@ -6,12 +6,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 
 use App\Models\ItemType;
+use App\Models\Image;
 
 use App\Scopes\Belongs2CompanyScope;
 
 class Item extends BaseModel
 {
     use SoftDeletes;
+
+    protected $with = ['images'];
     /**
      * The attributes that are mass assignable.
      *
@@ -72,6 +75,14 @@ class Item extends BaseModel
     public function type()
     {
         return $this->belongsTo(ItemType::class);
+    }
+
+    /**
+     * Get all of the item's images.
+     */
+    public function images()
+    {
+        return $this->morphMany('App\Models\Image', 'imageable');
     }
     
 
