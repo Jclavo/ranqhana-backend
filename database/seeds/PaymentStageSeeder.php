@@ -15,7 +15,7 @@ class PaymentStageSeeder extends Seeder
         // factory(PaymentStage::class)->create(['name' => 'Initial']);
         factory(PaymentStage::class)->create(['name' => 'Waiting']);
         factory(PaymentStage::class)->create(['name' => 'Delayed']);
-        factory(PaymentStage::class)->create(['name' => 'Payed']);
-        factory(PaymentStage::class)->create(['name' => 'Canceled']);
+        factory(PaymentStage::class)->create(['name' => 'Paid']);
+        factory(PaymentStage::class)->create(['name' => 'Anulled']);
     }
 }
