@@ -31,4 +31,19 @@ class PaymentMethod extends BaseModel
         return $this->morphMany(Translation::class, 'translationable')
                     ->where('locale',App::getLocale());
     }
+
+
+    /**
+     * Getter (statics)
+     */
+
+    static function getMethodMoney()
+    {
+        return 1;
+    }
+
+    static function getMethodCard()
+    {
+        return 2;
+    }
 }

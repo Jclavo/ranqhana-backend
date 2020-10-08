@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\BaseModel;
+use App\Models\Payment;
 
 use App\Scopes\Belongs2CompanyScope;
 
@@ -64,6 +65,14 @@ class Invoice extends BaseModel
     public function details()
     {
         return $this->hasMany('App\Models\InvoiceDetail');
+    }
+
+    /**
+     * Get the "Payments" for the "Invoice"
+    */
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
     }
 
 
