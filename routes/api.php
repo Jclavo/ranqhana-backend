@@ -67,6 +67,9 @@ Route::middleware(['auth:api'])->group(function () {
     //Images
     Route::resource('images', 'API\ImageController');
 
+    //Payment Method
+    Route::resource('payment-method', 'API\PaymentMethodController');
+
     //Services
     // Route::post('services/pagination', 'API\ServiceController@pagination');
     // Route::resource('services', 'API\ServiceController');
