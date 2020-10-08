@@ -70,6 +70,9 @@ Route::middleware(['auth:api'])->group(function () {
     //Payment Method
     Route::resource('payment-method', 'API\PaymentMethodController');
 
+    //Payment Stage
+    Route::resource('payment-stage', 'API\PaymentStageController');
+
     //Services
     // Route::post('services/pagination', 'API\ServiceController@pagination');
     // Route::resource('services', 'API\ServiceController');
