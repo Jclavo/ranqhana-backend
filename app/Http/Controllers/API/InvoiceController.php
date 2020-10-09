@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Models\Invoice;
 use App\Models\InvoiceDetail;
 use App\Models\User;
+use App\Models\PaymentType;
 
 use App\Http\Controllers\ResponseController;
 
@@ -131,11 +132,12 @@ class InvoiceController extends ResponseController
     {
         $validator = Validator::make($request->all(), [
             'serie' => 'nullable|max:10',
+            'payment_type_id' => 'required|exists:payment_types,id',
         ]);
 
-        // $validator->sometimes('external_user_id', 'exists:companies,id', function ($input) {
-        //     return $input->company_id > 0;
-        // });
+        $validator->sometimes('external_user_id', 'required', function ($input) {
+            return $input->payment_type_id == PaymentType::getTypeCredit();
+        });
 
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
@@ -143,8 +145,9 @@ class InvoiceController extends ResponseController
 
         $invoice = Invoice::findOrFail($id);
 
-        $invoice->serie             = $request->serie;
-        $invoice->external_user_id  = $request->external_user_id;
+        $invoice->serie            = $request->serie;
+        $invoice->external_user_id = $request->external_user_id;
+        $invoice->payment_type_id  = $request->payment_type_id;
 
         $invoice->save();
 
