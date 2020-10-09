@@ -37,12 +37,12 @@ class PaymentType extends BaseModel
      * Getter (statics)
      */
 
-    static function getTypeCredit()
+    static function getTypeDebit()
     {
         return 1;
     }
-
-    static function getTypeDebit()
+    
+    static function getTypeCredit()
     {
         return 2;
     }
