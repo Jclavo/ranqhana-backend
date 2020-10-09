@@ -95,6 +95,11 @@ class Invoice extends BaseModel
         return 2;
     }
 
+    static function getStageInitial()
+    {
+        return 3;
+    }
+
     static function getTypeForSell(){
         return 1;
     }
