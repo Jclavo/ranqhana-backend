@@ -77,6 +77,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('payments/invoices/{invoice_id}', 'API\PaymentController@byInvoice');
     Route::resource('payments', 'API\PaymentController');
 
+    //Payment Stage
+    Route::resource('payment-types', 'API\PaymentTypeController');
+
     //Services
     // Route::post('services/pagination', 'API\ServiceController@pagination');
     // Route::resource('services', 'API\ServiceController');
