@@ -227,10 +227,22 @@ class PaymentController extends ResponseController
 
         $payments = Payment::whereHas('invoice', function ($query) use($invoice_id) {
             $query->where('invoices.id', '=', $invoice_id);
-                //   ->where('payments.labeled',true);
         })
-        ->with(['paymentMethod','paymentStage'])
         ->get();
+
+        //Update state if date is delayed
+        foreach ($payments as $payment) {
+            if($payment->payment_stage_id == PaymentStage::getStageWaiting()){
+                if($payment->payment_date < Carbon::now()){
+                    $payment->payment_stage_id = PaymentStage::getStageDelayed();   
+                    $payment->save();
+                }
+            }
+        }
+
+        // load relationships
+        $payments->load(['paymentMethod','paymentStage']);
+
 
         return $this->sendResponse($payments->toArray(), $this->languageService->getSystemMessage('crud.read'));
     }
