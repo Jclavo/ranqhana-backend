@@ -59,13 +59,17 @@ class PaymentController extends ResponseController
     {
         $validator = Validator::make($request->all(), [
             'amount' => 'required|gt:0|regex:/^[0-9]{1,10}+(?:\.[0-9]{1,2})?$/',
-            'payment_date' => 'sometimes|date|after_or_equal:today',
             'invoice_id' => 'required|exists:invoices,id',
         ]);
 
         $validator->sometimes('payment_method_id', 'required|exists:payment_methods,id', function ($input) {
             return $input->payment_method_id > 0;
         });
+
+        $validator->sometimes('payment_date', 'date|after_or_equal:today', function ($input) {
+            return !empty($input->payment_date);
+        });
+
 
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
