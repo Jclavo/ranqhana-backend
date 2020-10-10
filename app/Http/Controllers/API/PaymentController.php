@@ -128,9 +128,12 @@ class PaymentController extends ResponseController
      * @param  \App\Models\Payment  $payment
      * @return \Illuminate\Http\Response
      */
-    public function show(Payment $payment)
+    public function show($id)
     {
-        //
+        $payment = Payment::findOrFail($id); 
+                
+        return $this->sendResponse($payment->toArray(), $this->languageService->getSystemMessage('crud.read'));
+    
     }
 
     /**
