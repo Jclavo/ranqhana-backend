@@ -164,13 +164,29 @@ class PaymentController extends ResponseController
             return $input->payment_method_id == PaymentMethod::getMethodMoney();
         });
 
+        $validator->sometimes('transaction_code', 'required|min:8', function ($input) {
+            return $input->payment_method_id == PaymentMethod::getMethodCard() && !empty($input->transaction_code);
+        });
+
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
         }
 
         //Get values 
-        $money = $request->money;
         $payment_method_id = $request->payment_method_id;
+        $money = 0.0;
+        $transaction_code = '';
+        switch ($payment_method_id) {
+            case PaymentMethod::getMethodMoney():
+                $money = $request->money;
+                break;
+            case PaymentMethod::getMethodCard():
+                $transaction_code = $request->transaction_code ?? "";
+                break;
+            default:
+                # code...
+                break;
+        }
         
         /**
          * Validation section
@@ -191,10 +207,11 @@ class PaymentController extends ResponseController
         }
 
         //update values
-        $payment_method_id == PaymentMethod::getMethodMoney() ? $payment->money = $money : null;
+        $payment->money = $money;
         $payment->payment_method_id = $payment_method_id;
         $payment->real_payment_date =  Carbon::now();
         $payment->payment_stage_id  = PaymentStage::getStagePaid();
+        $payment->transaction_code  = $transaction_code;
         $payment->save();
 
 
