@@ -61,8 +61,11 @@ class PaymentController extends ResponseController
             'amount' => 'required|gt:0|regex:/^[0-9]{1,10}+(?:\.[0-9]{1,2})?$/',
             'payment_date' => 'sometimes|date|after_or_equal:today',
             'invoice_id' => 'required|exists:invoices,id',
-            'payment_method_id' => 'required|exists:payment_methods,id',
         ]);
+
+        $validator->sometimes('payment_method_id', 'required|exists:payment_methods,id', function ($input) {
+            return $input->payment_method_id > 0;
+        });
 
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
@@ -70,9 +73,9 @@ class PaymentController extends ResponseController
 
         //Get values 
         $amount = $request->amount;
-        $payment_date = $request->payment_date;
+        $payment_date = $request->payment_date ?  $request->payment_date : Carbon::now();;
         $invoice_id = $request->invoice_id;
-        $payment_method_id = $request->payment_method_id;
+        $payment_method_id = $request->payment_method_id ? $request->payment_method_id : PaymentMethod::getMethodMoney();
         
         /**
          * Validation section
@@ -106,7 +109,7 @@ class PaymentController extends ResponseController
 
         $payment = new Payment();
         $payment->amount    = $amount;
-        $payment->payment_date =  $payment_date ?  $payment_date : Carbon::now();
+        $payment->payment_date =  $payment_date;
         $payment->invoice_id    = $invoice_id;
         $payment->payment_method_id = $payment_method_id;
         $payment->payment_stage_id  = PaymentStage::getStageWaiting();
