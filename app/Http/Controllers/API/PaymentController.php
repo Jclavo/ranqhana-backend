@@ -255,12 +255,13 @@ class PaymentController extends ResponseController
         $payments = Payment::whereHas('invoice', function ($query) use($invoice_id) {
             $query->where('invoices.id', '=', $invoice_id);
         })
+        ->orderBy('payment_date')
         ->get();
 
         //Update state if date is delayed
         foreach ($payments as $payment) {
             if($payment->payment_stage_id == PaymentStage::getStageWaiting()){
-                if($payment->payment_date < Carbon::now()){
+                if($payment->payment_date < Carbon::now()->toDateString()){
                     $payment->payment_stage_id = PaymentStage::getStageDelayed();   
                     $payment->save();
                 }
