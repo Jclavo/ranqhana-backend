@@ -80,6 +80,9 @@ Route::middleware(['auth:api'])->group(function () {
     //Payment Stage
     Route::resource('payment-types', 'API\PaymentTypeController');
 
+    //Order Stage
+    Route::resource('order-stages', 'API\OrderStageController');
+
     //Services
     // Route::post('services/pagination', 'API\ServiceController@pagination');
     // Route::resource('services', 'API\ServiceController');
