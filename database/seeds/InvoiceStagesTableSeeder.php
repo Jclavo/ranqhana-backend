@@ -15,6 +15,7 @@ class InvoiceStagesTableSeeder extends Seeder
     {
         factory(InvoiceStages::class)->create(['code' => 'P', 'description' => 'Paid']);
         factory(InvoiceStages::class)->create(['code' => 'A', 'description' => 'Anulled']);
-        factory(InvoiceStages::class)->create(['code' => 'I', 'description' => 'Initial']);
+        factory(InvoiceStages::class)->create(['code' => 'D', 'description' => 'Draft']);
+        factory(InvoiceStages::class)->create(['code' => 'I', 'description' => 'By installment']);
     }
 }
