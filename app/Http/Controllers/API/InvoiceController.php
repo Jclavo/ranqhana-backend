@@ -6,6 +6,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceDetail;
 use App\Models\User;
 use App\Models\PaymentType;
+use App\Models\InvoiceStages;
 
 use App\Http\Controllers\ResponseController;
 
@@ -217,8 +218,8 @@ class InvoiceController extends ResponseController
 
             $timezome =Auth::user()->getTimezone();
             //change date format
-            $fromDate = CustomCarbon::UTCtoCountryTZ($fromDate,'00:00:00', $timezome);
-            $toDate = CustomCarbon::UTCtoCountryTZ($toDate,'23:59:59', $timezome);
+            $fromDate = CustomCarbon::countryTZtoUTC($fromDate,'00:00:00', $timezome);
+            $toDate = CustomCarbon::countryTZtoUTC($toDate,'23:59:59', $timezome);
 
             return $q->whereBetween('created_at',[ $fromDate." 00:00:00", $toDate." 23:59:59"]);
         });
