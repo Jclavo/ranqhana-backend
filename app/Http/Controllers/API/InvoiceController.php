@@ -90,7 +90,7 @@ class InvoiceController extends ResponseController
         //Set FKs
         $invoice->type_id  = $request->type_id;
         $invoice->user_id = Auth::user()->getLocalUserID();
-        $invoice->stage_id = Invoice::getStageInitial();
+        $invoice->stage_id = Invoice::getStageDraft();
         
         $invoice->save();
 
@@ -148,6 +148,13 @@ class InvoiceController extends ResponseController
         $invoice->serie            = $request->serie;
         $invoice->external_user_id = $request->external_user_id;
         $invoice->payment_type_id  = $request->payment_type_id;
+
+        //change invoice stage
+        if($invoice->payment_type_id == Invoice::getPaymentTypeCredit()){
+            $invoice->setStageByInstallment();
+        }else{
+            $invoice->setStageDraft();
+        }
 
         $invoice->save();
 
