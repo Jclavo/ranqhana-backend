@@ -20,6 +20,9 @@ use Carbon\Carbon;
 //Services
 use App\Services\LanguageService;
 
+//Utils
+use App\Utils\CustomCarbon;
+
 class PaymentController extends ResponseController
 {
     private $languageService = null;
@@ -67,10 +70,20 @@ class PaymentController extends ResponseController
             return $input->payment_method_id > 0;
         });
 
-        $validator->sometimes('payment_date', 'date|after_or_equal:today', function ($input) {
-            return !empty($input->payment_date);
-        });
+        // $validator->sometimes('payment_date', 'date|after_or_equal:today', function ($input) {
+        //     return !empty($input->payment_date);
+        // });
 
+        if(!empty($request->payment_date)){
+            
+            $now = CustomCarbon::UTCtoCountryTZ(Carbon::now())->startOfDay();
+            $dateTimeObject = Carbon::parse($request->payment_date)->startOfDay();
+            $date_diff = $now->diffInDays($dateTimeObject);
+
+            if($date_diff > 0){
+                return $this->sendError('The payment date can not be in the past');
+            }
+        }
 
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
@@ -78,7 +91,7 @@ class PaymentController extends ResponseController
 
         //Get values 
         $amount = $request->amount;
-        $payment_date = $request->payment_date ?  $request->payment_date : Carbon::now();;
+        $payment_date = $request->payment_date ?  $request->payment_date : Carbon::now();
         $invoice_id = $request->invoice_id;
         $payment_method_id = $request->payment_method_id ? $request->payment_method_id : PaymentMethod::getMethodMoney();
         
