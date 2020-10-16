@@ -16,6 +16,8 @@ use Carbon\Carbon;
 use App\Models\Invoice;
 use App\Models\InvoiceDetail;
 use App\Models\User;
+use App\Models\PaymentStage;
+use App\Models\InvoiceStages;
 
 //Utils
 use App\Utils\CustomCarbon;
@@ -57,12 +59,13 @@ class ReportController extends ResponseController
 
         $query = Invoice::query();
 
-        $query->select('invoices.total','invoices.created_at');
+        $query->join('payments', function ($join) {
+            $join->on('invoices.id', '=', 'payments.invoice_id')
+                 ->where('payments.payment_stage_id', PaymentStage::getStagePaid());
+        })
+        ->whereIn('invoices.stage_id', [InvoiceStages::getStagePaid(), InvoiceStages::getStageByInstallment()])
+        ->select('payments.amount', 'invoices.created_at');
 
-        $query->whereHas('details', function ($query) use($type_id) {
-            $query->where('type_id', '=', $type_id)
-                  ->where('stage_id', '=', Invoice::getStagePaid());
-        });
               
         $query->when((!empty($fromDate)) && (!empty($toDate)) , function ($q) use($fromDate,$toDate) {
 
@@ -71,7 +74,7 @@ class ReportController extends ResponseController
             $fromDate = CustomCarbon::UTCtoCountryTZ($fromDate,'00:00:00', $timezome);
             $toDate = CustomCarbon::UTCtoCountryTZ($toDate,'23:59:59', $timezome);
 
-            return $q->whereBetween('created_at',[$fromDate, $toDate]);
+            return $q->whereBetween('invoices.created_at',[$fromDate, $toDate]);
         });
 
        
@@ -102,7 +105,7 @@ class ReportController extends ResponseController
                         }
                     })
                     ->map(function ($row) {
-                        return $row->sum('total');
+                        return $row->sum('amount');
                     });
         
         // Logic to convert the group by in an array with X/Y
@@ -142,7 +145,7 @@ class ReportController extends ResponseController
 
         $query->whereHas('invoice', function ($query) use($type_id){
             $query->where('invoices.type_id', '=', $type_id)
-                  ->where('invoices.stage_id', '=', Invoice::getStagePaid());
+                  ->where('invoices.stage_id', '=', InvoiceStages::getStagePaid());
         })
         ->groupBy('item_id')
         ->orderByDesc('quantity');
