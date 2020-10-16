@@ -90,7 +90,7 @@ class InvoiceController extends ResponseController
         //Set FKs
         $invoice->type_id  = $request->type_id;
         $invoice->user_id = Auth::user()->getLocalUserID();
-        $invoice->stage_id = Invoice::getStageDraft();
+        $invoice->stage_id = InvoiceStages::getStageDraft();
         
         $invoice->save();
 

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\BaseModel;
 use App\Models\Payment;
+use App\Models\InvoiceStages;
 
 use App\Scopes\Belongs2CompanyScope;
 
@@ -85,27 +86,6 @@ class Invoice extends BaseModel
 
     //Getter (statics)
 
-    // STAGES
-    static function getStagePaid()
-    {
-        return 1;
-    }
-
-    static function getStageAnulled()
-    {
-        return 2;
-    }
-
-    static function getStageDraft()
-    {
-        return 3;
-    }
-
-    static function getStageByInstallment()
-    {
-        return 4;
-    }
-
     //TYPES
 
     static function getTypeForSell(){
@@ -136,22 +116,22 @@ class Invoice extends BaseModel
     //Setter and Getters
     public function setStagePaid() // stage = 'P';
     {
-        $this->stage_id = 1;
+        $this->stage_id = InvoiceStages::getStagePaid();
     }
 
     public function setStageAnulled() // stage = 'A';
     {
-        $this->stage_id = 2;
+        $this->stage_id = InvoiceStages::getStageAnulled();
     }
 
     public function setStageDraft() // stage = 'D';
     {
-        $this->stage_id = self::getStageDraft();
+        $this->stage_id = InvoiceStages::getStageDraft();
     }
 
     public function setStageByInstallment() // stage = 'I';
     {
-        $this->stage_id = self::getStageByInstallment();
+        $this->stage_id = InvoiceStages::getStageByInstallment();
     }
 
 

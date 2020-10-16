@@ -31,4 +31,26 @@ class InvoiceStages extends BaseModel
         return $this->morphMany(Translation::class, 'translationable')
                     ->where('locale',App::getLocale());
     }
+
+    //Getter (statics)
+    // STAGES
+    static function getStagePaid()
+    {
+        return 1;
+    }
+
+    static function getStageAnulled()
+    {
+        return 2;
+    }
+
+    static function getStageDraft()
+    {
+        return 3;
+    }
+
+    static function getStageByInstallment()
+    {
+        return 4;
+    }
 }
