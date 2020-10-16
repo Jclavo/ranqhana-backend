@@ -85,6 +85,7 @@ class Invoice extends BaseModel
 
     //Getter (statics)
 
+    // STAGES
     static function getStagePaid()
     {
         return 1;
@@ -95,16 +96,33 @@ class Invoice extends BaseModel
         return 2;
     }
 
-    static function getStageInitial()
+    static function getStageDraft()
     {
         return 3;
     }
+
+    static function getStageByInstallment()
+    {
+        return 4;
+    }
+
+    //TYPES
 
     static function getTypeForSell(){
         return 1;
     }
 
     static function getTypeForPurchase(){
+        return 2;
+    }
+
+    //PAYMENT TYPE
+
+    static function getPaymentTypeDebit(){
+        return 1;
+    }
+
+    static function getPaymentTypeCredit(){
         return 2;
     }
 
@@ -124,6 +142,16 @@ class Invoice extends BaseModel
     public function setStageAnulled() // stage = 'A';
     {
         $this->stage_id = 2;
+    }
+
+    public function setStageDraft() // stage = 'D';
+    {
+        $this->stage_id = self::getStageDraft();
+    }
+
+    public function setStageByInstallment() // stage = 'I';
+    {
+        $this->stage_id = self::getStageByInstallment();
     }
 
 
