@@ -6,6 +6,7 @@ use App\Models\Invoice;
 use App\Models\Item;
 use App\Models\InvoiceTypes;
 use App\Models\InvoiceStages;
+use App\Models\Order;
 
 use Illuminate\Support\Facades\DB;
 use App\Actions\Item\ItemHasStock;
@@ -79,7 +80,13 @@ class InvoiceAnull
         }
         
         $this->invoice->setStageAnulled();
-        $this->invoice->save();
+        $this->invoice->save();     
+        
+        // cancel order
+        $this->invoice->load('order');
+        $order = Order::findOrFail($this->invoice->order->id);
+        $order->setStageCancel();
+        $order->save();
         
         //end transaction
         DB::commit();
