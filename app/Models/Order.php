@@ -42,4 +42,10 @@ class Order extends BaseModel
     {
         return $this->belongsTo(Invoice::class);
     }
+
+    //Setter and 
+    public function setStageCancel()  
+    {
+        $this->stage_id = OrderStage::getForCancel();
+    }
 }

@@ -15,7 +15,7 @@ class OrderStage extends BaseModel
      */
 
     protected $fillable = [
-        'name'
+        'name',
     ];
 
     /**
@@ -38,5 +38,10 @@ class OrderStage extends BaseModel
     static function getForNew()
     {
         return 1;
+    }
+
+    static function getForCancel()
+    {
+        return 9;
     }
 }
