@@ -326,10 +326,6 @@ class InvoiceController extends ResponseController
                 ], [ new InvoiceAnull($invoice)]);
             }
 
-            // $this->businessValidations([ new InvoiceHasEnoughSubtotal($invoice, $detail)], 
-            //                         [ new InvoiceAnull($invoice)]
-            // );
-
             //Update stock
             //Set price according to invoice type
             if($invoiceType == InvoiceTypes::getForSell()){

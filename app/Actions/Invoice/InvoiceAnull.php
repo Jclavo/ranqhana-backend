@@ -24,16 +24,21 @@ class InvoiceAnull
         //initialize language service
         $this->languageService = new LanguageService();
     
-        //set localization
-        $this->failMessage = $this->languageService->getSystemMessage('invoice.already-anulled');
-
         // $this->invoice = Invoice::findOrFail($invoice_id); 
         $this->invoice = $invoice; 
     }
     
     public function execute()
     {
-        if($this->invoice->stage_id == InvoiceStages::getForAnulled()) return false; 
+        //if the invoice is already anulled
+        if($this->invoice->stage_id == InvoiceStages::getForAnulled()){
+            $this->failMessage = $this->languageService->getSystemMessage('invoice.already-anulled');
+            return false;
+        } 
+        if($this->invoice->stage_id == InvoiceStages::getForDraft()){
+            $this->failMessage = $this->languageService->getSystemMessage('invoice.is-draft');
+            return false; 
+        } 
 
         $invoice_id = $this->invoice->id;
         $results = Invoice::
