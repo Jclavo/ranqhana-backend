@@ -47,7 +47,7 @@ class PaymentStage extends BaseModel
         return 2;
     }
 
-    static function getStagePaid()
+    static function getForPaid()
     {
         return 3;
     }

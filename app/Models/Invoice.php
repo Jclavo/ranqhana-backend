@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\BaseModel;
 use App\Models\Payment;
 use App\Models\InvoiceStages;
+use App\Models\Order;
 
 use App\Scopes\Belongs2CompanyScope;
 
@@ -76,6 +77,13 @@ class Invoice extends BaseModel
         return $this->hasMany(Payment::class);
     }
 
+    /**
+     * Get the order associated with the invoice.
+     */
+    public function order()
+    {
+        return $this->hasOne(Order::class);
+    }
 
 
     //Custom functions
@@ -85,16 +93,6 @@ class Invoice extends BaseModel
     }
 
     //Getter (statics)
-
-    //TYPES
-
-    static function getTypeForSell(){
-        return 1;
-    }
-
-    static function getTypeForPurchase(){
-        return 2;
-    }
 
     //PAYMENT TYPE
 
@@ -116,22 +114,27 @@ class Invoice extends BaseModel
     //Setter and Getters
     public function setStagePaid() // stage = 'P';
     {
-        $this->stage_id = InvoiceStages::getStagePaid();
+        $this->stage_id = InvoiceStages::getForPaid();
     }
 
     public function setStageAnulled() // stage = 'A';
     {
-        $this->stage_id = InvoiceStages::getStageAnulled();
+        $this->stage_id = InvoiceStages::getForAnulled();
     }
 
     public function setStageDraft() // stage = 'D';
     {
-        $this->stage_id = InvoiceStages::getStageDraft();
+        $this->stage_id = InvoiceStages::getForDraft();
     }
 
     public function setStageByInstallment() // stage = 'I';
     {
-        $this->stage_id = InvoiceStages::getStageByInstallment();
+        $this->stage_id = InvoiceStages::getForByInstallment();
+    }
+
+    public function setStageStockUpdated() // stage = 'U';
+    {
+        $this->stage_id = InvoiceStages::getForStockUpdated();
     }
 
 

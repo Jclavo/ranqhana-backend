@@ -4,6 +4,8 @@ namespace App\Actions\Invoice;
 
 use App\Models\Invoice;
 use App\Models\Item;
+use App\Models\InvoiceTypes;
+use App\Models\InvoiceStages;
 
 use Illuminate\Support\Facades\DB;
 use App\Actions\Item\ItemHasStock;
@@ -31,7 +33,7 @@ class InvoiceAnull
     
     public function execute()
     {
-        if($this->invoice->stage_id == $this->invoice->getStageAnulled()) return false; 
+        if($this->invoice->stage_id == InvoiceStages::getForAnulled()) return false; 
 
         $invoice_id = $this->invoice->id;
         $results = Invoice::
@@ -51,9 +53,9 @@ class InvoiceAnull
         foreach ($results as $result) {
             $item = Item::findOrFail($result->item_id);
 
-            if($invoiceType == $this->invoice->getTypeForSell()){
+            if($invoiceType == InvoiceTypes::getForSell()){
                 $item->increaseStock($result->quantity);
-            }else if($invoiceType == $this->invoice->getTypeForPurchase()){
+            }else if($invoiceType == InvoiceTypes::getForPurchase()){
                 
                 //Validate if it has stock is missing
 

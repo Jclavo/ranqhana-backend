@@ -35,7 +35,7 @@ class OrderStage extends BaseModel
      * Getter (statics)
      */
 
-    static function getStageNew()
+    static function getForNew()
     {
         return 1;
     }

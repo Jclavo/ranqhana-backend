@@ -38,6 +38,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::resource('invoices', 'API\InvoiceController');
     Route::post('invoices/pagination', 'API\InvoiceController@pagination');
     Route::get('invoices/anull/{invoice}', 'API\InvoiceController@anull');
+    Route::post('invoices/generate', 'API\InvoiceController@generate');
 
     //Invoice details
     Route::resource('invoiceDetails', 'API\InvoiceDetailController');
@@ -82,6 +83,11 @@ Route::middleware(['auth:api'])->group(function () {
 
     //Order Stage
     Route::resource('order-stages', 'API\OrderStageController');
+
+    //Orders
+    Route::resource('orders', 'API\OrderController');
+    Route::post('orders/pagination', 'API\OrderController@pagination');
+    Route::post('orders/changeStatus', 'API\OrderController@changeStatus');
 
     //Services
     // Route::post('services/pagination', 'API\ServiceController@pagination');

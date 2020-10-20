@@ -21,5 +21,6 @@ class OrderStageSeeder extends Seeder
         factory(OrderStage::class)->create(['name' => 'Shipped']);
         factory(OrderStage::class)->create(['name' => 'Delivered']);
         factory(OrderStage::class)->create(['name' => 'Canceled']);
+        factory(OrderStage::class)->create(['name' => 'Automatic']);
     }
 }

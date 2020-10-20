@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API;
 use App\Models\InvoiceDetail;
 use App\Models\Invoice;
 use App\Models\Item;
+use App\Models\InvoiceTypes;
+use App\Models\OrderStage;
 
 use App\Actions\Item\ItemHasStock;
 use App\Actions\Item\ItemIsStocked;
@@ -62,74 +64,140 @@ class InvoiceDetailController extends ResponseController
     {
         $validator = Validator::make($request->all(), [
             'quantity'   => 'required|numeric|gt:0|regex:/^[0-9]{1,5}+(?:\.[0-9]{1,2})?$/',
-            'price'    =>   'numeric|gt:0|regex:/^[0-9]{1,5}+(?:\.[0-9]{1,2})?$/',
             'item_id'    => 'required|exists:items,id',
             'invoice_id' => 'required|exists:invoices,id',
         ]);
+
+        $validator->sometimes('price', 'required|numeric|regex:/^[0-9]{1,5}+(?:\.[0-9]{1,2})?$/', function ($input) {
+            return $input->price > 0;
+        });
 
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
         }
 
         $item = Item::findOrFail($request->item_id);
-
         $invoice = Invoice::findOrFail($request->invoice_id);
         $invoiceType = $invoice->getType();
-        $typeSell = $invoice->getTypeForSell();
-        $typePurchase = $invoice->getTypeForPurchase();
+        $order = $invoice->order;
 
-        //Validation only for a Sell Invoice
-        if($invoiceType == $typeSell){
-            $this->businessValidations([
-                new ItemHasStock($item , $request->quantity),
-            ], [ new InvoiceAnull($invoice)]);
-        }
-        else if($invoiceType == $typePurchase){
-            $this->businessValidations([
-                new ItemIsStocked($item),
-            ], [ new InvoiceAnull($invoice)]);
+        if($order->stage_id != OrderStage::getForNew()){
+            return $this->sendError('There is not possible to add more items to this order.');
         }
 
+        if($invoiceType == InvoiceTypes::getForSell()){
+            $this->businessValidations([new ItemHasStock($item , $request->quantity)]);
+        }
+        else if($invoiceType == InvoiceTypes::getForPurchase()){
+            $this->businessValidations([new ItemIsStocked($item)]);
+        }
 
-        $this->businessValidations([
-            new InvoiceIsOpened($invoice),
-            new BelongsToStore(Auth::user(), [$item , $invoice ]),
-        ], [ new InvoiceAnull($invoice)]);
+        $this->businessValidations([new BelongsToStore(Auth::user(), [$item , $invoice ])]);
        
-
         //Set price according to invoice type
         $price = 0;
-        if($invoiceType == $typeSell){
+        if($invoiceType == InvoiceTypes::getForSell()){
             $price    = $item->price;
-        }else if($invoiceType == $typePurchase){
+        }else if($invoiceType == InvoiceTypes::getForPurchase()){
             $price   = $request->price;
         }
 
-        $invoiceDetail = new InvoiceDetail();
-        $invoiceDetail->item_id    = $request->item_id;
-        $invoiceDetail->quantity   = $request->quantity;
-        $invoiceDetail->price      = $price;
-        $invoiceDetail->invoice_id = $request->invoice_id;
-        $invoiceDetail->calculateTotal();
 
-        $this->businessValidations([ new InvoiceHasEnoughSubtotal($invoice, $invoiceDetail)], 
-                                   [ new InvoiceAnull($invoice)]
-        );
+        $invoiceDetail = InvoiceDetail::select('invoice_details.*')
+                                        ->where('item_id',$request->item_id)
+                                        ->where('invoice_id',$request->invoice_id)
+                                        ->first();
 
-        $invoiceDetail->save();
-
-        //Update stock
-        //Set price according to invoice type
-        if($invoiceType == $typeSell){
-            $item->decreaseStock($invoiceDetail->quantity);
-        }else if($invoiceType == $typePurchase){
-            $item->increaseStock($invoiceDetail->quantity);
+        if(is_null($invoiceDetail)){
+            $invoiceDetail = new InvoiceDetail();
+            $invoiceDetail->item_id    = $request->item_id;
+            $invoiceDetail->quantity   = $request->quantity;
+            $invoiceDetail->price      = $price;
+            $invoiceDetail->invoice_id = $request->invoice_id;
+        }else{
+            $invoiceDetail->quantity   = $invoiceDetail->quantity + $request->quantity;
+            $invoiceDetail->price      = $price;
         }
-        $item->save();
+        
+        $invoiceDetail->calculateTotal();
+        $invoiceDetail->save();
 
         return $this->sendResponse($invoiceDetail->toArray(),$this->languageService->getSystemMessage('crud.create'));
     
     }
+
+    // public function store(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'quantity'   => 'required|numeric|gt:0|regex:/^[0-9]{1,5}+(?:\.[0-9]{1,2})?$/',
+    //         'price'    =>   'numeric|gt:0|regex:/^[0-9]{1,5}+(?:\.[0-9]{1,2})?$/',
+    //         'item_id'    => 'required|exists:items,id',
+    //         'invoice_id' => 'required|exists:invoices,id',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return $this->sendError($validator->errors()->first());
+    //     }
+
+    //     $item = Item::findOrFail($request->item_id);
+
+    //     $invoice = Invoice::findOrFail($request->invoice_id);
+    //     $invoiceType = $invoice->getType();
+    //     $typeSell = $invoice->getForSell();
+    //     $typePurchase = $invoice->getForPurchase();
+
+    //     //Validation only for a Sell Invoice
+    //     if($invoiceType == $typeSell){
+    //         $this->businessValidations([
+    //             new ItemHasStock($item , $request->quantity),
+    //         ], [ new InvoiceAnull($invoice)]);
+    //     }
+    //     else if($invoiceType == $typePurchase){
+    //         $this->businessValidations([
+    //             new ItemIsStocked($item),
+    //         ], [ new InvoiceAnull($invoice)]);
+    //     }
+
+
+    //     $this->businessValidations([
+    //         new InvoiceIsOpened($invoice),
+    //         new BelongsToStore(Auth::user(), [$item , $invoice ]),
+    //     ], [ new InvoiceAnull($invoice)]);
+       
+
+    //     //Set price according to invoice type
+    //     $price = 0;
+    //     if($invoiceType == $typeSell){
+    //         $price    = $item->price;
+    //     }else if($invoiceType == $typePurchase){
+    //         $price   = $request->price;
+    //     }
+
+    //     $invoiceDetail = new InvoiceDetail();
+    //     $invoiceDetail->item_id    = $request->item_id;
+    //     $invoiceDetail->quantity   = $request->quantity;
+    //     $invoiceDetail->price      = $price;
+    //     $invoiceDetail->invoice_id = $request->invoice_id;
+    //     $invoiceDetail->calculateTotal();
+
+    //     $this->businessValidations([ new InvoiceHasEnoughSubtotal($invoice, $invoiceDetail)], 
+    //                                [ new InvoiceAnull($invoice)]
+    //     );
+
+    //     $invoiceDetail->save();
+
+    //     //Update stock
+    //     //Set price according to invoice type
+    //     if($invoiceType == $typeSell){
+    //         $item->decreaseStock($invoiceDetail->quantity);
+    //     }else if($invoiceType == $typePurchase){
+    //         $item->increaseStock($invoiceDetail->quantity);
+    //     }
+    //     $item->save();
+
+    //     return $this->sendResponse($invoiceDetail->toArray(),$this->languageService->getSystemMessage('crud.create'));
+    
+    // }
 
     /**
      * Display the specified resource.
@@ -143,6 +211,7 @@ class InvoiceDetailController extends ResponseController
         $invoiceDetails = InvoiceDetail::whereHas('invoice', function ($query) use($invoice_id) {
             $query->where('invoices.id', '=', $invoice_id);
         })
+        ->select(['invoice_details.*'])
         ->with(['item.unit'])
         ->get();
 
@@ -192,9 +261,14 @@ class InvoiceDetailController extends ResponseController
      * @param  \App\InvoiceDetail  $invoiceDetail
      * @return \Illuminate\Http\Response
      */
-    public function destroy(InvoiceDetail $invoiceDetail)
+    public function destroy(int $id)
     {
-        //
+        $InvoiceDetail = InvoiceDetail::select('invoice_details.*')->findOrFail($id);
+        
+        $InvoiceDetail->delete();
+
+        return $this->sendResponse($InvoiceDetail->toArray(), $this->languageService->getSystemMessage('crud.delete'));
+    
     }
 
 }

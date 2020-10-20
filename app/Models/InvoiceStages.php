@@ -34,23 +34,28 @@ class InvoiceStages extends BaseModel
 
     //Getter (statics)
     // STAGES
-    static function getStagePaid()
+    static function getForPaid()
     {
         return 1;
     }
 
-    static function getStageAnulled()
+    static function getForAnulled()
     {
         return 2;
     }
 
-    static function getStageDraft()
+    static function getForDraft()
     {
         return 3;
     }
 
-    static function getStageByInstallment()
+    static function getForByInstallment()
     {
         return 4;
+    }
+
+    static function getForStockUpdated()
+    {
+        return 5;
     }
 }

@@ -61,10 +61,10 @@ class ReportController extends ResponseController
 
         $query->join('payments', function ($join) {
             $join->on('invoices.id', '=', 'payments.invoice_id')
-                 ->where('payments.payment_stage_id', PaymentStage::getStagePaid());
+                 ->where('payments.payment_stage_id', PaymentStage::getForPaid());
         })
         ->where('invoices.type_id',$type_id)
-        ->whereIn('invoices.stage_id', [InvoiceStages::getStagePaid(), InvoiceStages::getStageByInstallment()])
+        ->whereIn('invoices.stage_id', [InvoiceStages::getForPaid(), InvoiceStages::getForByInstallment()])
         ->select('payments.amount', 'invoices.created_at');
 
               
@@ -145,7 +145,7 @@ class ReportController extends ResponseController
 
         $query->whereHas('invoice', function ($query) use($type_id){
             $query->where('invoices.type_id', '=', $type_id)
-                  ->where('invoices.stage_id', '=', InvoiceStages::getStagePaid());
+                  ->where('invoices.stage_id', '=', InvoiceStages::getForPaid());
         })
         ->groupBy('item_id')
         ->orderByDesc('quantity');
@@ -153,12 +153,11 @@ class ReportController extends ResponseController
         
         $query->when((!empty($fromDate)) && (!empty($toDate)) , function ($q) use($fromDate,$toDate) {
 
-            // $timezome = Auth::user()->getTimezone();  
             //change date format
             $fromDate = CustomCarbon::countryTZtoUTC($fromDate,'00:00:00');
             $toDate = CustomCarbon::countryTZtoUTC($toDate,'23:59:59');
 
-            return $q->whereBetween('created_at',[$fromDate, $toDate]);
+            return $q->whereBetween('invoices.created_at',[$fromDate, $toDate]);
         });
 
         $query->with('item');

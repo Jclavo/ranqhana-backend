@@ -7,6 +7,8 @@ use App\Models\InvoiceDetail;
 use App\Models\User;
 use App\Models\PaymentType;
 use App\Models\InvoiceStages;
+use App\Models\InvoiceTypes;
+use App\Models\Item;
 
 use App\Http\Controllers\ResponseController;
 
@@ -14,10 +16,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule; 
+use Illuminate\Support\Facades\DB;
 
 //Actions
+use App\Actions\Item\ItemHasStock;
+use App\Actions\Item\ItemIsStocked;
+use App\Actions\Invoice\InvoiceHasEnoughSubtotal;
 use App\Actions\Invoice\InvoiceAnull;
-use App\Actions\BelongsToStore;
 
 //Utils
 use App\Utils\PaginationUtils;
@@ -64,10 +69,6 @@ class InvoiceController extends ResponseController
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            // "/^-?[0-9]+(?:\.[0-9]{1,2})?$/"
-            'subtotal' => 'required|gt:0|regex:/^[0-9]{1,10}+(?:\.[0-9]{1,2})?$/',
-            'taxes' => 'numeric|gte:0|lt:subtotal',
-            'discount' => 'numeric|gte:0|lt:subtotal',
             'type_id' => 'required|exists:invoice_types,id',
         ]);
 
@@ -76,27 +77,60 @@ class InvoiceController extends ResponseController
         }
 
         $invoice = new Invoice();
-        
-        $invoice->serie    = $request->serie;
-        $invoice->subtotal = $request->subtotal;
-        $invoice->discount = $request->discount;
-        $invoice->total    = $invoice->calculateTotal();
-        $invoice->taxes    = $invoice->total * ( Auth::user()->getCountryTax() / 100 );
-
-        //Validate that total is not negative
-        if($invoice->total < 0){
-            return $this->sendError($invoice->toArray(),  $this->languageService->getSystemMessage('invoice.total-negative'));       
-        }
-
-        //Set FKs
         $invoice->type_id  = $request->type_id;
         $invoice->user_id = Auth::user()->getLocalUserID();
-        $invoice->stage_id = InvoiceStages::getStageDraft();
+        $invoice->stage_id = InvoiceStages::getForDraft();
+
+        //Initial values
+        $invoice->subtotal = 0;
         
         $invoice->save();
 
+        $invoice->order()->create(['stage_id' => 1]);
+
+        $invoice->load('order');
+
         return $this->sendResponse($invoice->toArray(), $this->languageService->getSystemMessage('crud.create'));  
     }
+
+    // public function store(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         // "/^-?[0-9]+(?:\.[0-9]{1,2})?$/"
+    //         'subtotal' => 'required|gt:0|regex:/^[0-9]{1,10}+(?:\.[0-9]{1,2})?$/',
+    //         'taxes' => 'numeric|gte:0|lt:subtotal',
+    //         'discount' => 'numeric|gte:0|lt:subtotal',
+    //         'type_id' => 'required|exists:invoice_types,id',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return $this->sendError($validator->errors()->first());
+    //     }
+
+    //     $invoice = new Invoice();
+        
+    //     $invoice->serie    = $request->serie;
+    //     $invoice->subtotal = $request->subtotal;
+    //     $invoice->discount = $request->discount;
+    //     $invoice->total    = $invoice->calculateTotal();
+    //     $invoice->taxes    = $invoice->total * ( Auth::user()->getCountryTax() / 100 );
+
+    //     //Validate that total is not negative
+    //     if($invoice->total < 0){
+    //         return $this->sendError($invoice->toArray(),  $this->languageService->getSystemMessage('invoice.total-negative'));       
+    //     }
+
+    //     //Set FKs
+    //     $invoice->type_id  = $request->type_id;
+    //     $invoice->user_id = Auth::user()->getLocalUserID();
+    //     $invoice->stage_id = InvoiceStages::getForDraft();
+        
+    //     $invoice->save();
+
+    //     $invoice->order()->create(['stage_id' => 1]);
+
+    //     return $this->sendResponse($invoice->toArray(), $this->languageService->getSystemMessage('crud.create'));  
+    // }
 
     /**
      * Display the specified resource.
@@ -106,7 +140,7 @@ class InvoiceController extends ResponseController
      */
     public function show($id)
     {
-        $invoice = Invoice::with(['type','stage'])->findOrFail($id);
+        $invoice = Invoice::with(['type','stage','order'])->findOrFail($id);
                 
         return $this->sendResponse($invoice->toArray(), $this->languageService->getSystemMessage('crud.read'));
     }
@@ -242,5 +276,94 @@ class InvoiceController extends ResponseController
         $this->businessActions([ new InvoiceAnull($invoice)]);
 
         return $this->sendResponse($invoice->toArray(), $this->languageService->getSystemMessage('invoice.anull'));
+    }
+
+
+    /**
+     * update stock
+     */
+    public function generate(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:invoices,id',
+            'discount' => 'numeric|gte:0'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first());
+        }
+
+        $invoice = Invoice::with(['details'])->findOrFail($request->id);
+        $invoiceType = $invoice->getType();
+
+        if($invoice->stage_id != InvoiceStages::getForDraft()){
+            return $this->sendError('There stock was already updated for this invoice.');
+        }
+
+        if(count($invoice->details) == 0){
+            return $this->sendError('The invoice has no items.');
+        }
+
+        $details = $invoice->details;
+        $invoice->subtotal = 0;
+
+        //beginTransaction
+        DB::beginTransaction();
+
+        //Update state if date is delayed
+        foreach ($details as $detail) {
+
+            $item = Item::findOrFail($detail->item_id);
+
+            if($invoiceType == InvoiceTypes::getForSell()){
+                $this->businessValidations([
+                    new ItemHasStock($item , $detail->quantity),
+                ], [ new InvoiceAnull($invoice)]);
+            }
+            else if($invoiceType == InvoiceTypes::getForPurchase()){
+                $this->businessValidations([
+                    new ItemIsStocked($item),
+                ], [ new InvoiceAnull($invoice)]);
+            }
+
+            // $this->businessValidations([ new InvoiceHasEnoughSubtotal($invoice, $detail)], 
+            //                         [ new InvoiceAnull($invoice)]
+            // );
+
+            //Update stock
+            //Set price according to invoice type
+            if($invoiceType == InvoiceTypes::getForSell()){
+                $item->decreaseStock($detail->quantity);
+            }else if($invoiceType == InvoiceTypes::getForPurchase()){
+                $item->increaseStock($detail->quantity);
+            }
+            $item->save();
+
+            //sum subtotal
+            $invoice->subtotal += ($detail->price * $detail->quantity);
+            
+        }
+
+        $invoice->discount = $request->discount;
+        $invoice->total    = $invoice->calculateTotal();
+        $invoice->taxes    = $invoice->total * ( Auth::user()->getCountryTax() / 100 );
+
+        //Validate that total is not negative
+        if($invoice->total < 0){
+            return $this->sendError([],  $this->languageService->getSystemMessage('invoice.total-negative'));       
+        }
+
+        //Validate that total is not negative
+        if($invoice->discount > $invoice->total){
+            return $this->sendError([],  $this->languageService->getSystemMessage('invoice.discount-incorrect'));       
+        }
+
+        $invoice->setStageStockUpdated();
+        $invoice->save();
+
+        //end transaction
+        DB::commit();
+
+        return $this->sendResponse([], $this->languageService->getSystemMessage('crud.update'));
     }
 }

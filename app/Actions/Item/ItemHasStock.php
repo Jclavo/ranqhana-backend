@@ -38,6 +38,6 @@ class ItemHasStock
     public function message()
     {
         // return 'There is not stock for item ' . $this->item->id;
-        return $this->languageService->getSystemMessage('item.has-no-stock') . ' : ' . $this->item->id;
+        return $this->languageService->getSystemMessage('item.has-no-stock') . ' : ' . $this->item->name;
     }
 }

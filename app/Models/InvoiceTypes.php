@@ -24,4 +24,16 @@ class InvoiceTypes extends BaseModel
         return $this->morphMany(Translation::class, 'translationable')
                     ->where('locale',App::getLocale());
     }
+
+        //Getter (statics)
+
+    //TYPES
+
+    static function getForSell(){
+        return 1;
+    }
+
+    static function getForPurchase(){
+        return 2;
+    }
 }

@@ -103,7 +103,7 @@ class PaymentController extends ResponseController
 
         // It is missing to validate if the invoice is already payed
 
-        if($invoice->stage_id == InvoiceStages::getStagePaid()){
+        if($invoice->stage_id == InvoiceStages::getForPaid()){
             return $this->sendError('The payment can not be created because the invoice was already paid.');
         }
 
@@ -209,7 +209,7 @@ class PaymentController extends ResponseController
         $payment = Payment::findOrFail($id);
 
         // validate if payment is already payed
-        if($payment->payment_stage_id == PaymentStage::getStagePaid()){
+        if($payment->payment_stage_id == PaymentStage::getForPaid()){
             return $this->sendError('This payment is already paid.');
         }
         
@@ -224,7 +224,7 @@ class PaymentController extends ResponseController
         $payment->money = $money;
         $payment->payment_method_id = $payment_method_id;
         $payment->real_payment_date =  Carbon::now();
-        $payment->payment_stage_id  = PaymentStage::getStagePaid();
+        $payment->payment_stage_id  = PaymentStage::getForPaid();
         $payment->transaction_code  = $transaction_code;
         $payment->save();
 
@@ -234,7 +234,7 @@ class PaymentController extends ResponseController
         //calculate last payments
         $lastPaymentsAmount = $this->getLastPaymentsAmountPayed($invoice->id);
         if($lastPaymentsAmount == $invoice->total){
-            $invoice->stage_id = InvoiceStages::getStagePaid();
+            $invoice->stage_id = InvoiceStages::getForPaid();
             $invoice->save();
         }
 
@@ -252,7 +252,7 @@ class PaymentController extends ResponseController
         $payment = Payment::findOrFail($id);
 
         // validate if payment is already payed
-        if($payment->payment_stage_id == PaymentStage::getStagePaid()){
+        if($payment->payment_stage_id == PaymentStage::getForPaid()){
             return $this->sendError('This payment can not be Anull because it is already paid.');
         }
 
@@ -297,7 +297,7 @@ class PaymentController extends ResponseController
         $lastPaymentsAmount = 0;
 
         $lastPayments = Payment::where('invoice_id',$invoice_id)
-                                // ->where('payment_stage_id',PaymentStage::getStagePaid())
+                                // ->where('payment_stage_id',PaymentStage::getForPaid())
                                 ->get();
 
         foreach ($lastPayments as $lastPayment) {
@@ -314,7 +314,7 @@ class PaymentController extends ResponseController
         $lastPaymentsAmount = 0;
 
         $lastPayments = Payment::where('invoice_id',$invoice_id)
-                                ->where('payment_stage_id',PaymentStage::getStagePaid())
+                                ->where('payment_stage_id',PaymentStage::getForPaid())
                                 ->get();
 
         foreach ($lastPayments as $lastPayment) {
