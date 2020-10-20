@@ -6,6 +6,7 @@ composer create-project --prefer-dist laravel/laravel blog "5.8.*"
 
 - CREATE ALL
 php artisan make:model modelName -a
+php artisan make:model Models/modelName -a
 
 - CREATE MODEL (& migration)
 
