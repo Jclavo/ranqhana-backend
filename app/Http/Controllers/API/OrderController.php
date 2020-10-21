@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Models\Order;
+use App\Models\OrderStage;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ResponseController;
 
@@ -178,7 +179,15 @@ class OrderController extends ResponseController
             return $this->sendError($validator->errors()->first());
         }
 
+        if($request->stage_id == OrderStage::getForCancel()){
+            return $this->sendError('To cancel the order, please use the another feature.');
+        }
+
         $order = Order::findOrFail($request->id);
+
+        if($order->stage_id == OrderStage::getForCancel()){
+            return $this->sendError('There is not possible to change the stage, because the order is canceled.');
+        }
 
         $order->stage_id = $request->stage_id;
         $order->save();
