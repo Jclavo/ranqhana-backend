@@ -36,10 +36,6 @@ class InvoiceAnull
             $this->failMessage = $this->languageService->getSystemMessage('invoice.already-anulled');
             return false;
         } 
-        if($this->invoice->stage_id == InvoiceStages::getForDraft()){
-            $this->failMessage = $this->languageService->getSystemMessage('invoice.is-draft');
-            return false; 
-        } 
 
         $invoice_id = $this->invoice->id;
         $results = Invoice::
@@ -56,29 +52,32 @@ class InvoiceAnull
         //beginTransaction
         DB::beginTransaction();
 
-        foreach ($results as $result) {
-            $item = Item::findOrFail($result->item_id);
+        if($this->invoice->stage_id != InvoiceStages::getForDraft()){
 
-            if($invoiceType == InvoiceTypes::getForSell()){
-                $item->increaseStock($result->quantity);
-            }else if($invoiceType == InvoiceTypes::getForPurchase()){
-                
-                //Validate if it has stock is missing
-
-                // $checkStock = new ItemHasStock($item, $result->quantity);
-
-                if($item->isStocked()){
-                    $item->decreaseStock($result->quantity);
+            foreach ($results as $result) {
+                $item = Item::findOrFail($result->item_id);
+    
+                if($invoiceType == InvoiceTypes::getForSell()){
+                    $item->increaseStock($result->quantity);
+                }else if($invoiceType == InvoiceTypes::getForPurchase()){
+                    
+                    //Validate if it has stock is missing
+    
+                    // $checkStock = new ItemHasStock($item, $result->quantity);
+    
+                    if($item->isStocked()){
+                        $item->decreaseStock($result->quantity);
+                    }
+                    else{
+                        $this->failMessage = $this->languageService->getSystemMessage('invoice.has-no-stock');
+                        DB::rollBack();
+                        return false;
+                    }
                 }
-                else{
-                    $this->failMessage = $this->languageService->getSystemMessage('invoice.has-no-stock');
-                    DB::rollBack();
-                    return false;
-                }
+                $item->save();
             }
-            $item->save();
-        }
-        
+        } 
+
         $this->invoice->setStageAnulled();
         $this->invoice->save();     
         
