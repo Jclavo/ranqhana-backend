@@ -9,6 +9,7 @@ use App\Models\PaymentType;
 use App\Models\InvoiceStages;
 use App\Models\InvoiceTypes;
 use App\Models\Item;
+use App\Models\Order;
 
 use App\Http\Controllers\ResponseController;
 
@@ -87,7 +88,7 @@ class InvoiceController extends ResponseController
         
         $invoice->save();
 
-        $invoice->order()->create(['stage_id' => 1, 'delivery_date' => Carbon::now()]);
+        $invoice->order()->create(['stage_id' => 1, 'delivery_date' => Carbon::now(), 'code' => '0000']);
 
         $invoice->load('order');
 

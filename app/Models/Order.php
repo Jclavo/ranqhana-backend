@@ -6,8 +6,19 @@ use App\Models\BaseModel;
 use App\Models\OrderStage;
 use App\Models\Invoice;
 
+// use App\Casts\CorrelativeCode;
+
+use App\Utils\MoreUtils;
+
+
 class Order extends BaseModel
 {
+    /**
+     * The relations to be loaded
+     */
+
+    protected $with = ['stage'];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -15,15 +26,28 @@ class Order extends BaseModel
      */
  
     protected $fillable = [
-        'invoice_id', 'stage_id', 'delivery_date'
+        'invoice_id', 'stage_id', 'delivery_date', 'code'
     ];
 
     /**
-     * The relations to be loaded
+     * The attributes that should be cast.
+     *
+     * @var array
      */
+    // protected $casts = [
+    //     'code' => CorrelativeCode::class,
+    // ];
 
-    protected $with = ['stage'];
-
+    /**
+     * Set the user's first name.
+     *
+     * @param  string  $value
+     * @return void
+     */
+    public function setCodeAttribute($value)
+    {
+        $this->attributes['code'] = MoreUtils::generateCorrelativeCode($this);
+    }
 
     //Relationships
 
