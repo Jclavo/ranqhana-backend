@@ -15,7 +15,7 @@ class Order extends BaseModel
      */
  
     protected $fillable = [
-        'invoice_id', 'stage_id'
+        'invoice_id', 'stage_id', 'delivery_date'
     ];
 
     /**

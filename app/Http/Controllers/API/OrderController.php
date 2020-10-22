@@ -16,6 +16,8 @@ use App\Utils\CustomCarbon;
 //Services
 use App\Services\LanguageService;
 
+use Carbon\Carbon;
+
 class OrderController extends ResponseController
 {
     private $languageService = null;
@@ -180,18 +182,55 @@ class OrderController extends ResponseController
         }
 
         if($request->stage_id == OrderStage::getForCancel()){
-            return $this->sendError('To cancel the order, please use the another feature.');
+            return $this->sendError($this->languageService->getSystemMessage('order.change-stage-canceled'));
         }
 
         $order = Order::findOrFail($request->id);
 
         if($order->stage_id == OrderStage::getForCancel()){
-            return $this->sendError('There is not possible to change the stage, because the order is canceled.');
+            return $this->sendError($this->languageService->getSystemMessage('order.already-canceled'));
         }
 
         $order->stage_id = $request->stage_id;
         $order->save();
                 
-        return $this->sendResponse($order->toArray(), $this->languageService->getSystemMessage('statusChange'));
+        return $this->sendResponse($order->toArray(), $this->languageService->getSystemMessage('stageChange'));
     }
+
+    /**
+     * Change date
+     */
+    public function changeDeliveryDate(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:orders,id',
+            'delivery_date' => 'required|date|after_or_equal:today',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first());
+        }
+
+        $order = Order::findOrFail($request->id);
+
+        //validate depends on Stage
+        switch ($order->stage_id) {
+            case OrderStage::getForCancel():
+                return $this->sendError($this->languageService->getSystemMessage('order.already-canceled'));
+                break;
+            case OrderStage::getForDelivered():
+                return $this->sendError($this->languageService->getSystemMessage('order.already-delivered'));
+                break;
+            default:
+                # code...
+                break;
+        }
+
+
+        $order->delivery_date = Carbon::parse($request->delivery_date);
+        $order->save();
+                
+        return $this->sendResponse($order->toArray(), $this->languageService->getSystemMessage('dateChange'));
+    }
+
 }

@@ -88,6 +88,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::resource('orders', 'API\OrderController');
     Route::post('orders/pagination', 'API\OrderController@pagination');
     Route::post('orders/changeStatus', 'API\OrderController@changeStatus');
+    Route::post('orders/changeDeliveryDate', 'API\OrderController@changeDeliveryDate');
 
     //Services
     // Route::post('services/pagination', 'API\ServiceController@pagination');
