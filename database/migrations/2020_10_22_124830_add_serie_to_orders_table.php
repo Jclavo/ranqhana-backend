@@ -14,7 +14,7 @@ class AddCodeToOrdersTable extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->string('code',12);
+            $table->string('serie',12)->unique();
         });
     }
 

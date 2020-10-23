@@ -88,7 +88,7 @@ class InvoiceController extends ResponseController
         
         $invoice->save();
 
-        $invoice->order()->create(['stage_id' => 1, 'delivery_date' => Carbon::now(), 'code' => '0000']);
+        $invoice->order()->create(['stage_id' => 1, 'delivery_date' => Carbon::now(), 'serie' => '0000']);
 
         $invoice->load('order');
 

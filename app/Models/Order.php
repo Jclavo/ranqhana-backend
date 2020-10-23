@@ -26,7 +26,7 @@ class Order extends BaseModel
      */
  
     protected $fillable = [
-        'invoice_id', 'stage_id', 'delivery_date', 'code'
+        'invoice_id', 'stage_id', 'delivery_date', 'serie'
     ];
 
     /**
@@ -44,9 +44,9 @@ class Order extends BaseModel
      * @param  string  $value
      * @return void
      */
-    public function setCodeAttribute($value)
+    public function setSerieAttribute($value)
     {
-        $this->attributes['code'] = MoreUtils::generateCorrelativeCode($this);
+        $this->attributes['serie'] = MoreUtils::generateCorrelativeSerie($this);
     }
 
     //Relationships
