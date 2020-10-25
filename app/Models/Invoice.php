@@ -9,6 +9,7 @@ use App\Models\InvoiceStage;
 use App\Models\Order;
 
 use App\Scopes\Belongs2CompanyScope;
+use App\Utils\MoreUtils;
 
 class Invoice extends BaseModel 
 {
@@ -29,6 +30,12 @@ class Invoice extends BaseModel
         // 'subtotal' => 'decimal:2',
         //  'discount' => 'decimal:2',
     ];
+
+     public function setSerieAttribute($value)
+    {
+        $this->attributes['serie'] = MoreUtils::generateCorrelativeSerie($this);
+    }
+
 
     /**
      * The "booting" method of the model.

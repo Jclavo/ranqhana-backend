@@ -82,13 +82,12 @@ class InvoiceController extends ResponseController
         $invoice->type_id  = $request->type_id;
         $invoice->user_id = Auth::user()->getLocalUserID();
         $invoice->stage_id = InvoiceStage::getForDraft();
-
         //Initial values
         $invoice->subtotal = 0;
-        
+        $invoice->serie = '0000'; //set a fake value to call a custom function in the model 
         $invoice->save();
 
-        $invoice->order()->create(['stage_id' => 1, 'delivery_date' => Carbon::now(), 'serie' => '0000']);
+        $invoice->order()->create(['stage_id' => 1, 'delivery_date' => Carbon::now(), 'serie' => $invoice->serie]);
 
         $invoice->load('order');
 
@@ -215,9 +214,12 @@ class InvoiceController extends ResponseController
     public function pagination(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'type_id' => 'required|exists:invoice_types,id',
             'pageSize' => 'numeric|gt:0',
         ]);
+
+        $validator->sometimes('type_id', 'required|exists:invoice_types,id', function ($input) {
+            return $input->type_id > 0;
+        });
 
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
@@ -233,17 +235,15 @@ class InvoiceController extends ResponseController
         $toDate        = $request->toDate;
         $type_id       = $request->type_id;
         
-        // if (empty($type)) {
-        //     $type = "S";
-        // }
-
         $query = Invoice::query();
 
         $query->select('invoices.*');
         $query->whereHas('details');
         $query->with('stage');
 
-        $query->where('type_id', '=', $type_id);
+        $query->when((!empty($type_id)), function ($q) use($type_id) {
+            return $q->where('type_id', '=', $type_id);
+        });
 
         $query->when((!empty($searchValue)), function ($q) use($searchValue) {
             return $q->where('serie', 'like', '%'. $searchValue .'%')

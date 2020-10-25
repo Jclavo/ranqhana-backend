@@ -15,7 +15,7 @@ class CreateInvoicesTable extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('serie',10)->nullable();
+            $table->string('serie',12)->nullable();
             $table->decimal('subtotal',12,2);
             $table->decimal('taxes',12,2)->default('0');
             $table->decimal('discount',12,2)->default('0');

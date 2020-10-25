@@ -8,7 +8,7 @@ use App\Models\Invoice;
 
 // use App\Casts\CorrelativeCode;
 
-use App\Utils\MoreUtils;
+// use App\Utils\MoreUtils;
 
 
 class Order extends BaseModel
@@ -44,10 +44,10 @@ class Order extends BaseModel
      * @param  string  $value
      * @return void
      */
-    public function setSerieAttribute($value)
-    {
-        $this->attributes['serie'] = MoreUtils::generateCorrelativeSerie($this);
-    }
+    // public function setSerieAttribute($value)
+    // {
+    //     $this->attributes['serie'] = MoreUtils::generateCorrelativeSerie($this);
+    // }
 
     //Relationships
 
