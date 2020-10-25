@@ -37,12 +37,12 @@ class PaymentStage extends BaseModel
      * Getter (statics)
      */
 
-    static function getStageWaiting()
+    static function getForWaiting()
     {
         return 1;
     }
 
-    static function getStageDelayed()
+    static function getForDelayed()
     {
         return 2;
     }
@@ -52,7 +52,7 @@ class PaymentStage extends BaseModel
         return 3;
     }
 
-    static function getStageCanceled()
+    static function getForCanceled()
     {
         return 4;
     }

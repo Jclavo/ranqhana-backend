@@ -130,7 +130,7 @@ class PaymentController extends ResponseController
         $payment->payment_date =  $payment_date;
         $payment->invoice_id    = $invoice_id;
         $payment->payment_method_id = $payment_method_id;
-        $payment->payment_stage_id  = PaymentStage::getStageWaiting();
+        $payment->payment_stage_id  = PaymentStage::getForWaiting();
         $payment->save();
 
         return $this->sendResponse($payment->toArray(), $this->languageService->getSystemMessage('crud.create'));  
@@ -274,9 +274,9 @@ class PaymentController extends ResponseController
 
         //Update state if date is delayed
         foreach ($payments as $payment) {
-            if($payment->payment_stage_id == PaymentStage::getStageWaiting()){
+            if($payment->payment_stage_id == PaymentStage::getForWaiting()){
                 if($payment->payment_date < Carbon::now()->toDateString()){
-                    $payment->payment_stage_id = PaymentStage::getStageDelayed();   
+                    $payment->payment_stage_id = PaymentStage::getForDelayed();   
                     $payment->save();
                 }
             }
@@ -323,4 +323,42 @@ class PaymentController extends ResponseController
 
         return $lastPaymentsAmount;
     }
+
+
+    /**
+     * Change Payment date
+     */
+    // public function changePaymentDate(Request $request){
+
+    //     $validator = Validator::make($request->all(), [
+    //         'id' => 'required|exists:payments,id',
+    //         'delivery_date' => 'required|date|after_or_equal:today',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return $this->sendError($validator->errors()->first());
+    //     }
+
+    //     $payment = Payment::findOrFail($request->id);
+
+    //     //validate depends on Stage
+    //     switch ($payment->payment_stage_id) {
+    //         case OrderStage::getForCancel():
+    //             return $this->sendError($this->languageService->getSystemMessage('order.already-canceled'));
+    //             break;
+    //         case OrderStage::getForDelivered():
+    //             return $this->sendError($this->languageService->getSystemMessage('order.already-delivered'));
+    //             break;
+    //         default:
+    //             # code...
+    //             break;
+    //     }
+
+
+    //     $order->delivery_date = Carbon::parse($request->delivery_date);
+    //     $order->save();
+                
+    //     return $this->sendResponse($order->toArray(), $this->languageService->getSystemMessage('dateChange'));
+    // }
+
 }
