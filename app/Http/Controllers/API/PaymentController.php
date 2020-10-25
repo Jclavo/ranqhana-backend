@@ -253,12 +253,14 @@ class PaymentController extends ResponseController
 
         // validate if payment is already payed
         if($payment->stage_id == PaymentStage::getForPaid()){
-            return $this->sendError('This payment can not be Anull because it is already paid.');
+            return $this->sendError($this->languageService->getSystemMessage('stage.already-paid'));
         }
 
+        $payment->setStageAnulled();
+        $payment->save();
         $payment->delete();
 
-        return $this->sendResponse($payment->toArray(), $this->languageService->getSystemMessage('payment.anull'));
+        return $this->sendResponse($payment->toArray(), $this->languageService->getSystemMessage('crud.annulled'));
     }
 
     /**
