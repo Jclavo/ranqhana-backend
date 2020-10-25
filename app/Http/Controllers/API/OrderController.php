@@ -113,9 +113,17 @@ class OrderController extends ResponseController
     public function pagination(Request $request){
 
         $validator = Validator::make($request->all(), [
-            'stage_id' => 'exists:order_stages,id',
+            'serie' => 'max:12',
             'pageSize' => 'numeric|gt:0',
         ]);
+
+        $validator->sometimes('stage_id', 'required|exists:order_stages,id', function ($input) {
+            return $input->stage_id > 0;
+        });
+
+        $validator->sometimes('type_id', 'required|exists:invoice_types,id', function ($input) {
+            return $input->type_id > 0;
+        });
 
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
@@ -129,26 +137,29 @@ class OrderController extends ResponseController
 
         $fromDate      = $request->fromDate;
         $toDate        = $request->toDate;
-        $stage_id       = $request->stage_id;
+        $stage_id      = $request->stage_id;
+        $type_id       = $request->type_id;
+        $serie         = $request->serie;
         
 
         $query = Order::query();
 
         $query->select('orders.*');
-        $query->whereHas('invoice');
-        $query->with('invoice.stage');
-        // $query->where('type_id', '=', $type_id);
 
-        // $query->when((!empty($searchValue)), function ($q) use($searchValue) {
-        //     return $q->where('serie', 'like', '%'. $searchValue .'%')
-        //              ->orWhere('total', 'like', '%'. $searchValue .'%');
-        // });
-        // $query = $query::whereHas('invoice', function ($query) use($invoice_id) {
-        //     $query->where('invoices.id', '=', $invoice_id);
-        // });
+        $query->whereHas('invoice', function ($query) use($type_id) {
+            $query->when((!empty($type_id)) , function ($subquery) use($type_id) {
+                return $subquery->where('invoices.type_id', '=', $type_id);
+            });
+        });
+
+        $query->with('invoice.stage');
 
         $query->when((!empty($stage_id)) , function ($q) use($stage_id) {
             return $q->where('orders.stage_id', '=', $stage_id);
+        });
+
+        $query->when((!empty($serie)) , function ($q) use($serie) {
+            return $q->where('orders.serie', 'like', '%'. $serie .'%');
         });
 
 
