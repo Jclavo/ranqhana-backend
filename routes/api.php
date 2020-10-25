@@ -88,8 +88,8 @@ Route::middleware(['auth:api'])->group(function () {
     //Orders
     Route::resource('orders', 'API\OrderController');
     Route::post('orders/pagination', 'API\OrderController@pagination');
-    Route::post('orders/changeStatus', 'API\OrderController@changeStatus');
-    Route::post('orders/changeDeliveryDate', 'API\OrderController@changeDeliveryDate');
+    Route::post('orders/updateStage', 'API\OrderController@updateStage');
+    Route::post('orders/updateDeliveryDate', 'API\OrderController@updateDeliveryDate');
 
     //Invoice Type
     Route::resource('invoice-types', 'API\InvoiceTypeController');

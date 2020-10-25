@@ -181,7 +181,7 @@ class OrderController extends ResponseController
     /**
      * Change Status
      */
-    public function changeStatus(Request $request){
+    public function updateStage(Request $request){
 
         $validator = Validator::make($request->all(), [
             'id' => 'required|exists:orders,id',
@@ -211,7 +211,7 @@ class OrderController extends ResponseController
     /**
      * Change date
      */
-    public function changeDeliveryDate(Request $request){
+    public function updateDeliveryDate(Request $request){
 
         $validator = Validator::make($request->all(), [
             'id' => 'required|exists:orders,id',
