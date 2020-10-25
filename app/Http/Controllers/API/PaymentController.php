@@ -332,7 +332,7 @@ class PaymentController extends ResponseController
 
         $validator = Validator::make($request->all(), [
             'id' => 'required|exists:payments,id',
-            'delivery_date' => 'required|date|after_or_equal:today',
+            'payment_date' => 'required|date|after_or_equal:today',
         ]);
 
         if ($validator->fails()) {
@@ -354,7 +354,7 @@ class PaymentController extends ResponseController
                 break;
         }
 
-        $payment->payment_date = Carbon::parse($request->delivery_date);
+        $payment->payment_date = Carbon::parse($request->payment_date);
         $payment->save();
                 
         return $this->sendResponse($payment->toArray(), $this->languageService->getSystemMessage('crud.update-date'));
