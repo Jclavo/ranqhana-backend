@@ -6,10 +6,9 @@ use App\Models\BaseModel;
 use App\Models\OrderStage;
 use App\Models\Invoice;
 
+use App\Scopes\Belongs2CompanyByInvoice;
 // use App\Casts\CorrelativeCode;
-
 // use App\Utils\MoreUtils;
-
 
 class Order extends BaseModel
 {
@@ -28,6 +27,19 @@ class Order extends BaseModel
     protected $fillable = [
         'invoice_id', 'stage_id', 'delivery_date', 'serie'
     ];
+
+    /**
+     * The "booting" method of the model.
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope(new Belongs2CompanyByInvoice);
+    }
+
 
     /**
      * The attributes that should be cast.

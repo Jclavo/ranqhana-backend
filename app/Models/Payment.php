@@ -7,11 +7,25 @@ use App\Models\Invoice;
 use App\Models\PaymentMethod;
 use App\Models\PaymentStage;
 
+use App\Scopes\Belongs2CompanyByInvoice;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Payment extends Model
 { 
     use SoftDeletes;
+
+    /**
+     * The "booting" method of the model.
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope(new Belongs2CompanyByInvoice);
+    }
+
     /**
      * Relationships
      */
@@ -38,6 +52,15 @@ class Payment extends Model
     public function paymentStage()
     {
         return $this->belongsTo(PaymentStage::class);
+    }
+
+    /**
+     * Setter
+     */
+
+    public function setStageAnulled() 
+    {
+        $this->stage_id = PaymentStage::getForAnnulled();
     }
 
 

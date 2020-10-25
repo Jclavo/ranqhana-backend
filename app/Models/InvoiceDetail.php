@@ -6,6 +6,8 @@ use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
+use App\Scopes\Belongs2CompanyByInvoice;
+
 class InvoiceDetail extends BaseModel
 {
     protected $fillable = [
@@ -21,15 +23,7 @@ class InvoiceDetail extends BaseModel
     {
         parent::boot();
 
-        static::addGlobalScope('belongs2Company', function (Builder $builder) {
-            $builder->join('invoices', 'invoice_id', '=', 'invoices.id')    
-                    ->whereIn('invoices.user_id', function($query){
-                        $query->select('ranqhana_users.id')
-                            ->from('ranqhana_users')
-                            ->where('ranqhana_users.company_project_id', '=', Auth::user()->company_project_id);
-                    });
-
-        });
+        static::addGlobalScope(new Belongs2CompanyByInvoice);
     }
 
     //Relationships

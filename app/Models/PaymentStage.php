@@ -52,7 +52,7 @@ class PaymentStage extends BaseModel
         return 3;
     }
 
-    static function getForCanceled()
+    static function getForAnnulled()
     {
         return 4;
     }
