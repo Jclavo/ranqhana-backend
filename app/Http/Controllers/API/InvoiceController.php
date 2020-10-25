@@ -6,8 +6,8 @@ use App\Models\Invoice;
 use App\Models\InvoiceDetail;
 use App\Models\User;
 use App\Models\PaymentType;
-use App\Models\InvoiceStages;
-use App\Models\InvoiceTypes;
+use App\Models\InvoiceStage;
+use App\Models\InvoiceType;
 use App\Models\Item;
 use App\Models\Order;
 
@@ -81,7 +81,7 @@ class InvoiceController extends ResponseController
         $invoice = new Invoice();
         $invoice->type_id  = $request->type_id;
         $invoice->user_id = Auth::user()->getLocalUserID();
-        $invoice->stage_id = InvoiceStages::getForDraft();
+        $invoice->stage_id = InvoiceStage::getForDraft();
 
         //Initial values
         $invoice->subtotal = 0;
@@ -125,7 +125,7 @@ class InvoiceController extends ResponseController
     //     //Set FKs
     //     $invoice->type_id  = $request->type_id;
     //     $invoice->user_id = Auth::user()->getLocalUserID();
-    //     $invoice->stage_id = InvoiceStages::getForDraft();
+    //     $invoice->stage_id = InvoiceStage::getForDraft();
         
     //     $invoice->save();
 
@@ -298,7 +298,7 @@ class InvoiceController extends ResponseController
         $invoice = Invoice::with(['details'])->findOrFail($request->id);
         $invoiceType = $invoice->getType();
 
-        if($invoice->stage_id != InvoiceStages::getForDraft()){
+        if($invoice->stage_id != InvoiceStage::getForDraft()){
             return $this->sendError('There stock was already updated for this invoice.');
         }
 
@@ -317,12 +317,12 @@ class InvoiceController extends ResponseController
 
             $item = Item::findOrFail($detail->item_id);
 
-            if($invoiceType == InvoiceTypes::getForSell()){
+            if($invoiceType == InvoiceType::getForSell()){
                 $this->businessValidations([
                     new ItemHasStock($item , $detail->quantity),
                 ], [ new InvoiceAnull($invoice)]);
             }
-            else if($invoiceType == InvoiceTypes::getForPurchase()){
+            else if($invoiceType == InvoiceType::getForPurchase()){
                 $this->businessValidations([
                     new ItemIsStocked($item),
                 ], [ new InvoiceAnull($invoice)]);
@@ -330,9 +330,9 @@ class InvoiceController extends ResponseController
 
             //Update stock
             //Set price according to invoice type
-            if($invoiceType == InvoiceTypes::getForSell()){
+            if($invoiceType == InvoiceType::getForSell()){
                 $item->decreaseStock($detail->quantity);
-            }else if($invoiceType == InvoiceTypes::getForPurchase()){
+            }else if($invoiceType == InvoiceType::getForPurchase()){
                 $item->increaseStock($detail->quantity);
             }
             $item->save();

@@ -4,8 +4,8 @@ namespace App\Actions\Invoice;
 
 use App\Models\Invoice;
 use App\Models\Item;
-use App\Models\InvoiceTypes;
-use App\Models\InvoiceStages;
+use App\Models\InvoiceType;
+use App\Models\InvoiceStage;
 use App\Models\Order;
 
 use Illuminate\Support\Facades\DB;
@@ -32,7 +32,7 @@ class InvoiceAnull
     public function execute()
     {
         //if the invoice is already anulled
-        if($this->invoice->stage_id == InvoiceStages::getForAnulled()){
+        if($this->invoice->stage_id == InvoiceStage::getForAnulled()){
             $this->failMessage = $this->languageService->getSystemMessage('invoice.already-anulled');
             return false;
         } 
@@ -52,14 +52,14 @@ class InvoiceAnull
         //beginTransaction
         DB::beginTransaction();
 
-        if($this->invoice->stage_id != InvoiceStages::getForDraft()){
+        if($this->invoice->stage_id != InvoiceStage::getForDraft()){
 
             foreach ($results as $result) {
                 $item = Item::findOrFail($result->item_id);
     
-                if($invoiceType == InvoiceTypes::getForSell()){
+                if($invoiceType == InvoiceType::getForSell()){
                     $item->increaseStock($result->quantity);
-                }else if($invoiceType == InvoiceTypes::getForPurchase()){
+                }else if($invoiceType == InvoiceType::getForPurchase()){
                     
                     //Validate if it has stock is missing
     

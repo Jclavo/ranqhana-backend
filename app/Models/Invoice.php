@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\BaseModel;
 use App\Models\Payment;
-use App\Models\InvoiceStages;
+use App\Models\InvoiceStage;
 use App\Models\Order;
 
 use App\Scopes\Belongs2CompanyScope;
@@ -50,7 +50,7 @@ class Invoice extends BaseModel
      */
     public function type()
     {
-        return $this->belongsTo('App\Models\InvoiceTypes');
+        return $this->belongsTo('App\Models\InvoiceType');
     }
 
     /**
@@ -58,7 +58,7 @@ class Invoice extends BaseModel
      */
     public function stage()
     {
-        return $this->belongsTo('App\Models\InvoiceStages');
+        return $this->belongsTo('App\Models\InvoiceStage');
     }
 
     /**
@@ -114,27 +114,27 @@ class Invoice extends BaseModel
     //Setter and Getters
     public function setStagePaid() // stage = 'P';
     {
-        $this->stage_id = InvoiceStages::getForPaid();
+        $this->stage_id = InvoiceStage::getForPaid();
     }
 
     public function setStageAnulled() // stage = 'A';
     {
-        $this->stage_id = InvoiceStages::getForAnulled();
+        $this->stage_id = InvoiceStage::getForAnulled();
     }
 
     public function setStageDraft() // stage = 'D';
     {
-        $this->stage_id = InvoiceStages::getForDraft();
+        $this->stage_id = InvoiceStage::getForDraft();
     }
 
     public function setStageByInstallment() // stage = 'I';
     {
-        $this->stage_id = InvoiceStages::getForByInstallment();
+        $this->stage_id = InvoiceStage::getForByInstallment();
     }
 
     public function setStageStockUpdated() // stage = 'U';
     {
-        $this->stage_id = InvoiceStages::getForStockUpdated();
+        $this->stage_id = InvoiceStage::getForStockUpdated();
     }
 
 
