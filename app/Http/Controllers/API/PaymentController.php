@@ -326,39 +326,38 @@ class PaymentController extends ResponseController
 
 
     /**
-     * Change Payment date
+     * Update Payment date
      */
-    // public function changePaymentDate(Request $request){
+    public function updatePaymentDate(Request $request){
 
-    //     $validator = Validator::make($request->all(), [
-    //         'id' => 'required|exists:payments,id',
-    //         'delivery_date' => 'required|date|after_or_equal:today',
-    //     ]);
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:payments,id',
+            'delivery_date' => 'required|date|after_or_equal:today',
+        ]);
 
-    //     if ($validator->fails()) {
-    //         return $this->sendError($validator->errors()->first());
-    //     }
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first());
+        }
 
-    //     $payment = Payment::findOrFail($request->id);
+        $payment = Payment::findOrFail($request->id);
 
-    //     //validate depends on Stage
-    //     switch ($payment->payment_stage_id) {
-    //         case OrderStage::getForCancel():
-    //             return $this->sendError($this->languageService->getSystemMessage('order.already-canceled'));
-    //             break;
-    //         case OrderStage::getForDelivered():
-    //             return $this->sendError($this->languageService->getSystemMessage('order.already-delivered'));
-    //             break;
-    //         default:
-    //             # code...
-    //             break;
-    //     }
+        //validate depends on Stage
+        switch ($payment->payment_stage_id) {
+            case PaymentStage::getForCanceled():
+                return $this->sendError($this->languageService->getSystemMessage('stage.already-canceled'));
+                break;
+            case PaymentStage::getForPaid():
+                return $this->sendError($this->languageService->getSystemMessage('stage.already-paid'));
+                break;
+            default:
+                # code...
+                break;
+        }
 
-
-    //     $order->delivery_date = Carbon::parse($request->delivery_date);
-    //     $order->save();
+        $payment->payment_date = Carbon::parse($request->delivery_date);
+        $payment->save();
                 
-    //     return $this->sendResponse($order->toArray(), $this->languageService->getSystemMessage('dateChange'));
-    // }
+        return $this->sendResponse($payment->toArray(), $this->languageService->getSystemMessage('crud.update-date'));
+    }
 
 }

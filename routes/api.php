@@ -74,11 +74,12 @@ Route::middleware(['auth:api'])->group(function () {
     //Payment Stage
     Route::resource('payment-stages', 'API\PaymentStageController');
 
-    //Payment Stage
-    Route::get('payments/invoices/{invoice_id}', 'API\PaymentController@byInvoice');
+    //Payments
     Route::resource('payments', 'API\PaymentController');
-
-    //Payment Stage
+    Route::get('payments/invoices/{invoice_id}', 'API\PaymentController@byInvoice');
+    Route::post('payments/updatePaymentDate', 'API\PaymentController@updatePaymentDate');
+    
+    //Payment Types
     Route::resource('payment-types', 'API\PaymentTypeController');
 
     //Order Stage
