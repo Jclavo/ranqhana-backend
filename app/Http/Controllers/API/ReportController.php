@@ -17,7 +17,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceDetail;
 use App\Models\User;
 use App\Models\PaymentStage;
-use App\Models\InvoiceStages;
+use App\Models\InvoiceStage;
 
 //Utils
 use App\Utils\CustomCarbon;
@@ -64,7 +64,7 @@ class ReportController extends ResponseController
                  ->where('payments.payment_stage_id', PaymentStage::getForPaid());
         })
         ->where('invoices.type_id',$type_id)
-        ->whereIn('invoices.stage_id', [InvoiceStages::getForPaid(), InvoiceStages::getForByInstallment()])
+        ->whereIn('invoices.stage_id', [InvoiceStage::getForPaid(), InvoiceStage::getForByInstallment()])
         ->select('payments.amount', 'invoices.created_at');
 
               
@@ -145,7 +145,7 @@ class ReportController extends ResponseController
 
         $query->whereHas('invoice', function ($query) use($type_id){
             $query->where('invoices.type_id', '=', $type_id)
-                  ->where('invoices.stage_id', '=', InvoiceStages::getForPaid());
+                  ->where('invoices.stage_id', '=', InvoiceStage::getForPaid());
         })
         ->groupBy('item_id')
         ->orderByDesc('quantity');

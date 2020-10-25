@@ -6,7 +6,7 @@ use App\Models\BaseModel;
 
 use Illuminate\Support\Facades\App;
 
-class InvoiceStages extends BaseModel
+class InvoiceStage extends BaseModel
 {
 
     /** 

@@ -6,7 +6,7 @@ use App\Models\Payment;
 use App\Models\PaymentMethod;
 use App\Models\PaymentStage;
 use App\Models\Invoice;
-use App\Models\InvoiceStages;
+use App\Models\InvoiceStage;
 
 use App\Http\Controllers\ResponseController;
 
@@ -103,7 +103,7 @@ class PaymentController extends ResponseController
 
         // It is missing to validate if the invoice is already payed
 
-        if($invoice->stage_id == InvoiceStages::getForPaid()){
+        if($invoice->stage_id == InvoiceStage::getForPaid()){
             return $this->sendError('The payment can not be created because the invoice was already paid.');
         }
 
@@ -234,7 +234,7 @@ class PaymentController extends ResponseController
         //calculate last payments
         $lastPaymentsAmount = $this->getLastPaymentsAmountPayed($invoice->id);
         if($lastPaymentsAmount == $invoice->total){
-            $invoice->stage_id = InvoiceStages::getForPaid();
+            $invoice->stage_id = InvoiceStage::getForPaid();
             $invoice->save();
         }
 
