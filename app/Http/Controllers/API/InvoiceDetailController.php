@@ -228,7 +228,7 @@ class InvoiceDetailController extends ResponseController
         if($invoiceDetails->isEmpty()){
             return $this->sendError($this->languageService->getSystemMessage('invoice.detail-not-found'));
         }else{
-            return $this->sendResponse($invoiceDetails, $this->languageService->getSystemMessage('.read'));
+            return $this->sendResponse($invoiceDetails, $this->languageService->getSystemMessage('crud.read'));
         }
     }
 
