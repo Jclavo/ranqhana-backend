@@ -2,10 +2,10 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Models\InvoiceTypes;
+use App\Models\InvoiceType;
 use Faker\Generator as Faker;
 
-$factory->define(InvoiceTypes::class, function (Faker $faker) {
+$factory->define(InvoiceType::class, function (Faker $faker) {
     return [
         'code' => strtoupper($faker->unique()->lexify('?')),
         'description' => $faker->name,

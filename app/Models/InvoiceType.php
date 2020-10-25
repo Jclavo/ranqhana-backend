@@ -6,7 +6,7 @@ use App\Models\BaseModel;
 
 use Illuminate\Support\Facades\App;
 
-class InvoiceTypes extends BaseModel
+class InvoiceType extends BaseModel
 {
     protected $fillable = [
         'code', 'description'

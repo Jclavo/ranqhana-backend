@@ -3,7 +3,7 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use App\Models\Invoice;
-use App\Models\InvoiceTypes;
+use App\Models\InvoiceType;
 use App\Models\RanqhanaUser;
 
 use Faker\Generator as Faker;
@@ -18,7 +18,7 @@ $factory->define(Invoice::class, function (Faker $faker) {
         'total' => 0,
         //'type_id' => $faker->randomElement(['1', '2']),
         //FKs
-        'type_id' => InvoiceTypes::all()->random()->id,
+        'type_id' => InvoiceType::all()->random()->id,
         'stage_id' => 1,
         'user_id' => RanqhanaUser::all()->random()->id,
     ];
@@ -38,7 +38,7 @@ $factory->defineAs(Invoice::class,'full', function (Faker $faker) {
         'discount' => $discount,
         'total' => $total,
         //FKs
-        'type_id' => InvoiceTypes::all()->random()->id,
+        'type_id' => InvoiceType::all()->random()->id,
         'stage_id' => 1,
         'user_id' => RanqhanaUser::all()->random()->id,
     ];

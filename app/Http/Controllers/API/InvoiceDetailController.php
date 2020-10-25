@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Models\InvoiceDetail;
 use App\Models\Invoice;
 use App\Models\Item;
-use App\Models\InvoiceTypes;
+use App\Models\InvoiceType;
 use App\Models\OrderStage;
 
 use App\Actions\Item\ItemHasStock;
@@ -85,10 +85,10 @@ class InvoiceDetailController extends ResponseController
             return $this->sendError('There is not possible to add more items to this order.');
         }
 
-        if($invoiceType == InvoiceTypes::getForSell()){
+        if($invoiceType == InvoiceType::getForSell()){
             $this->businessValidations([new ItemHasStock($item , $request->quantity)]);
         }
-        else if($invoiceType == InvoiceTypes::getForPurchase()){
+        else if($invoiceType == InvoiceType::getForPurchase()){
             $this->businessValidations([new ItemIsStocked($item)]);
         }
 
@@ -96,9 +96,9 @@ class InvoiceDetailController extends ResponseController
        
         //Set price according to invoice type
         $price = 0;
-        if($invoiceType == InvoiceTypes::getForSell()){
+        if($invoiceType == InvoiceType::getForSell()){
             $price    = $item->price;
-        }else if($invoiceType == InvoiceTypes::getForPurchase()){
+        }else if($invoiceType == InvoiceType::getForPurchase()){
             $price   = $request->price;
         }
 
