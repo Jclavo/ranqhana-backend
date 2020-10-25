@@ -143,22 +143,22 @@ class ReportController extends ResponseController
 
         $query->select('item_id', DB::raw("sum(invoice_details.quantity) as quantity"));
 
-        $query->whereHas('invoice', function ($query) use($type_id){
+        $query->whereHas('invoice', function ($query) use($type_id,$fromDate,$toDate){
             $query->where('invoices.type_id', '=', $type_id)
                   ->where('invoices.stage_id', '=', InvoiceStage::getForPaid());
+
+            $query->when((!empty($fromDate)) && (!empty($toDate)) , function ($q) use($fromDate,$toDate) {
+
+                //change date format
+                $fromDate = CustomCarbon::countryTZtoUTC($fromDate,'00:00:00');
+                $toDate = CustomCarbon::countryTZtoUTC($toDate,'23:59:59');
+    
+                return $q->whereBetween('invoices.created_at',[$fromDate, $toDate]);
+            });
         })
         ->groupBy('item_id')
         ->orderByDesc('quantity');
 
-        
-        $query->when((!empty($fromDate)) && (!empty($toDate)) , function ($q) use($fromDate,$toDate) {
-
-            //change date format
-            $fromDate = CustomCarbon::countryTZtoUTC($fromDate,'00:00:00');
-            $toDate = CustomCarbon::countryTZtoUTC($toDate,'23:59:59');
-
-            return $q->whereBetween('invoices.created_at',[$fromDate, $toDate]);
-        });
 
         $query->with('item');
         $query = $query->get();
