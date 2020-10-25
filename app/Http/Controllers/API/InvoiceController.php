@@ -167,7 +167,7 @@ class InvoiceController extends ResponseController
     public function update(int $id, Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'serie' => 'nullable|max:10',
+            // 'serie' => 'nullable|max:10',
             'payment_type_id' => 'required|exists:payment_types,id',
         ]);
 
@@ -180,8 +180,6 @@ class InvoiceController extends ResponseController
         }
 
         $invoice = Invoice::findOrFail($id);
-
-        $invoice->serie            = $request->serie;
         $invoice->external_user_id = $request->external_user_id;
         $invoice->payment_type_id  = $request->payment_type_id;
 
