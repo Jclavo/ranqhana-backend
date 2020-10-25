@@ -66,8 +66,8 @@ class PaymentController extends ResponseController
             'invoice_id' => 'required|exists:invoices,id',
         ]);
 
-        $validator->sometimes('payment_method_id', 'required|exists:payment_methods,id', function ($input) {
-            return $input->payment_method_id > 0;
+        $validator->sometimes('method_id', 'required|exists:payment_methods,id', function ($input) {
+            return $input->method_id > 0;
         });
 
         // $validator->sometimes('payment_date', 'date|after_or_equal:today', function ($input) {
@@ -93,7 +93,7 @@ class PaymentController extends ResponseController
         $amount = $request->amount;
         $payment_date = $request->payment_date ?  $request->payment_date : Carbon::now();
         $invoice_id = $request->invoice_id;
-        $payment_method_id = $request->payment_method_id ? $request->payment_method_id : PaymentMethod::getMethodMoney();
+        $method_id = $request->method_id ? $request->method_id : PaymentMethod::getMethodMoney();
         
         /**
          * Validation section
@@ -129,8 +129,8 @@ class PaymentController extends ResponseController
         $payment->amount    = $amount;
         $payment->payment_date =  $payment_date;
         $payment->invoice_id    = $invoice_id;
-        $payment->payment_method_id = $payment_method_id;
-        $payment->payment_stage_id  = PaymentStage::getForWaiting();
+        $payment->method_id = $method_id;
+        $payment->stage_id  = PaymentStage::getForWaiting();
         $payment->save();
 
         return $this->sendResponse($payment->toArray(), $this->languageService->getSystemMessage('crud.create'));  
@@ -171,15 +171,15 @@ class PaymentController extends ResponseController
     public function update(int $id, Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'payment_method_id' => 'required|exists:payment_methods,id',
+            'method_id' => 'required|exists:payment_methods,id',
         ]);
 
         $validator->sometimes('money', 'required|gt:0|regex:/^[0-9]{1,10}+(?:\.[0-9]{1,2})?$/', function ($input) {
-            return $input->payment_method_id == PaymentMethod::getMethodMoney();
+            return $input->method_id == PaymentMethod::getMethodMoney();
         });
 
         $validator->sometimes('transaction_code', 'required|min:8', function ($input) {
-            return $input->payment_method_id == PaymentMethod::getMethodCard() && !empty($input->transaction_code);
+            return $input->method_id == PaymentMethod::getMethodCard() && !empty($input->transaction_code);
         });
 
         if ($validator->fails()) {
@@ -187,10 +187,10 @@ class PaymentController extends ResponseController
         }
 
         //Get values 
-        $payment_method_id = $request->payment_method_id;
+        $method_id = $request->method_id;
         $money = 0.0;
         $transaction_code = '';
-        switch ($payment_method_id) {
+        switch ($method_id) {
             case PaymentMethod::getMethodMoney():
                 $money = $request->money;
                 break;
@@ -209,12 +209,12 @@ class PaymentController extends ResponseController
         $payment = Payment::findOrFail($id);
 
         // validate if payment is already payed
-        if($payment->payment_stage_id == PaymentStage::getForPaid()){
+        if($payment->stage_id == PaymentStage::getForPaid()){
             return $this->sendError('This payment is already paid.');
         }
         
         //validate money only if the payment is in cash
-        if($payment_method_id == PaymentMethod::getMethodMoney()){
+        if($method_id == PaymentMethod::getMethodMoney()){
             if($money < $payment->amount){
                 return $this->sendError('The money is less than the amount to pay.');
             }
@@ -222,9 +222,9 @@ class PaymentController extends ResponseController
 
         //update values
         $payment->money = $money;
-        $payment->payment_method_id = $payment_method_id;
+        $payment->method_id = $method_id;
         $payment->real_payment_date =  Carbon::now();
-        $payment->payment_stage_id  = PaymentStage::getForPaid();
+        $payment->stage_id  = PaymentStage::getForPaid();
         $payment->transaction_code  = $transaction_code;
         $payment->save();
 
@@ -252,7 +252,7 @@ class PaymentController extends ResponseController
         $payment = Payment::findOrFail($id);
 
         // validate if payment is already payed
-        if($payment->payment_stage_id == PaymentStage::getForPaid()){
+        if($payment->stage_id == PaymentStage::getForPaid()){
             return $this->sendError('This payment can not be Anull because it is already paid.');
         }
 
@@ -274,9 +274,9 @@ class PaymentController extends ResponseController
 
         //Update state if date is delayed
         foreach ($payments as $payment) {
-            if($payment->payment_stage_id == PaymentStage::getForWaiting()){
+            if($payment->stage_id == PaymentStage::getForWaiting()){
                 if($payment->payment_date < Carbon::now()->toDateString()){
-                    $payment->payment_stage_id = PaymentStage::getForDelayed();   
+                    $payment->stage_id = PaymentStage::getForDelayed();   
                     $payment->save();
                 }
             }
@@ -297,7 +297,7 @@ class PaymentController extends ResponseController
         $lastPaymentsAmount = 0;
 
         $lastPayments = Payment::where('invoice_id',$invoice_id)
-                                // ->where('payment_stage_id',PaymentStage::getForPaid())
+                                // ->where('stage_id',PaymentStage::getForPaid())
                                 ->get();
 
         foreach ($lastPayments as $lastPayment) {
@@ -314,7 +314,7 @@ class PaymentController extends ResponseController
         $lastPaymentsAmount = 0;
 
         $lastPayments = Payment::where('invoice_id',$invoice_id)
-                                ->where('payment_stage_id',PaymentStage::getForPaid())
+                                ->where('stage_id',PaymentStage::getForPaid())
                                 ->get();
 
         foreach ($lastPayments as $lastPayment) {
@@ -342,7 +342,7 @@ class PaymentController extends ResponseController
         $payment = Payment::findOrFail($request->id);
 
         //validate depends on Stage
-        switch ($payment->payment_stage_id) {
+        switch ($payment->stage_id) {
             case PaymentStage::getForCanceled():
                 return $this->sendError($this->languageService->getSystemMessage('stage.already-canceled'));
                 break;

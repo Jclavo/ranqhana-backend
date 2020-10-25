@@ -26,12 +26,12 @@ class CreatePaymentsTable extends Migration
             $table->foreign('invoice_id')->references('id')->on('invoices');
 
             //FK Payment Method
-            $table->unsignedBigInteger('payment_method_id');
-            $table->foreign('payment_method_id')->references('id')->on('payment_methods');
+            $table->unsignedBigInteger('method_id');
+            $table->foreign('method_id')->references('id')->on('payment_methods');
 
             //FK Payment Stage
-            $table->unsignedBigInteger('payment_stage_id');
-            $table->foreign('payment_stage_id')->references('id')->on('payment_stages');
+            $table->unsignedBigInteger('stage_id');
+            $table->foreign('stage_id')->references('id')->on('payment_stages');
 
             $table->timestamps();
         });

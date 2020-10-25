@@ -61,7 +61,7 @@ class ReportController extends ResponseController
 
         $query->join('payments', function ($join) {
             $join->on('invoices.id', '=', 'payments.invoice_id')
-                 ->where('payments.payment_stage_id', PaymentStage::getForPaid());
+                 ->where('payments.stage_id', PaymentStage::getForPaid());
         })
         ->where('invoices.type_id',$type_id)
         ->whereIn('invoices.stage_id', [InvoiceStage::getForPaid(), InvoiceStage::getForByInstallment()])
