@@ -14,6 +14,8 @@ class Payment extends Model
 { 
     use SoftDeletes;
 
+    protected $with = ['method','stage'];
+
     /**
      * The "booting" method of the model.
      *
@@ -41,7 +43,7 @@ class Payment extends Model
     /**
      * Get the Payment Method associated with the Payment.
      */
-    public function paymentMethod()
+    public function method()
     {
         return $this->belongsTo(PaymentMethod::class);
     }
@@ -49,7 +51,7 @@ class Payment extends Model
     /**
      * Get the Payment Stage associated with the Payment.
      */
-    public function paymentStage()
+    public function stage()
     {
         return $this->belongsTo(PaymentStage::class);
     }

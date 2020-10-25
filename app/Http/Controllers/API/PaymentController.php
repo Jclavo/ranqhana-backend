@@ -285,8 +285,7 @@ class PaymentController extends ResponseController
         }
 
         // load relationships
-        $payments->load(['paymentMethod','paymentStage']);
-
+        //$payments->load(['paymentMethod','paymentStage']);
 
         return $this->sendResponse($payments->toArray(), $this->languageService->getSystemMessage('crud.read'));
     }
