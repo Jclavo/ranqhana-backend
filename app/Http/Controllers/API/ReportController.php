@@ -44,9 +44,12 @@ class ReportController extends ResponseController
         $validator = Validator::make($request->all(), [
             'fromDate' => 'date',
             'toDate' => 'date|after_or_equal:fromDate',
-            'type_id' => 'required|exists:invoice_types,id',
             'searchBy' => [Rule::in(['Y', 'M', 'D', 'H'])]
         ]);
+
+        $validator->sometimes('type_id', 'required|exists:invoice_types,id', function ($input) {
+            return $input->type_id > 0;
+        });
 
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
@@ -62,10 +65,14 @@ class ReportController extends ResponseController
         $query->join('payments', function ($join) {
             $join->on('invoices.id', '=', 'payments.invoice_id')
                  ->where('payments.stage_id', PaymentStage::getForPaid());
-        })
-        ->where('invoices.type_id',$type_id)
-        ->whereIn('invoices.stage_id', [InvoiceStage::getForPaid(), InvoiceStage::getForByInstallment()])
-        ->select('payments.amount', 'invoices.created_at');
+        });
+
+        $query->when((!empty($type_id)), function ($q) use($type_id) {
+            return $q->where('invoices.type_id', '=', $type_id);
+        });
+
+        $query->whereIn('invoices.stage_id', [InvoiceStage::getForPaid(), InvoiceStage::getForByInstallment()])
+              ->select('payments.amount', 'invoices.created_at');
 
               
         $query->when((!empty($fromDate)) && (!empty($toDate)) , function ($q) use($fromDate,$toDate) {
