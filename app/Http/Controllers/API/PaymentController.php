@@ -93,7 +93,7 @@ class PaymentController extends ResponseController
         $amount = $request->amount;
         $payment_date = $request->payment_date ?  $request->payment_date : Carbon::now();
         $invoice_id = $request->invoice_id;
-        $method_id = $request->method_id ? $request->method_id : PaymentMethod::getMethodMoney();
+        $method_id = $request->method_id ? $request->method_id : PaymentMethod::getForMoney();
         
         /**
          * Validation section
@@ -175,11 +175,11 @@ class PaymentController extends ResponseController
         ]);
 
         $validator->sometimes('money', 'required|gt:0|regex:/^[0-9]{1,10}+(?:\.[0-9]{1,2})?$/', function ($input) {
-            return $input->method_id == PaymentMethod::getMethodMoney();
+            return $input->method_id == PaymentMethod::getForMoney();
         });
 
         $validator->sometimes('transaction_code', 'required|min:8', function ($input) {
-            return $input->method_id == PaymentMethod::getMethodCard() && !empty($input->transaction_code);
+            return $input->method_id == PaymentMethod::getForCard() && !empty($input->transaction_code);
         });
 
         if ($validator->fails()) {
@@ -191,10 +191,10 @@ class PaymentController extends ResponseController
         $money = 0.0;
         $transaction_code = '';
         switch ($method_id) {
-            case PaymentMethod::getMethodMoney():
+            case PaymentMethod::getForMoney():
                 $money = $request->money;
                 break;
-            case PaymentMethod::getMethodCard():
+            case PaymentMethod::getForCard():
                 $transaction_code = $request->transaction_code ?? "";
                 break;
             default:
@@ -214,7 +214,7 @@ class PaymentController extends ResponseController
         }
         
         //validate money only if the payment is in cash
-        if($method_id == PaymentMethod::getMethodMoney()){
+        if($method_id == PaymentMethod::getForMoney()){
             if($money < $payment->amount){
                 return $this->sendError('The money is less than the amount to pay.');
             }

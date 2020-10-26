@@ -21,12 +21,12 @@ class ItemType extends Model
      * Getter (statics)
      */
 
-    static function getTypeProduct()
+    static function getForProduct()
     {
         return 1;
     }
 
-    static function getTypeService()
+    static function getForService()
     {
         return 2;
     }

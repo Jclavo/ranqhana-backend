@@ -98,52 +98,35 @@ class Invoice extends BaseModel
         // return (($this->subtotal + $this->taxes) - $this->discount);
         return ($this->subtotal - $this->discount);
     }
-
-    //Getter (statics)
-
-    //PAYMENT TYPE
-
-    static function getPaymentTypeDebit(){
-        return 1;
-    }
-
-    static function getPaymentTypeCredit(){
-        return 2;
-    }
-
     
     //Getter 
     public function getType(){
         return $this->type_id;
     }
 
-
     //Setter and Getters
-    public function setStagePaid() // stage = 'P';
+    public function setStagePaid()
     {
         $this->stage_id = InvoiceStage::getForPaid();
     }
 
-    public function setStageAnulled() // stage = 'A';
+    public function setStageAnulled() 
     {
         $this->stage_id = InvoiceStage::getForAnulled();
     }
 
-    public function setStageDraft() // stage = 'D';
+    public function setStageDraft()
     {
         $this->stage_id = InvoiceStage::getForDraft();
     }
 
-    public function setStageByInstallment() // stage = 'I';
+    public function setStageByInstallment() 
     {
         $this->stage_id = InvoiceStage::getForByInstallment();
     }
 
-    public function setStageStockUpdated() // stage = 'U';
+    public function setStageStockUpdated()
     {
         $this->stage_id = InvoiceStage::getForStockUpdated();
     }
-
-
- 
 }

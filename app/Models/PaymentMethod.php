@@ -37,12 +37,12 @@ class PaymentMethod extends BaseModel
      * Getter (statics)
      */
 
-    static function getMethodMoney()
+    static function getForMoney()
     {
         return 1;
     }
 
-    static function getMethodCard()
+    static function getForCard()
     {
         return 2;
     }

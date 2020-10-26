@@ -33,7 +33,7 @@ class InvoiceStage extends BaseModel
     }
 
     //Getter (statics)
-    // STAGES
+
     static function getForPaid()
     {
         return 1;

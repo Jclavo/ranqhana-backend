@@ -25,9 +25,7 @@ class InvoiceType extends BaseModel
                     ->where('locale',App::getLocale());
     }
 
-        //Getter (statics)
-
-    //TYPES
+    //Getter (statics)
 
     static function getForSell(){
         return 1;
