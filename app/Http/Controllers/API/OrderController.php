@@ -152,7 +152,7 @@ class OrderController extends ResponseController
             });
         });
 
-        $query->with('invoice.stage');
+        $query->with(['invoice.stage','invoice.type']);
 
         $query->when((!empty($stage_id)) , function ($q) use($stage_id) {
             return $q->where('orders.stage_id', '=', $stage_id);
