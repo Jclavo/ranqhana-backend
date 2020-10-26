@@ -237,7 +237,7 @@ class InvoiceController extends ResponseController
 
         $query->select('invoices.*');
         $query->whereHas('details');
-        $query->with('stage');
+        $query->with(['stage','type']);
         $query->whereNotIn('stage_id', [InvoiceStage::getForDraft()]);
 
         $query->when((!empty($type_id)), function ($q) use($type_id) {
