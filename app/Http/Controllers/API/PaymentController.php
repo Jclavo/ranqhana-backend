@@ -344,7 +344,7 @@ class PaymentController extends ResponseController
 
         //validate depends on Stage
         switch ($payment->stage_id) {
-            case PaymentStage::getForCanceled():
+            case PaymentStage::getForAnnulled():
                 return $this->sendError($this->languageService->getSystemMessage('stage.already-canceled'));
                 break;
             case PaymentStage::getForPaid():
