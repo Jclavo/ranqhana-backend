@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 use App\Models\ItemType;
 use App\Models\Image;
+use App\Models\StockType;
 
 use App\Scopes\Belongs2CompanyScope;
 
@@ -58,7 +59,7 @@ class Item extends BaseModel
      */
     public function stock_types()
     {
-        return $this->morphToMany('App\Models\StockType', 'stock_typeable');
+        return $this->morphToMany(StockType::class, 'stock_typeable');
     }
 
     /**
