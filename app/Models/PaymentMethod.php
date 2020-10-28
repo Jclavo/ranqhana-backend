@@ -16,7 +16,7 @@ class PaymentMethod extends BaseModel
      */
 
     protected $fillable = [
-        'name'
+        'code', 'name'
     ];
 
     /**

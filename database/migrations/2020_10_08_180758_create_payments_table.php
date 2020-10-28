@@ -27,7 +27,7 @@ class CreatePaymentsTable extends Migration
 
             //FK Payment Method
             $table->unsignedBigInteger('method_id');
-            $table->foreign('method_id')->references('id')->on('payment_methods');
+            $table->foreign('method_id')->references('code')->on('payment_methods');
 
             //FK Payment Stage
             $table->unsignedBigInteger('stage_id');
