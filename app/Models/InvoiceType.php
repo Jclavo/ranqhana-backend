@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\App;
 class InvoiceType extends BaseModel
 {
     protected $fillable = [
-        'code', 'description'
+        'code', 'name'
     ];
 
     /**

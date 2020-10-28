@@ -8,6 +8,6 @@ use Faker\Generator as Faker;
 $factory->define(InvoiceType::class, function (Faker $faker) {
     return [
         'code' => strtoupper($faker->unique()->lexify('?')),
-        'description' => $faker->name,
+        'name' => $faker->name,
     ];
 });

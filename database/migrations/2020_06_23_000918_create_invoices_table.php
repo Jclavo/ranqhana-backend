@@ -23,7 +23,7 @@ class CreateInvoicesTable extends Migration
 
             //FK for Invoice Types table
             $table->unsignedBigInteger('type_id')->nullable()->before('created_at');
-            $table->foreign('type_id')->references('id')->on('invoice_types');
+            $table->foreign('type_id')->references('code')->on('invoice_types');
 
             //FK for Invoice Stages table
             $table->unsignedBigInteger('stage_id')->nullable()->before('created_at');

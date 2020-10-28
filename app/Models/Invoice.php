@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\BaseModel;
 use App\Models\Payment;
 use App\Models\InvoiceStage;
+use App\Models\InvoiceType;
 use App\Models\Order;
 
 use App\Scopes\Belongs2CompanyScope;
@@ -57,7 +58,7 @@ class Invoice extends BaseModel
      */
     public function type()
     {
-        return $this->belongsTo('App\Models\InvoiceType');
+        return $this->belongsTo(InvoiceType::class,'type_id','code');
     }
 
     /**

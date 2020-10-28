@@ -15,8 +15,8 @@ class CreateInvoiceTypesTable extends Migration
     {
         Schema::create('invoice_types', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->char('code',1);
-            $table->string('description',50);
+            $table->unsignedBigInteger('code')->unique();;
+            $table->string('name',45);
             $table->timestamps();
         });
     }
