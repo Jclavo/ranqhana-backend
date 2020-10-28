@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\BaseModel;
 use App\Models\Payment;
+use App\Models\PaymentType;
 use App\Models\InvoiceStage;
 use App\Models\InvoiceType;
 use App\Models\Order;
@@ -67,6 +68,14 @@ class Invoice extends BaseModel
     public function stage()
     {
         return $this->belongsTo(InvoiceStage::class,'stage_id','code');
+    }
+
+    /**
+     * Get the "payment" associated with the "Invoice".
+     */
+    public function payment()
+    {
+        return $this->belongsTo(PaymentType::class,'payment_type_id','code');
     }
 
     /**

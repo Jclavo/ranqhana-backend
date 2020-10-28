@@ -16,7 +16,7 @@ class AddPaymentTypesToInvoicesTable extends Migration
         Schema::table('invoices', function (Blueprint $table) {
              //FK for Invoice Types table
              $table->unsignedBigInteger('payment_type_id')->nullable();
-             $table->foreign('payment_type_id')->references('id')->on('payment_types');
+             $table->foreign('payment_type_id')->references('code')->on('payment_types');
         });
     }
 

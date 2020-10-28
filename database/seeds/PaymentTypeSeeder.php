@@ -12,7 +12,7 @@ class PaymentTypeSeeder extends Seeder
      */
     public function run()
     {
-        factory(PaymentType::class)->create(['name' => 'Debit']);
-        factory(PaymentType::class)->create(['name' => 'Credit']);
+        PaymentType::updateOrCreate(['code' => 1],['name' => 'Debit']); 
+        PaymentType::updateOrCreate(['code' => 2],['name' => 'Credit']); 
     }
 }
