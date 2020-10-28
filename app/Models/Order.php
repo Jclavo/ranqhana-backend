@@ -68,7 +68,7 @@ class Order extends BaseModel
      */
     public function stage()
     {
-        return $this->belongsTo(OrderStage::class);
+        return $this->belongsTo(OrderStage::class,'stage_id','code');
     }
 
     /**
@@ -79,7 +79,7 @@ class Order extends BaseModel
         return $this->belongsTo(Invoice::class);
     }
 
-    //Setter and 
+    //Setters
     public function setStageCancel()  
     {
         $this->stage_id = OrderStage::getForCancel();

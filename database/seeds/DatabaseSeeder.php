@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ItemTypeSeeder::class,
             StockTypeSeeder::class,
+            OrderStageSeeder::class,
         ]);
     }
 }

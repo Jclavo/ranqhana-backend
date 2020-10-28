@@ -15,6 +15,7 @@ class CreateOrderStagesTable extends Migration
     {
         Schema::create('order_stages', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->unsignedBigInteger('code')->unique();
             $table->string('name',45);
             $table->timestamps();
         });

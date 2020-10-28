@@ -22,7 +22,7 @@ class CreateOrdersTable extends Migration
 
             //FK: Order Stages table
             $table->unsignedBigInteger('stage_id');
-            $table->foreign('stage_id')->references('id')->on('order_stages');
+            $table->foreign('stage_id')->references('code')->on('order_stages');
 
             $table->timestamps();
         });

@@ -12,15 +12,15 @@ class OrderStageSeeder extends Seeder
      */
     public function run()
     {
-        factory(OrderStage::class)->create(['name' => 'New']);
-        factory(OrderStage::class)->create(['name' => 'Requested']);
-        factory(OrderStage::class)->create(['name' => 'Accepted']);
-        factory(OrderStage::class)->create(['name' => 'Preparing']);
-        factory(OrderStage::class)->create(['name' => 'Wrapped']);
-        factory(OrderStage::class)->create(['name' => 'Ready']);
-        factory(OrderStage::class)->create(['name' => 'Shipped']);
-        factory(OrderStage::class)->create(['name' => 'Delivered']);
-        factory(OrderStage::class)->create(['name' => 'Canceled']);
-        factory(OrderStage::class)->create(['name' => 'Automatic']);
+        OrderStage::updateOrCreate(['code' => 1],['name' => 'New']); 
+        OrderStage::updateOrCreate(['code' => 2],['name' => 'Requested']); 
+        OrderStage::updateOrCreate(['code' => 3],['name' => 'Accepted']); 
+        OrderStage::updateOrCreate(['code' => 4],['name' => 'Preparing']); 
+        OrderStage::updateOrCreate(['code' => 5],['name' => 'Wrapped']); 
+        OrderStage::updateOrCreate(['code' => 6],['name' => 'Ready']); 
+        OrderStage::updateOrCreate(['code' => 7],['name' => 'Shipped']); 
+        OrderStage::updateOrCreate(['code' => 8],['name' => 'Delivered']); 
+        OrderStage::updateOrCreate(['code' => 9],['name' => 'Canceled']); 
+        OrderStage::updateOrCreate(['code' => 10],['name' => 'Automatic']); 
     }
 }
