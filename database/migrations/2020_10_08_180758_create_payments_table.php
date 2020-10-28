@@ -31,7 +31,7 @@ class CreatePaymentsTable extends Migration
 
             //FK Payment Stage
             $table->unsignedBigInteger('stage_id');
-            $table->foreign('stage_id')->references('id')->on('payment_stages');
+            $table->foreign('stage_id')->references('code')->on('payment_stages');
 
             $table->timestamps();
         });

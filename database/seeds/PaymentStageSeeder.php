@@ -12,10 +12,9 @@ class PaymentStageSeeder extends Seeder
      */
     public function run()
     {
-        // factory(PaymentStage::class)->create(['name' => 'Initial']);
-        factory(PaymentStage::class)->create(['name' => 'Waiting']);
-        factory(PaymentStage::class)->create(['name' => 'Delayed']);
-        factory(PaymentStage::class)->create(['name' => 'Paid']);
-        factory(PaymentStage::class)->create(['name' => 'Anulled']);
+        PaymentStage::updateOrCreate(['code' => 1],['name' => 'Waiting']); 
+        PaymentStage::updateOrCreate(['code' => 2],['name' => 'Delayed']); 
+        PaymentStage::updateOrCreate(['code' => 3],['name' => 'Paid']); 
+        PaymentStage::updateOrCreate(['code' => 4],['name' => 'Annulled']); 
     }
 }

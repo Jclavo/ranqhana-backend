@@ -16,7 +16,7 @@ class PaymentStage extends BaseModel
      */
 
     protected $fillable = [
-        'name'
+        'code', 'name'
     ];
 
      /**

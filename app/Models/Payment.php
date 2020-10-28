@@ -53,7 +53,7 @@ class Payment extends Model
      */
     public function stage()
     {
-        return $this->belongsTo(PaymentStage::class);
+        return $this->belongsTo(PaymentStage::class,'stage_id','code');
     }
 
     /**

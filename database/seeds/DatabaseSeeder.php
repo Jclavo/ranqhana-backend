@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             OrderStageSeeder::class,
             InvoiceTypeSeeder::class,
             InvoiceStageSeeder::class,
+            PaymentStageSeeder::class,
         ]);
     }
 }

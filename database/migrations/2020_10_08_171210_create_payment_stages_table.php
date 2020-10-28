@@ -15,6 +15,7 @@ class CreatePaymentStagesTable extends Migration
     {
         Schema::create('payment_stages', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->unsignedBigInteger('code')->unique();
             $table->string('name',45);
             $table->timestamps();
         });
