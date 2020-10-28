@@ -15,6 +15,7 @@ class CreateItemTypesTable extends Migration
     {
         Schema::create('item_types', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->unsignedBigInteger('code')->unique();
             $table->string('name',45);
             $table->timestamps();
         });

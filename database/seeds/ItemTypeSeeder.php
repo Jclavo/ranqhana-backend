@@ -12,7 +12,7 @@ class ItemTypeSeeder extends Seeder
      */
     public function run()
     {
-        factory(ItemType::class)->create(['name' => 'Product']);
-        factory(ItemType::class)->create(['name' => 'Service']);
+        ItemType::updateOrCreate(['code' => 1],['name' => 'Product']); 
+        ItemType::updateOrCreate(['code' => 2],['name' => 'Service']); 
     }
 }
