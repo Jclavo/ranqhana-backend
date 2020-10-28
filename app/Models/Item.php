@@ -70,11 +70,11 @@ class Item extends BaseModel
     }
 
     /**
-     * Get the "Type" associated with the "Invoice".
+     * Get the "Type" associated with the "Item".
      */
     public function type()
     {
-        return $this->belongsTo(ItemType::class);
+        return $this->belongsTo(ItemType::class,'type_id','code');
     }
 
     /**
