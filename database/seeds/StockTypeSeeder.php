@@ -12,8 +12,8 @@ class StockTypeSeeder extends Seeder
      */
     public function run()
     {
-        factory(StockType::class)->create(['name' => 'Sale']);
-        factory(StockType::class)->create(['name' => 'Purchase']);
-        factory(StockType::class)->create(['name' => 'Production']);
+        StockType::updateOrCreate(['code' => 1],['name' => 'Sale']); 
+        StockType::updateOrCreate(['code' => 2],['name' => 'Purchase']); 
+        StockType::updateOrCreate(['code' => 3],['name' => 'Production']); 
     }
 }

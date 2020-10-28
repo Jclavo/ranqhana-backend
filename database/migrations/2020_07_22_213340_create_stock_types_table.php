@@ -15,6 +15,7 @@ class CreateStockTypesTable extends Migration
     {
         Schema::create('stock_types', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->unsignedBigInteger('code')->unique();
             $table->string('name',45);
             $table->timestamps();
         });

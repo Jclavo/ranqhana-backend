@@ -17,7 +17,7 @@ class CreateStockTypeablesTable extends Migration
             $table->unsignedBigInteger('stock_type_id');
 
             $table->foreign('stock_type_id')
-            ->references('id')
+            ->references('code') 
             ->on('stock_types')
             ->onDelete('cascade');
 
