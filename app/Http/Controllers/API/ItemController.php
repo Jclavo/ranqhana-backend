@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Models\Item;
+use App\Models\ItemType;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\ResponseController;
@@ -75,10 +76,16 @@ class ItemController extends ResponseController
     {
         
         $validator = Validator::make($request->all(), [
-            'pageSize' => 'numeric|gt:0',
-            // 'stock_type_id' => 'nullable|exists:stock_types,id',
-            // 'type_id' => 'nullable|exists:item_types,id'
+            'pageSize' => 'numeric|gt:0'
         ]);
+
+        $validator->sometimes('stock_type_id', 'required|exists:stock_types,id', function ($input) {
+            return $input->stock_type_id > 0;
+        });
+
+        $validator->sometimes('type_id', 'required|exists:item_types,id', function ($input) {
+            return $input->type_id > 0;
+        });
 
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
@@ -163,7 +170,7 @@ class ItemController extends ResponseController
         $request->stocked ? $item->stocked = $request->stocked : $item->stocked = false; 
         $item->unit_id = $request->unit_id;
         $item->user_id = Auth::user()->getLocalUserID();
-        $item->type_id = Item::getTypeProduct();
+        $item->type_id = ItemType::getForProduct();
         $item->save();
 
         //Add price
@@ -196,7 +203,7 @@ class ItemController extends ResponseController
             return $this->sendError($validator->errors()->first());
         }
        
-        $item = Item::where('type_id', Item::getTypeProduct())->findOrFail($id); 
+        $item = Item::where('type_id', ItemType::getForProduct())->findOrFail($id); 
         
         $item->name = $request->name;
         $item->description = $request->description;
@@ -253,7 +260,7 @@ class ItemController extends ResponseController
         $service->price = $request->price;
         $service->stocked = true;
         $service->user_id = Auth::user()->getLocalUserID();
-        $service->type_id = Item::getTypeService();
+        $service->type_id = ItemType::getForService();
         $service->save();
 
         //Add price
@@ -286,7 +293,7 @@ class ItemController extends ResponseController
             return $this->sendError($validator->errors()->first());
         }
 
-        $service = Item::where('type_id', Item::getTypeService())->findOrFail($id); 
+        $service = Item::where('type_id', ItemType::getForService())->findOrFail($id); 
         
         $service->name = $request->name;
         $service->description = $request->description;
