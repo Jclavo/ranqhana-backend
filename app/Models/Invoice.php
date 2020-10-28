@@ -66,7 +66,7 @@ class Invoice extends BaseModel
      */
     public function stage()
     {
-        return $this->belongsTo('App\Models\InvoiceStage');
+        return $this->belongsTo(InvoiceStage::class,'stage_id','code');
     }
 
     /**
@@ -113,7 +113,7 @@ class Invoice extends BaseModel
 
     public function setStageAnulled() 
     {
-        $this->stage_id = InvoiceStage::getForAnulled();
+        $this->stage_id = InvoiceStage::getForAnnulled();
     }
 
     public function setStageDraft()

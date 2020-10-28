@@ -7,7 +7,7 @@ use Faker\Generator as Faker;
 
 $factory->define(InvoiceStage::class, function (Faker $faker) {
     return [
-        'code' => $faker->name,
-        'description' => $faker->text(),
+        'code' => strtoupper($faker->unique()->lexify('?')),
+        'name' => $faker->name,
     ];
 });

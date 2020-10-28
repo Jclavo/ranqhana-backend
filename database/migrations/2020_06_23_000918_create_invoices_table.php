@@ -27,7 +27,7 @@ class CreateInvoicesTable extends Migration
 
             //FK for Invoice Stages table
             $table->unsignedBigInteger('stage_id')->nullable()->before('created_at');
-            $table->foreign('stage_id')->references('id')->on('invoice_stages');
+            $table->foreign('stage_id')->references('code')->on('invoice_stages');
 
             //FK for RANQHANA_USERS table
             $table->unsignedBigInteger('user_id')->nullable();

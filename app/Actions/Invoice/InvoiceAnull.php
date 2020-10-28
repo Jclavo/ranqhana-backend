@@ -32,7 +32,7 @@ class InvoiceAnull
     public function execute()
     {
         //if the invoice is already anulled
-        if($this->invoice->stage_id == InvoiceStage::getForAnulled()){
+        if($this->invoice->stage_id == InvoiceStage::getForAnnulled()){
             $this->failMessage = $this->languageService->getSystemMessage('invoice.already-anulled');
             return false;
         } 

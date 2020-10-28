@@ -16,7 +16,7 @@ class InvoiceStage extends BaseModel
      */
     
     protected $fillable = [
-        'code', 'description'
+        'code', 'name'
     ];
 
      /**
@@ -39,7 +39,7 @@ class InvoiceStage extends BaseModel
         return 1;
     }
 
-    static function getForAnulled()
+    static function getForAnnulled()
     {
         return 2;
     }
