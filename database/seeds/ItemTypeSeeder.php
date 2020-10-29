@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\Models\ItemType;
+use App\Utils\TranslationUtils;
 
 class ItemTypeSeeder extends Seeder
 {
@@ -12,7 +13,19 @@ class ItemTypeSeeder extends Seeder
      */
     public function run()
     {
-        ItemType::updateOrCreate(['code' => 1],['name' => 'Product']); 
-        ItemType::updateOrCreate(['code' => 2],['name' => 'Service']); 
+         $types = [
+            (object) array('code' => 1, 'name' => 'Product',
+                            'translations' => [
+                                    (object) array('value' => 'Producto', 'locale' => 'es'),
+                                    (object) array('value' => 'Produto', 'locale' => 'pt')]
+                            ),
+            (object) array('code' => 2, 'name' => 'Service',
+            'translations' => [
+                    (object) array('value' => 'Servicio', 'locale' => 'es'),
+                    (object) array('value' => 'Serviço', 'locale' => 'pt')]
+            ),
+        ];
+
+        TranslationUtils::customUpdateOrCreate($types,ItemType::class);
     }
 }

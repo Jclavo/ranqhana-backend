@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
+            LocaleSeeder::class,
             ItemTypeSeeder::class,
             StockTypeSeeder::class,
             OrderStageSeeder::class,
@@ -27,7 +28,6 @@ class DatabaseSeeder extends Seeder
             PaymentTypeSeeder::class,
             PaymentMethodSeeder::class,
             UnitTableSeeder::class,
-            LocaleSeeder::class,
         ]);
     }
 }

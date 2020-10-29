@@ -13,4 +13,5 @@ class TranslationSeeder extends Seeder
     {
         //
     }
+
 }

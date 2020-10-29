@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\Models\InvoiceType;
+use App\Utils\TranslationUtils;
 
 class InvoiceTypeSeeder extends Seeder
 {
@@ -12,7 +13,22 @@ class InvoiceTypeSeeder extends Seeder
      */
     public function run()
     {
-        InvoiceType::updateOrCreate(['code' => 1],['name' => 'Sell']);
-        InvoiceType::updateOrCreate(['code' => 2],['name' => 'Purcharse']); 
+        $types = [
+            (object) array('code' => 1, 'name' => 'Sell Invoice',
+                            'translations' => [
+                                    (object) array('value' => 'Factura de venta', 'locale' => 'es'),
+                                    (object) array('value' => 'Fatura de venda', 'locale' => 'pt')]
+                            ),
+            (object) array('code' => 2, 'name' => 'Purcharse Invoice',
+                                    'translations' => [
+                                    (object) array('value' => 'Factura de compra', 'locale' => 'es'),
+                                    (object) array('value' => 'Fatura de compra', 'locale' => 'pt')]
+                            ),
+        ];
+
+        TranslationUtils::customUpdateOrCreate($types,InvoiceType::class);
+                       
     }
+
+
 }
