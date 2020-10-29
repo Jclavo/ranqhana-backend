@@ -12,8 +12,8 @@ class LocaleSeeder extends Seeder
      */
     public function run()
     {
-        factory(Locale::class)->create(['code' => 'en']);
-        factory(Locale::class)->create(['code' => 'pt']);
-        factory(Locale::class)->create(['code' => 'es']);
+        Locale::updateOrCreate(['code' => 'en']); 
+        Locale::updateOrCreate(['code' => 'pt']); 
+        Locale::updateOrCreate(['code' => 'es']); 
     }
 }

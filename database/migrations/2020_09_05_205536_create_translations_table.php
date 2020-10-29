@@ -18,8 +18,9 @@ class CreateTranslationsTable extends Migration
             
             $table->string('key');
             $table->string('value');
-            $table->string('locale')->index();
-            // $table->string('locale',5)->index();
+
+            $table->string('locale',5);
+            $table->foreign('locale')->references('code')->on('locales');
 
             $table->unsignedBigInteger('translationable_id')->index();
             $table->string('translationable_type')->index();

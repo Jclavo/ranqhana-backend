@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             PaymentTypeSeeder::class,
             PaymentMethodSeeder::class,
             UnitTableSeeder::class,
+            LocaleSeeder::class,
         ]);
     }
 }
