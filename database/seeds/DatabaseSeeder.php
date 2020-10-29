@@ -12,14 +12,8 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // $this->call([
-        //     // InvoiceStagesTableSeeder::class,
-        //     StockTypeSeeder::class,
-        //     ItemTypeSeeder::class,
-        //     UnitsTableSeeder::class,
         //     RanqhanaUsersSeeder::class,
         //     ItemsTableSeeder::class,
-        //     InvoiceTypesTableSeeder::class,
-        //     InvoiceStagesTableSeeder::class,
         //     LocaleSeeder::class,
         // ]);
 
@@ -32,6 +26,7 @@ class DatabaseSeeder extends Seeder
             PaymentStageSeeder::class,
             PaymentTypeSeeder::class,
             PaymentMethodSeeder::class,
+            UnitTableSeeder::class,
         ]);
     }
 }
