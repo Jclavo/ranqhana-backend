@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Models\ItemType;
 use App\Models\Image;
 use App\Models\StockType;
+use App\Models\Unit;
 
 use App\Scopes\Belongs2CompanyScope;
 
@@ -51,7 +52,7 @@ class Item extends BaseModel
      */
     public function unit()
     {
-        return $this->belongsTo('App\Models\Unit');
+        return $this->belongsTo(Unit::class, 'unit_id','code');
     }
 
      /**

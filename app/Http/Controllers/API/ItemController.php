@@ -100,9 +100,9 @@ class ItemController extends ResponseController
         $type_id       = $request->type_id;
             
         $query = Item::query();
-        $query->select('items.*', 'units.code as unit', 'units.fractioned')
+        $query->select('items.*', 'units.abbreviation as unit', 'units.fractioned')
               ->leftJoin('units', function ($join){
-                    $join->on('units.id', '=', 'items.unit_id');
+                    $join->on('units.code', '=', 'items.unit_id');
                 });
 
         $query->where(function($q) use ($searchValue){
@@ -128,6 +128,7 @@ class ItemController extends ResponseController
                 
         //get stock_types
         $query->with(['stock_types','type']);
+        // $query->with(['stock_types','type','unit']);
 
         
         $results = $query->orderBy($sortColumn, $sortDirection)
