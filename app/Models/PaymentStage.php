@@ -28,8 +28,8 @@ class PaymentStage extends BaseModel
      */
     public function translations()
     {
-        return $this->morphMany(Translation::class, 'translationable')
-                    ->where('locale',App::getLocale());
+         return $this->morphMany(Translation::class, 'translationable', null,null,'code')
+                     ->where('locale',App::getLocale());
     }
 
 
