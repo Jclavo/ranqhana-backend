@@ -3,7 +3,7 @@
 use Illuminate\Database\Seeder;
 use App\Models\RanqhanaUser;
 
-class RanqhanaUsersSeeder extends Seeder
+class RanqhanaUserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
