@@ -22,11 +22,11 @@ class CreateItemsTable extends Migration
             $table->boolean('stocked')->default(true);
 
             //FK for UNITS table
-            $table->unsignedBigInteger('unit_id')->nullable(true);
-            $table->foreign('unit_id')->references('id')->on('units');
+            $table->unsignedBigInteger('unit_id');
+            $table->foreign('unit_id')->references('code')->on('units');
 
             //FK for RANQHANA_USERS table
-            $table->unsignedBigInteger('user_id')->nullable(true);
+            $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('ranqhana_users');
 
             $table->softDeletes();
