@@ -7,15 +7,15 @@ use App\Models\Translation;
 class TranslationUtils
 {
 
-    // static function updateOrCreateTranslation($id, $value, $locale, $type, $key = null ){
+    static function updateOrCreateTranslation($id, $value, $locale, $type, $key = null ){
 
-    //     is_null($key) ? $key = 'name' : null;
+        is_null($key) ? $key = 'name' : null;
 
-    //     $newTranslation = Translation::updateOrCreate(
-    //         ['key' => $key, 'locale' => $locale, 'translationable_id' => $id,'translationable_type' => $type],
-    //         [ 'value' => $value]);
+        $newTranslation = Translation::updateOrCreate(
+            ['key' => $key, 'locale' => $locale, 'translationable_id' => $id,'translationable_type' => $type],
+            [ 'value' => $value]);
 
-    // }
+    }
 
     static function customUpdateOrCreate($values, $model){
 
