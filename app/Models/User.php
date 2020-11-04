@@ -137,13 +137,13 @@ class User extends Authenticatable
     /**
      * Get ID from Local User table
      */
-    public function getLocalUserID(){
-        $RanqhanaUserResult = RanqhanaUser::
-                                where('external_user_id','=',$this->id)
-                                ->where('company_project_id','=',$this->company_project_id)
-                                ->pluck('id');
+    // public function getLocalUserID(){
+    //     $RanqhanaUserResult = RanqhanaUser::
+    //                             where('external_user_id','=',$this->id)
+    //                             ->where('company_project_id','=',$this->company_project_id)
+    //                             ->pluck('id');
 
-        if($RanqhanaUserResult == null) return null;
-        return $RanqhanaUserResult[0];
-    }
+    //     if($RanqhanaUserResult == null) return null;
+    //     return $RanqhanaUserResult[0];
+    // }
 }
