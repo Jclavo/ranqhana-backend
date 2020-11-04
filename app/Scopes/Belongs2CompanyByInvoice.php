@@ -26,7 +26,7 @@ class Belongs2CompanyByInvoice implements Scope
         // });
         $builder->whereIn('invoice_id', function($query){
                     $query->select('invoices.id')
-                          ->join('ranqhana_users', 'user_id', '=', 'ranqhana_users.id')
+                          ->join('ranqhana_users', 'user_id', '=', 'ranqhana_users.external_user_id')
                           ->from('invoices')
                           ->where('ranqhana_users.company_project_id', '=', Auth::user()->company_project_id);
         });

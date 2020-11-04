@@ -20,7 +20,7 @@ class Belongs2CompanyScope implements Scope
     {
         //$builder->where('age', '>', 200);
         $builder->whereIn('user_id', function($query){
-            $query->select('ranqhana_users.id')
+            $query->select('ranqhana_users.external_user_id')
                 ->from('ranqhana_users')
                 ->where('ranqhana_users.company_project_id', '=', Auth::user()->company_project_id);
         });
