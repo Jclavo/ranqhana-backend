@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\App;
 class LanguageService{
 
     const SYSTEM_ID = '';
-    const SYSTEM_MODEL_ID = 15;
+    const SYSTEM_MODEL_ID = 1;
 
     const URL = 'getTranslation';
     private $client = null;
