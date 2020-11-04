@@ -31,7 +31,7 @@ class CreateInvoicesTable extends Migration
 
             //FK for RANQHANA_USERS table
             $table->unsignedBigInteger('user_id')->nullable();
-            $table->foreign('user_id')->references('id')->on('ranqhana_users');
+            $table->foreign('user_id')->references('external_user_id')->on('ranqhana_users');
 
             $table->softDeletes();
             $table->timestamps();
