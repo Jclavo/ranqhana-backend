@@ -170,7 +170,7 @@ class ItemController extends ResponseController
         $item->price = $request->price;
         $request->stocked ? $item->stocked = $request->stocked : $item->stocked = false; 
         $item->unit_id = $request->unit_id;
-        $item->user_id = Auth::user()->getLocalUserID();
+        $item->user_id = Auth::user()->id;
         $item->type_id = ItemType::getForProduct();
         $item->save();
 
@@ -260,7 +260,7 @@ class ItemController extends ResponseController
         $service->description = $request->description;
         $service->price = $request->price;
         $service->stocked = true;
-        $service->user_id = Auth::user()->getLocalUserID();
+        $service->user_id = Auth::user()->id;
         $service->type_id = ItemType::getForService();
         $service->save();
 
@@ -299,7 +299,7 @@ class ItemController extends ResponseController
         $service->name = $request->name;
         $service->description = $request->description;
         $service->price = $request->price;
-        $service->user_id = Auth::user()->getLocalUserID();
+        $service->user_id = Auth::user()->id;
         $service->save();
 
         //Add price

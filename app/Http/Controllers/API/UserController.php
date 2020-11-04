@@ -260,7 +260,7 @@ class UserController extends ResponseController{
     //         ['external_user_id' => Auth::user()->id, 'company_project_id' => Auth::user()->company_project_id]
     //     );
 
-    //     Auth::user()->local_user_id = Auth::user()->getLocalUserID();
+    //     Auth::user()->local_user_id = Auth::user()->id;
 
     //     return $this->sendResponse(Auth::user()->toArray(), $this->languageService->getSystemMessage('crud.pagination'));  
     // }

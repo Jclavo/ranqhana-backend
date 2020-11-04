@@ -80,7 +80,7 @@ class InvoiceController extends ResponseController
 
         $invoice = new Invoice();
         $invoice->type_id  = $request->type_id;
-        $invoice->user_id = Auth::user()->getLocalUserID();
+        $invoice->user_id = Auth::user()->id;
         $invoice->stage_id = InvoiceStage::getForDraft();
         //Initial values
         $invoice->subtotal = 0;
@@ -123,7 +123,7 @@ class InvoiceController extends ResponseController
 
     //     //Set FKs
     //     $invoice->type_id  = $request->type_id;
-    //     $invoice->user_id = Auth::user()->getLocalUserID();
+    //     $invoice->user_id = Auth::user()->id;
     //     $invoice->stage_id = InvoiceStage::getForDraft();
         
     //     $invoice->save();
