@@ -52,53 +52,53 @@ class User extends Authenticatable
      * @param  \DateTimeInterface  $date
      * @return string
      */
-    protected function serializeDate($date)
-    {
-        $carbonInstance = \Carbon\Carbon::instance($date);
+    // protected function serializeDate($date)
+    // {
+    //     $carbonInstance = \Carbon\Carbon::instance($date);
 
-        return $carbonInstance->toISOString();
-    }
+    //     return $carbonInstance->toISOString();
+    // }
 
 
     /**
      * Get the company_project that owns the user.
      */
-    public function company_project(){
-        return User::select('company_project.*')
-                     ->join('company_project','users.company_project_id','=','company_project.id')
-                     ->where('users.company_project_id','=',$this->company_project_id)
-                     ->distinct()
-                     ->first();
-    }
+    // public function company_project(){
+    //     return User::select('company_project.*')
+    //                  ->join('company_project','users.company_project_id','=','company_project.id')
+    //                  ->where('users.company_project_id','=',$this->company_project_id)
+    //                  ->distinct()
+    //                  ->first();
+    // }
 
     /**
      * Get the company thay owns the user.
      */
-    public function company(){
-        return User::select('companies.*')
-                    ->join('company_project', function ($join){
-                        $join->on('users.company_project_id','=','company_project.id')
-                              ->where('users.company_project_id','=',$this->company_project_id);
-                    })
-                    ->join('companies','company_project.company_id','=','companies.id')
-                    ->distinct()
-                    ->first();
-    }
+    // public function company(){
+    //     return User::select('companies.*')
+    //                 ->join('company_project', function ($join){
+    //                     $join->on('users.company_project_id','=','company_project.id')
+    //                           ->where('users.company_project_id','=',$this->company_project_id);
+    //                 })
+    //                 ->join('companies','company_project.company_id','=','companies.id')
+    //                 ->distinct()
+    //                 ->first();
+    // }
 
 
     /**
      * Get the project thay owns the user.
      */
-    public function project(){
-        return User::select('projects.*')
-                    ->join('company_project', function ($join){
-                        $join->on('users.company_project_id','=','company_project.id')
-                              ->where('users.company_project_id','=',$this->company_project_id);
-                    })
-                    ->join('projects','company_project.project_id','=','projects.id')
-                    ->distinct()
-                    ->first();
-    }
+    // public function project(){
+    //     return User::select('projects.*')
+    //                 ->join('company_project', function ($join){
+    //                     $join->on('users.company_project_id','=','company_project.id')
+    //                           ->where('users.company_project_id','=',$this->company_project_id);
+    //                 })
+    //                 ->join('projects','company_project.project_id','=','projects.id')
+    //                 ->distinct()
+    //                 ->first();
+    // }
 
 
     /**
@@ -111,7 +111,7 @@ class User extends Authenticatable
                               ->where('users.company_project_id','=',$this->company_project_id);
                     })
                     ->join('companies','company_project.company_id','=','companies.id')
-                    ->join('countries','companies.country_id','=','countries.id')
+                    ->join('countries','companies.country_code','=','countries.code')
                     ->distinct()
                     ->first();
     }
