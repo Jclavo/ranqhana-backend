@@ -51,6 +51,9 @@ Route::middleware(['auth:api'])->group(function () {
     // Route::resource('users', 'API\UserController');
     // Route::post('users/pagination', 'API\UserController@pagination');
 
+    //Ranqhana User 
+    Route::resource('ranqhana-users', 'API\RanqhanaUserController');
+
     //Stores
     Route::resource('stores', 'API\StoreController');
     Route::post('stores/pagination', 'API\StoreController@pagination');
