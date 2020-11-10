@@ -22,10 +22,10 @@ class UnitController extends ResponseController
 
     function __construct()
     {
-        $this->middleware('permission_in_role:units/read'); 
-        $this->middleware('permission_in_role:units/create', ['only' => ['store']]);
-        $this->middleware('permission_in_role:units/update', ['only' => ['update']]);
-        $this->middleware('permission_in_role:units/delete', ['only' => ['destroy']]);
+        // $this->middleware('permission_in_role:units/read'); 
+        // $this->middleware('permission_in_role:units/create', ['only' => ['store']]);
+        // $this->middleware('permission_in_role:units/update', ['only' => ['update']]);
+        // $this->middleware('permission_in_role:units/delete', ['only' => ['destroy']]);
 
         //initialize language service
         $this->languageService = new LanguageService();
@@ -61,22 +61,22 @@ class UnitController extends ResponseController
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'code' => ['required','max:3','unique:units'] 
-        ]);
+        // $validator = Validator::make($request->all(), [
+        //     'code' => ['required','max:3','unique:units'] 
+        // ]);
         
-        if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first());
-        }
+        // if ($validator->fails()) {
+        //     return $this->sendError($validator->errors()->first());
+        // }
 
-        $unit = new Unit();
+        // $unit = new Unit();
         
-        $unit->code = strtoupper($request->code);
-        $unit->description = $request->description;
-        $request->fractioned ? $unit->fractioned = true : $unit->fractioned = false;
-        $unit->save();
+        // $unit->code = strtoupper($request->code);
+        // $unit->description = $request->description;
+        // $request->fractioned ? $unit->fractioned = true : $unit->fractioned = false;
+        // $unit->save();
 
-        return $this->sendResponse($unit->toArray(), $this->languageService->getSystemMessage('crud.create'));  
+        // return $this->sendResponse($unit->toArray(), $this->languageService->getSystemMessage('crud.create'));  
     }
 
     /**
@@ -87,9 +87,9 @@ class UnitController extends ResponseController
      */
     public function show($id)
     {
-        $unit = Unit::findOrFail($id);
+        // $unit = Unit::findOrFail($id);
         
-        return $this->sendResponse($unit->toArray(), $this->languageService->getSystemMessage('crud.read'));
+        // return $this->sendResponse($unit->toArray(), $this->languageService->getSystemMessage('crud.read'));
     }
 
     /**
@@ -112,24 +112,24 @@ class UnitController extends ResponseController
      */
     public function update(int $id, Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'code' => ['required','max:3',
-                        Rule::unique('units')->ignore($id)],
-        ]);
+    //     $validator = Validator::make($request->all(), [
+    //         'code' => ['required','max:3',
+    //                     Rule::unique('units')->ignore($id)],
+    //     ]);
         
-        if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first());
-        }
+    //     if ($validator->fails()) {
+    //         return $this->sendError($validator->errors()->first());
+    //     }
 
-        $unit = Unit::findOrFail($id);
+    //     $unit = Unit::findOrFail($id);
         
-        $unit->code = strtoupper($request->code);
-        $unit->description = $request->description;
-        $request->fractioned ? $unit->fractioned = true : $unit->fractioned = false;
+    //     $unit->code = strtoupper($request->code);
+    //     $unit->description = $request->description;
+    //     $request->fractioned ? $unit->fractioned = true : $unit->fractioned = false;
 
-        $unit->save();
+    //     $unit->save();
 
-        return $this->sendResponse($unit->toArray(),$this->languageService->getSystemMessage('crud.update'));  
+    //     return $this->sendResponse($unit->toArray(),$this->languageService->getSystemMessage('crud.update'));  
     }
 
     /**
@@ -140,11 +140,11 @@ class UnitController extends ResponseController
      */
     public function destroy(int $id)
     {
-        $unit = Unit::findOrFail($id);
+        // $unit = Unit::findOrFail($id);
 
-        $unit->delete();
+        // $unit->delete();
 
-        return $this->sendResponse($unit->toArray(), $this->languageService->getSystemMessage('crud.delete'));
+        // return $this->sendResponse($unit->toArray(), $this->languageService->getSystemMessage('crud.delete'));
     }
 
     /**
