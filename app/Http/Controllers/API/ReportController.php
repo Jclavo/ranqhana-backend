@@ -33,6 +33,10 @@ class ReportController extends ResponseController
     {
         //initialize language service
         $this->languageService = new LanguageService();
+
+        //permission middleware
+        $this->middleware('permission_in_role:invoices_chart/pagination|permission_in_role:invoices_chart/read',
+                         ['only' => ['invoiceMoney','popularProducts']]);
     }
 
     /**

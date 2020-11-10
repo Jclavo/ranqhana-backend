@@ -26,6 +26,14 @@ class OrderController extends ResponseController
     {
         //initialize language service
         $this->languageService = new LanguageService();
+
+        //permission middleware
+        $this->middleware('permission_in_role:orders_list/read');
+        $this->middleware('permission_in_role:orders_list/pagination', ['only' => ['pagination']]);
+        // $this->middleware('permission_in_role:orders_list/delete', ['only' => ['destroy', 'anull']]);
+
+        // $this->middleware('permission_in_role:order/create', ['only' => ['store' ]]);
+        $this->middleware('permission_in_role:order/update', ['only' => ['update', 'updateStage','updateDeliveryDate']]);
     }
 
     /**

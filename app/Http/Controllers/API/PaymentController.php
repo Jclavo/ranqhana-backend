@@ -31,6 +31,14 @@ class PaymentController extends ResponseController
     {
         //initialize language service
         $this->languageService = new LanguageService();
+
+        //permission middleware
+        $this->middleware('permission_in_role:payment/read'); 
+        $this->middleware('permission_in_role:payment/create', ['only' => ['store']]);
+        $this->middleware('permission_in_role:payment/update', ['only' => ['update']]);
+        $this->middleware('permission_in_role:payment/delete', ['only' => ['destroy']]);
+        $this->middleware('permission_in_role:payment/pagination', ['only' => ['pagination']]);
+
     }
 
     /**

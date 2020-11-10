@@ -41,6 +41,15 @@ class InvoiceController extends ResponseController
     {
         //initialize language service
         $this->languageService = new LanguageService();
+
+        //permission middleware
+        $this->middleware('permission_in_role:invoices_list/read');
+        $this->middleware('permission_in_role:invoices_list/pagination', ['only' => ['pagination']]);
+        $this->middleware('permission_in_role:invoices_list/delete', ['only' => ['destroy', 'anull']]);
+     
+        $this->middleware('permission_in_role:sell_invoice/create|permission_in_role:purchase_invoice/create', ['only' => ['store','generate' ]]);
+        $this->middleware('permission_in_role:sell_invoice/update|permission_in_role:purchase_invoice/update', ['only' => ['update']]);
+   
     }
 
     /**

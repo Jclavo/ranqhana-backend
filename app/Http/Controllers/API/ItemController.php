@@ -24,6 +24,9 @@ class ItemController extends ResponseController
     
     function __construct()
     {
+        //initialize language service
+        $this->languageService = new LanguageService();
+        
         //General
         $this->middleware('permission_in_role:services_list/pagination|products_list/pagination' , ['only' => ['pagination']]);
         $this->middleware('permission_in_role:services_list/delete|products_list/delete', ['only' => ['destroy']]);
@@ -36,8 +39,7 @@ class ItemController extends ResponseController
         $this->middleware('permission_in_role:product/create', ['only' => ['storeProduct']]);
         $this->middleware('permission_in_role:product/update', ['only' => ['updateProduct']]);
 
-        //initialize language service
-	    $this->languageService = new LanguageService();
+
     }
 
     /**
