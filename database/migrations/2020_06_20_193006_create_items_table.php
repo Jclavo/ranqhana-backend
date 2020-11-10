@@ -22,7 +22,7 @@ class CreateItemsTable extends Migration
             $table->boolean('stocked')->default(true);
 
             //FK for UNITS table
-            $table->unsignedBigInteger('unit_id');
+            $table->unsignedBigInteger('unit_id')->nullable();
             $table->foreign('unit_id')->references('code')->on('units');
 
             //FK for RANQHANA_USERS table
