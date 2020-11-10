@@ -25,8 +25,8 @@ class ItemController extends ResponseController
     function __construct()
     {
         //General
-        $this->middleware('permission_in_role:services-list/pagination|products-list/pagination' , ['only' => ['pagination']]);
-        $this->middleware('permission_in_role:services-list/delete|products-list/delete', ['only' => ['destroy']]);
+        $this->middleware('permission_in_role:services_list/pagination|products_list/pagination' , ['only' => ['pagination']]);
+        $this->middleware('permission_in_role:services_list/delete|products_list/delete', ['only' => ['destroy']]);
         
         //Products
         $this->middleware('permission_in_role:service/create', ['only' => ['storeService']]);
