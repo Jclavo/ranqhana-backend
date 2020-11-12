@@ -24,7 +24,7 @@ class ItemHasStock
     
     public function passes()
     {
-        if($this->item->type_id == ItemType::getTypeService()) return true;
+        if($this->item->type_id == ItemType::getForService()) return true;
 
         if(!$this->item->stocked) return true;
 
