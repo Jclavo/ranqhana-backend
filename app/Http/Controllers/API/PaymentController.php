@@ -20,8 +20,8 @@ use Carbon\Carbon;
 //Services
 use App\Services\LanguageService;
 
-//Utils
-use App\Utils\CustomCarbon;
+//Rules
+use App\Rules\DateInPast;
 
 class PaymentController extends ResponseController
 {
@@ -74,24 +74,13 @@ class PaymentController extends ResponseController
             'invoice_id' => 'required|exists:invoices,id',
         ]);
 
-        $validator->sometimes('method_id', 'required|exists:payment_methods,id', function ($input) {
-            return $input->method_id > 0;
+        $validator->sometimes('method_id', 'required|exists:payment_methods,id', function ($request) {
+            return $request->method_id > 0;
         });
 
-        // $validator->sometimes('payment_date', 'date|after_or_equal:today', function ($input) {
-        //     return !empty($input->payment_date);
-        // });
-
-        if(!empty($request->payment_date)){
-            
-            $now = CustomCarbon::UTCtoCountryTZ(Carbon::now())->startOfDay();
-            $dateTimeObject = Carbon::parse($request->payment_date)->startOfDay();
-            $date_diff = $now->diffInDays($dateTimeObject);
-
-            if($date_diff > 0){
-                return $this->sendError('The payment date can not be in the past');
-            }
-        }
+        $validator->sometimes('payment_date', ['required','date', new DateInPast], function ($request) {
+            return !empty($request->payment_date);
+        });
 
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
@@ -341,12 +330,15 @@ class PaymentController extends ResponseController
 
         $validator = Validator::make($request->all(), [
             'id' => 'required|exists:payments,id',
-            'payment_date' => 'required|date|after_or_equal:today',
         ]);
 
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
         }
+
+        $validator->sometimes('payment_date', ['required','date', new DateInPast], function ($request) {
+            return !empty($request->payment_date);
+        });
 
         $payment = Payment::findOrFail($request->id);
 
@@ -364,9 +356,9 @@ class PaymentController extends ResponseController
         }
 
         $payment->payment_date = Carbon::parse($request->payment_date);
+        $payment->stage_id  = PaymentStage::getForWaiting();
         $payment->save();
                 
         return $this->sendResponse($payment->toArray(), $this->languageService->getSystemMessage('crud.update-date'));
     }
-
 }
