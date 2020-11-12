@@ -33,7 +33,7 @@ class OrderController extends ResponseController
         // $this->middleware('permission_in_role:orders_list/delete', ['only' => ['destroy', 'anull']]);
 
         // $this->middleware('permission_in_role:order/create', ['only' => ['store' ]]);
-        $this->middleware('permission_in_role:order/update', ['only' => ['update', 'updateStage','updateDeliveryDate']]);
+        $this->middleware('permission_in_role:sell_order/update|permission_in_role:purchase_order/update', ['only' => ['update', 'updateStage','updateDeliveryDate']]);
     }
 
     /**
