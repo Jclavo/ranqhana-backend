@@ -249,7 +249,7 @@ class OrderController extends ResponseController
         $order->delivery_date = Carbon::parse($request->delivery_date);
         $order->save();
                 
-        return $this->sendResponse($order->toArray(), $this->languageService->getSystemMessage('dateChange'));
+        return $this->sendResponse($order->toArray(), $this->languageService->getSystemMessage('crud.update-date'));
     }
 
 }
