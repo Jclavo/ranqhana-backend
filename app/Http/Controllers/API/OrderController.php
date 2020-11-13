@@ -213,7 +213,7 @@ class OrderController extends ResponseController
         $order->stage_id = $request->stage_id;
         $order->save();
                 
-        return $this->sendResponse($order->toArray(), $this->languageService->getSystemMessage('stageChange'));
+        return $this->sendResponse($order->toArray(), $this->languageService->getSystemMessage('stage.updated'));
     }
 
     /**
