@@ -51,8 +51,8 @@ class ReportController extends ResponseController
             'searchBy' => [Rule::in(['Y', 'M', 'D', 'H'])]
         ]);
 
-        $validator->sometimes('type_id', 'required|exists:invoice_types,id', function ($input) {
-            return $input->type_id > 0;
+        $validator->sometimes('type_id', 'required|exists:invoice_types,id', function ($request) {
+            return $request->type_id > 0;
         });
 
         if ($validator->fails()) {
@@ -139,8 +139,11 @@ class ReportController extends ResponseController
         $validator = Validator::make($request->all(), [
             'fromDate' => 'date',
             'toDate' => 'date|after_or_equal:fromDate',
-            'type_id' => 'required|exists:invoice_types,id',
         ]);
+
+        $validator->sometimes('type_id', 'required|exists:invoice_types,id', function ($request) {
+            return $request->type_id > 0;
+        });
 
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
