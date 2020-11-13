@@ -254,8 +254,7 @@ class InvoiceController extends ResponseController
         });
 
         $query->when((!empty($searchValue)), function ($q) use($searchValue) {
-            return $q->where('serie', 'like', '%'. $searchValue .'%')
-                     ->orWhere('total', 'like', '%'. $searchValue .'%');
+            return $q->where('serie', 'like', '%'. $searchValue .'%');
         });
 
         $query->when((!empty($fromDate)) && (!empty($toDate)) , function ($q) use($fromDate,$toDate) {
