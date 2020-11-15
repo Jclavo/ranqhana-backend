@@ -111,7 +111,8 @@ class User extends Authenticatable
                               ->where('users.company_project_id','=',$this->company_project_id);
                     })
                     ->join('companies','company_project.company_id','=','companies.id')
-                    ->join('countries','companies.country_code','=','countries.code')
+                    ->join('universal_people','companies.universal_person_id','=','universal_people.id')
+                    ->join('countries','universal_people.country_code','=','countries.code')
                     ->distinct()
                     ->first();
     }
