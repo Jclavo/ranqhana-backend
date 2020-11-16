@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\BaseModel;
+use Illuminate\Support\Facades\App;
 
-class ItemType extends Model
+class ItemType extends BaseModel
 {
     /**
      * The attributes that are mass assignable.
@@ -16,6 +17,14 @@ class ItemType extends Model
         'name'
     ];
 
+    /**
+     * Get all of the Invoice Stages' translations.
+     */
+    public function translations()
+    {
+         return $this->morphMany(Translation::class, 'translationable', null,null,'code')
+                     ->where('locale',App::getLocale());
+    }
 
     /**
      * Getter (statics)
