@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\App;
 
 //Models
 use App\Models\Item;
+use App\Models\Translation;
 
 class StockType extends BaseModel
 {
