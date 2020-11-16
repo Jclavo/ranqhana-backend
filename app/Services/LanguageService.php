@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\App;
 class LanguageService{
 
     const SYSTEM_ID = '';
-    const SYSTEM_MODEL_ID = 1;
+    const SYSTEM_MODEL = 'App\Models\System';
 
     const URL = 'getTranslation';
     private $client = null;
@@ -30,11 +30,11 @@ class LanguageService{
 
         empty($locale) ? $locale = App::getLocale() : null;
         
-        return $this->getTranslation($key,LanguageService::SYSTEM_ID,LanguageService::SYSTEM_MODEL_ID,$locale);
+        return $this->getTranslation($key,LanguageService::SYSTEM_ID,LanguageService::SYSTEM_MODEL,$locale);
 
     }
 
-    private function getTranslation($key,$translationable_id,$model_id,$locale){
+    private function getTranslation($key,$translationable_id,$translationable_type,$locale){
 
         //set basic configurations
         $this->client = $this->setBasicConfigurations();
@@ -45,8 +45,8 @@ class LanguageService{
 
             'form_params' => [
                 'key' => $key,
-                'translationable_id' => $translationable_id,
-                'model_id' => $model_id,
+                // 'translationable_id' => $translationable_id,
+                'translationable_type' => $translationable_type,
                 'locale' => $locale,
             ]
         ]);
