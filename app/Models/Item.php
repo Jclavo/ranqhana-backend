@@ -9,12 +9,15 @@ use App\Models\ItemType;
 use App\Models\Image;
 use App\Models\StockType;
 use App\Models\Unit;
+use App\Models\ItemStockType;
 
 use App\Scopes\Belongs2CompanyScope;
+use App\Traits\LanguageTrait;
 
 class Item extends BaseModel
 {
     use SoftDeletes;
+    use LanguageTrait;
 
     protected $with = ['images'];
     /**
@@ -60,7 +63,11 @@ class Item extends BaseModel
      */
     public function stock_types()
     {
-        return $this->morphToMany(StockType::class, 'stock_typeable');
+        $collections = $this->belongsToMany('App\Models\StockType')
+                    ->using('App\Models\ItemStockType')
+                    ->with('translations');
+
+        return $collections;
     }
 
     /**

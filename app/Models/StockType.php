@@ -21,7 +21,8 @@ class StockType extends BaseModel
      */
     public function items()
     {
-        return $this->morphedByMany(Item::class, 'stock_typeable');
+        return $this->belongsToMany('App\Models\Item')
+                    ->using('App\Models\ItemStockType');
     }
 
     /**

@@ -130,14 +130,30 @@ class ItemController extends ResponseController
                 
         //get stock_types
         $query->with(['stock_types','type']);
-        // $query->with(['stock_types','type','unit']);
-
         
         $results = $query->orderBy($sortColumn, $sortDirection)
                          ->paginate($pageSize);
 
+        /**
+         * custom logic to get translation when the relationship has a Pivot table
+         */
+
+        $items = $results->items();
+
+        foreach ($items as $item) {
+
+            foreach ($item['stock_types'] as $stock_type) {
+
+                foreach ($stock_type->translations as $translation) {
+                        $stock_type[$translation->key] = $translation->value;
+                }
+                unset($stock_type->translations);              
+            }
+        }
+
+
             
-        return $this->sendResponse($results->items(), $this->languageService->getSystemMessage('crud.pagination'), $results->total() );
+        return $this->sendResponse($items, $this->languageService->getSystemMessage('crud.pagination'), $results->total() );
 
     }
 
