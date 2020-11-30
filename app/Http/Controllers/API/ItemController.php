@@ -121,10 +121,9 @@ class ItemController extends ResponseController
 
         //Filter by stock types
         $query->when(( $stock_type_id > 0 ), function ($q) use($stock_type_id) {
-            return $q->join('stock_typeables', function ($join) use($stock_type_id){
-                        $join->on('stock_typeables.stock_typeable_id', '=', 'items.id')
-                                ->where('stock_typeables.stock_type_id', $stock_type_id)
-                                ->where('stock_typeables.stock_typeable_type', Item::class);
+            return $q->join('item_stock_type', function ($join) use($stock_type_id){
+                        $join->on('item_stock_type.item_id', '=', 'items.id')
+                                ->where('item_stock_type.stock_type_id', $stock_type_id);
                     });
         });
                 
