@@ -2,8 +2,6 @@
 
 use Illuminate\Support\Str;
 
-$DATABASE_URL=parse_url('postgres://fmlzikbnnchafi:294cb9d5d02d8f312fb8d07d2f90675cf1ee0c4872f9538daac78ed13f310f7a@ec2-184-72-235-159.compute-1.amazonaws.com:5432/d75bvcfvqj3bve');
-
 return [
 
     /*
@@ -68,7 +66,7 @@ return [
 
         #Roles database
         'mysql_roles' => [
-            'driver' => 'mysql',
+            'driver' => env('DB_CONNECTION_TAAPAQ'),
             'url' => env('DATABASE_URL_TAAPAQ'),
             'host' => env('DB_HOST_TAAPAQ', '127.0.0.1'),
             'port' => env('DB_PORT_TAAPAQ', '3306'),
@@ -76,8 +74,8 @@ return [
             'username' => env('DB_USERNAME_TAAPAQ', 'forge'),
             'password' => env('DB_PASSWORD_TAAPAQ', ''),
             'unix_socket' => env('DB_SOCKET', ''),
-            'charset' => 'utf8mb4',
-            'collation' => 'utf8mb4_unicode_ci',
+            'charset' => 'utf8',
+            // 'collation' => 'utf8mb4_unicode_ci',
             'prefix' => '',
             'prefix_indexes' => true,
             'strict' => true,
