@@ -228,7 +228,7 @@ class UserController extends ResponseController{
     // public function login(Request $request)
     // {
     //     $validator = Validator::make($request->all(), [
-    //         'login' => 'required|exists:mysql_roles.users,login',
+    //         'login' => 'required|exists:taapaq_DB.users,login',
     //         'password' => 'required|min:8|max:45',
     //     ]);
         

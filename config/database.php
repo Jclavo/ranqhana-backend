@@ -64,8 +64,8 @@ return [
             ]) : [],
         ],
 
-        #Roles database
-        'mysql_roles' => [
+        # Taapaq DB
+        'taapaq_DB' => [
             'driver' => env('DB_CONNECTION_TAAPAQ'),
             'url' => env('DATABASE_URL_TAAPAQ'),
             'host' => env('DB_HOST_TAAPAQ', '127.0.0.1'),

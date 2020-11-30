@@ -15,9 +15,9 @@ class RanqhanaUserController extends ResponseController{
     public function store(Request $request)
     {
         // $validator = Validator::make($request->all(), [
-        //     'external_user_id' => 'required|exists:mysql_roles.users,id',
-        //     'login' => 'required|exists:mysql_roles.users,login',
-        //     'company_project_id' => 'required|exists:mysql_roles.users,company_project_id',
+        //     'external_user_id' => 'required|exists:taapaq_DB.users,id',
+        //     'login' => 'required|exists:taapaq_DB.users,login',
+        //     'company_project_id' => 'required|exists:taapaq_DB.users,company_project_id',
         // ]);
         
         // if ($validator->fails()) {
