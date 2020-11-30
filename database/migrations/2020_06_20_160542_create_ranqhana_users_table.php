@@ -14,7 +14,7 @@ class CreateRanqhanaUsersTable extends Migration
     public function up()
     {
         Schema::create('ranqhana_users', function (Blueprint $table) {
-            // $table->bigIncrements('id');
+            $table->bigIncrements('id');
             $table->unsignedBigInteger('external_user_id')->unique();
             $table->string('login');
             $table->bigInteger('company_project_id');
