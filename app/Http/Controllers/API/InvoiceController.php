@@ -264,7 +264,7 @@ class InvoiceController extends ResponseController
             $fromDate = CustomCarbon::countryTZtoUTC($fromDate,'00:00:00', $timezome);
             $toDate = CustomCarbon::countryTZtoUTC($toDate,'23:59:59', $timezome);
 
-            return $q->whereBetween('created_at',[ $fromDate." 00:00:00", $toDate." 23:59:59"]);
+            return $q->whereBetween('created_at',[ $fromDate, $toDate]);
         });
 
         $results = $query->orderBy($sortColumn, $sortDirection)
