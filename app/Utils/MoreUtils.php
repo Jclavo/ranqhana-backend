@@ -7,13 +7,14 @@ use App\Utils\CustomCarbon;
 
 class MoreUtils
 {
-    static function generateCorrelativeSerie($model){
+    static function generateInvoiceCorrelativeSerie($model, $type_id){
 
         $today = CustomCarbon::UTCtoCountryTZ(Carbon::now())->toDateString();
         $fromDate = CustomCarbon::countryTZtoUTC($today , '00:00:00');
         $toDate = CustomCarbon::countryTZtoUTC($today , '23:59:59');
 
-        $order = $model::whereBetween('created_at',[ $fromDate, $toDate])
+        $order = $model::where('type_id',$type_id)
+                        ->whereBetween('created_at',[ $fromDate, $toDate])
                         ->orderBy('id','DESC')
                         ->first();
 

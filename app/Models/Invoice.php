@@ -33,10 +33,10 @@ class Invoice extends BaseModel
         //  'discount' => 'decimal:2',
     ];
 
-     public function setSerieAttribute($value)
-    {
-        $this->attributes['serie'] = MoreUtils::generateCorrelativeSerie($this);
-    }
+    //  public function setSerieAttribute($value)
+    // {
+    //     $this->attributes['serie'] = MoreUtils::generateInvoiceCorrelativeSerie($this);
+    // }
 
 
     /**

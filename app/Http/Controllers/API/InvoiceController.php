@@ -29,6 +29,7 @@ use App\Actions\Invoice\InvoiceAnull;
 //Utils
 use App\Utils\PaginationUtils;
 use App\Utils\CustomCarbon;
+use App\Utils\MoreUtils;
 
 //Services
 use App\Services\LanguageService;
@@ -93,7 +94,8 @@ class InvoiceController extends ResponseController
         $invoice->stage_id = InvoiceStage::getForDraft();
         //Initial values
         $invoice->subtotal = 0;
-        $invoice->serie = '0000'; //set a fake value to call a custom function in the model 
+        // $invoice->serie = '0000'; //set a fake value to call a custom function in the model 
+        $invoice->serie = MoreUtils::generateInvoiceCorrelativeSerie(Invoice::class, $invoice->type_id );
         $invoice->save();
 
         $invoice->order()->create(['stage_id' => 1, 'delivery_date' => Carbon::now(), 'serie' => $invoice->serie]);

@@ -50,17 +50,6 @@ class Order extends BaseModel
     //     'code' => CorrelativeCode::class,
     // ];
 
-    /**
-     * Set the user's first name.
-     *
-     * @param  string  $value
-     * @return void
-     */
-    // public function setSerieAttribute($value)
-    // {
-    //     $this->attributes['serie'] = MoreUtils::generateCorrelativeSerie($this);
-    // }
-
     //Relationships
 
     /**
