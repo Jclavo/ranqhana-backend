@@ -46,4 +46,14 @@ class PaymentType extends BaseModel
     {
         return 2;
     }
+
+    static function getForCash()
+    {
+        return 3;
+    }
+
+    static function getForInternalCredit()
+    {
+        return 4;
+    }
 }

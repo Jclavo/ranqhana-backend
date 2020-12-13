@@ -24,6 +24,16 @@ class PaymentTypeSeeder extends Seeder
                                     (object) array('value' => 'Credito', 'locale' => 'es'),
                                     (object) array('value' => 'Credito', 'locale' => 'pt')]
                             ),
+            (object) array('code' => 3, 'name' => 'Cash',
+            'translations' => [
+                    (object) array('value' => 'Cash', 'locale' => 'es'),
+                    (object) array('value' => 'Cash', 'locale' => 'pt')]
+                            ),
+            (object) array('code' => 4, 'name' => 'Store Credit',
+            'translations' => [
+                    (object) array('value' => 'Credito interno', 'locale' => 'es'),
+                    (object) array('value' => 'Credito da loja', 'locale' => 'pt')]
+                            ),
         ];
 
         TranslationUtils::customUpdateOrCreate($types,PaymentType::class);
