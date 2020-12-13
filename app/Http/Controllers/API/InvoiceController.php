@@ -6,6 +6,8 @@ use App\Models\Invoice;
 use App\Models\InvoiceDetail;
 use App\Models\User;
 use App\Models\PaymentType;
+use App\Models\PaymentStage;
+use App\Models\PaymentMethod;
 use App\Models\InvoiceStage;
 use App\Models\InvoiceType;
 use App\Models\Item;
@@ -182,18 +184,33 @@ class InvoiceController extends ResponseController
             'payment_type_id' => 'required|exists:payment_types,id',
         ]);
 
-        // $validator->sometimes('external_user_id', 'required', function ($input) {
-        //     return $input->payment_type_id == PaymentType::getForCredit();
-        // });
-
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
         }
 
-        $invoice = Invoice::findOrFail($id);
+        $invoice = Invoice::with('payments')->findOrFail($id);
         $invoice->external_user_id = $request->external_user_id;
-        $invoice->payment_type_id  = $request->payment_type_id;
+        
 
+        //check that update payment_type_id is possible
+        if($invoice->payment_type_id > 0 && $invoice->payment_type_id != $request->payment_type_id){
+            $payments = $invoice->payments;
+
+            // xdebug_break();
+            foreach ($payments as $payment) {
+                if($payment->stage_id == PaymentStage::getForPaid()){
+                    return $this->sendError('At least one payment is already paid.');
+                }
+            }
+
+            foreach ($payments as $payment) {
+                $payment->method_id = PaymentMethod::getForPaymentType($request->payment_type_id);
+                $payment->save();
+
+            }
+        }
+        $invoice->payment_type_id  = $request->payment_type_id;
+        
         //change invoice stage
         if($invoice->payment_type_id == PaymentType::getForInternalCredit()){
             $invoice->setStageByInstallment();
@@ -202,6 +219,7 @@ class InvoiceController extends ResponseController
         }
 
         $invoice->save();
+        $invoice->load('payments');
 
         return $this->sendResponse($invoice->toArray(), $this->languageService->getSystemMessage('crud.update'));  
     }

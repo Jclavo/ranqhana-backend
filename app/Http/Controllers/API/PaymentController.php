@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Models\Payment;
 use App\Models\PaymentMethod;
 use App\Models\PaymentStage;
+use App\Models\PaymentType;
 use App\Models\Invoice;
 use App\Models\InvoiceStage;
 
@@ -90,7 +91,6 @@ class PaymentController extends ResponseController
         $amount = $request->amount;
         $payment_date = $request->payment_date ?  $request->payment_date : Carbon::now();
         $invoice_id = $request->invoice_id;
-        $method_id = $request->method_id ? $request->method_id : PaymentMethod::getForMoney();
         
         /**
          * Validation section
@@ -126,7 +126,7 @@ class PaymentController extends ResponseController
         $payment->amount    = $amount;
         $payment->payment_date =  $payment_date;
         $payment->invoice_id    = $invoice_id;
-        $payment->method_id = $method_id;
+        $payment->method_id = PaymentMethod::getForPaymentType($invoice->payment_type_id,$request->method_id);
         $payment->stage_id  = PaymentStage::getForWaiting();
         $payment->save();
 
@@ -141,7 +141,7 @@ class PaymentController extends ResponseController
      */
     public function show($id)
     {
-        $payment = Payment::findOrFail($id); 
+        $payment = Payment::with('invoice.payment')->findOrFail($id); 
                 
         return $this->sendResponse($payment->toArray(), $this->languageService->getSystemMessage('crud.read'));
     

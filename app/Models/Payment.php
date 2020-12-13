@@ -65,6 +65,5 @@ class Payment extends Model
         $this->stage_id = PaymentStage::getForAnnulled();
     }
 
-
 }
 
