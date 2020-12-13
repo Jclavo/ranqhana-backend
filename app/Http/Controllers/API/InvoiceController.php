@@ -182,9 +182,9 @@ class InvoiceController extends ResponseController
             'payment_type_id' => 'required|exists:payment_types,id',
         ]);
 
-        $validator->sometimes('external_user_id', 'required', function ($input) {
-            return $input->payment_type_id == PaymentType::getForCredit();
-        });
+        // $validator->sometimes('external_user_id', 'required', function ($input) {
+        //     return $input->payment_type_id == PaymentType::getForCredit();
+        // });
 
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
@@ -195,7 +195,7 @@ class InvoiceController extends ResponseController
         $invoice->payment_type_id  = $request->payment_type_id;
 
         //change invoice stage
-        if($invoice->payment_type_id == PaymentType::getForCredit()){
+        if($invoice->payment_type_id == PaymentType::getForInternalCredit()){
             $invoice->setStageByInstallment();
         }else{
             $invoice->setStageDraft();
