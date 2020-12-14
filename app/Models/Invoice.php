@@ -135,8 +135,8 @@ class Invoice extends BaseModel
         $this->stage_id = InvoiceStage::getForByInstallment();
     }
 
-    public function setStageStockUpdated()
+    public function setStageWaitingPayment()
     {
-        $this->stage_id = InvoiceStage::getForStockUpdated();
+        $this->stage_id = InvoiceStage::getForWaitingPayment();
     }
 }

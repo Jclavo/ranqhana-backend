@@ -54,7 +54,7 @@ class InvoiceStage extends BaseModel
         return 4;
     }
 
-    static function getForStockUpdated()
+    static function getForWaitingPayment()
     {
         return 5;
     }

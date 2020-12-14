@@ -214,9 +214,10 @@ class InvoiceController extends ResponseController
         //change invoice stage
         if($invoice->payment_type_id == PaymentType::getForInternalCredit()){
             $invoice->setStageByInstallment();
-        }else{
-            $invoice->setStageDraft();
         }
+        // else{
+        //     $invoice->setStageDraft();
+        // }
 
         $invoice->save();
         $invoice->load('payments');
@@ -266,7 +267,7 @@ class InvoiceController extends ResponseController
 
         $query->select('invoices.*');
         $query->whereHas('details');
-        $query->with(['stage','type']);
+        $query->with(['stage','type','payments']);
         $query->whereNotIn('stage_id', [InvoiceStage::getForDraft()]);
 
         $query->when((!empty($type_id)), function ($q) use($type_id) {
@@ -383,7 +384,7 @@ class InvoiceController extends ResponseController
             return $this->sendError([],  $this->languageService->getSystemMessage('invoice.discount-incorrect'));       
         }
 
-        $invoice->setStageStockUpdated();
+        $invoice->setStageWaitingPayment();
         $invoice->save();
 
         //end transaction
