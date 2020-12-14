@@ -245,8 +245,12 @@ class InvoiceController extends ResponseController
             'pageSize' => 'numeric|gt:0',
         ]);
 
-        $validator->sometimes('type_id', 'required|exists:invoice_types,id', function ($input) {
-            return $input->type_id > 0;
+        $validator->sometimes('type_id', 'required|exists:invoice_types,id', function ($request) {
+            return $request->type_id > 0;
+        });
+
+        $validator->sometimes('stage_id', 'required|exists:invoice_stages,id', function ($request) {
+            return $request->stage_id > 0;
         });
 
         if ($validator->fails()) {
@@ -262,6 +266,7 @@ class InvoiceController extends ResponseController
         $fromDate      = $request->fromDate;
         $toDate        = $request->toDate;
         $type_id       = $request->type_id;
+        $stage_id      = $request->stage_id;
         
         $query = Invoice::query();
 
@@ -272,6 +277,10 @@ class InvoiceController extends ResponseController
 
         $query->when((!empty($type_id)), function ($q) use($type_id) {
             return $q->where('type_id', '=', $type_id);
+        });
+
+        $query->when((!empty($stage_id)), function ($q) use($stage_id) {
+            return $q->where('stage_id', '=', $stage_id);
         });
 
         $query->when((!empty($searchValue)), function ($q) use($searchValue) {
