@@ -97,6 +97,9 @@ Route::middleware(['auth:api'])->group(function () {
     //Invoice Type
     Route::resource('invoice-types', 'API\InvoiceTypeController');
 
+    //Invoice Stage
+    Route::resource('invoice-stages', 'API\InvoiceStageController');
+
     //Services
     // Route::post('services/pagination', 'API\ServiceController@pagination');
     // Route::resource('services', 'API\ServiceController');
