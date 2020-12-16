@@ -35,7 +35,9 @@ class ReportController extends ResponseController
         $this->languageService = new LanguageService();
 
         //permission middleware
-        $this->middleware('permission_in_role:invoices_chart/pagination|permission_in_role:invoices_chart/read',
+        $this->middleware('permission_in_role:dashboard/read|
+                           permission_in_role:invoice_$$$_by_payment_type/read|
+                           permission_in_role:invoice_$$$_by_period/read',
                          ['only' => ['invoiceMoney','popularProducts']]);
     }
 
@@ -55,14 +57,20 @@ class ReportController extends ResponseController
             return $request->type_id > 0;
         });
 
+        $validator->sometimes('payment_type_id', 'required|exists:payment_types,id', function ($request) {
+            return $request->payment_type_id > 0;
+        });
+
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
         }
 
+        $searchBy = $request->searchBy;
         $fromDate = $request->fromDate;
         $toDate = $request->toDate;
         $type_id = $request->type_id;
-        $searchBy = $request->searchBy;
+        $payment_type_id = $request->payment_type_id;
+        
 
         $query = Invoice::query();
 
@@ -73,6 +81,10 @@ class ReportController extends ResponseController
 
         $query->when((!empty($type_id)), function ($q) use($type_id) {
             return $q->where('invoices.type_id', '=', $type_id);
+        });
+
+        $query->when((!empty($payment_type_id)), function ($q) use($payment_type_id) {
+            return $q->where('invoices.payment_type_id', $payment_type_id);
         });
 
         $query->whereIn('invoices.stage_id', [InvoiceStage::getForPaid(), InvoiceStage::getForByInstallment()])
