@@ -297,10 +297,15 @@ class InvoiceController extends ResponseController
             return $q->whereBetween('created_at',[ $fromDate, $toDate]);
         });
 
-        $results = $query->orderBy($sortColumn, $sortDirection)
-                         ->paginate($pageSize);       
- 
-        return $this->sendResponse($results->items(), $this->languageService->getSystemMessage('crud.pagination'), $results->total() );
+        $resultPagination = $query->orderBy($sortColumn, $sortDirection)
+                            ->paginate($pageSize);   
+                         
+        $sum = $query->sum('total');
+
+        $result = array('values' => $resultPagination->items(),
+                        'sum' => $sum);
+
+        return $this->sendResponse($result, $this->languageService->getSystemMessage('crud.pagination'), $resultPagination->total() );
 
     }
      
