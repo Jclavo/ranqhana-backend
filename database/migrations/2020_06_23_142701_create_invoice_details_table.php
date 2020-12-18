@@ -18,7 +18,7 @@ class CreateInvoiceDetailsTable extends Migration
 
             $table->integer('quantity');
             $table->decimal('price',7,2);
-            $table->decimal('total',10,2);
+            $table->decimal('total',12,2);
 
             $table->unsignedBigInteger('item_id')->nullable(true);
             $table->foreign('item_id')->references('id')->on('items');

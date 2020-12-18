@@ -170,7 +170,7 @@ class ItemController extends ResponseController
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'price' => 'required|numeric|between:0.00,99999.99',
+            'price' => 'required|gt:0|regex:/^[0-9]{1,6}+(?:\.[0-9]{1,2})?$/',
             'unit_id' => 'required|exists:units,id',
             'stock_types' => 'nullable|array',
             'stock_types.*' => 'nullable|exists:stock_types,id'
@@ -211,7 +211,7 @@ class ItemController extends ResponseController
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'price' => 'required|numeric|between:0.00,99999.99',
+            'price' => 'required|gt:0|regex:/^[0-9]{1,6}+(?:\.[0-9]{1,2})?$/',
             'unit_id' => 'required|exists:units,id',
             'stock_types' => 'nullable|array',
             'stock_types.*' => 'nullable|exists:stock_types,id'
@@ -261,7 +261,7 @@ class ItemController extends ResponseController
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'price' => 'required|numeric|between:0.00,99999.99',
+            'price' => 'required|gt:0|regex:/^[0-9]{1,6}+(?:\.[0-9]{1,2})?$/',
             'description' => 'nullable|max:200',
             'stock_types' => 'nullable|array',
             'stock_types.*' => 'nullable|exists:stock_types,id'
@@ -301,7 +301,7 @@ class ItemController extends ResponseController
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'price' => 'required|numeric|between:0.00,99999.99',
+            'price' => 'required|gt:0|regex:/^[0-9]{1,6}+(?:\.[0-9]{1,2})?$/',
             'description' => 'nullable|max:200',
             'stock_types' => 'nullable|array',
             'stock_types.*' => 'nullable|exists:stock_types,id'

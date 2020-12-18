@@ -71,12 +71,12 @@ class InvoiceDetailController extends ResponseController
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'quantity'   => 'required|numeric|gt:0|regex:/^[0-9]{1,5}+(?:\.[0-9]{1,2})?$/',
+            'quantity'   => 'required|numeric|gt:0',
             'item_id'    => 'required|exists:items,id',
             'invoice_id' => 'required|exists:invoices,id',
         ]);
 
-        $validator->sometimes('price', 'required|numeric|regex:/^[0-9]{1,5}+(?:\.[0-9]{1,2})?$/', function ($input) {
+        $validator->sometimes('price', 'required|numeric|regex:/^[0-9]{1,6}+(?:\.[0-9]{1,2})?$/', function ($input) {
             return $input->price > 0;
         });
 

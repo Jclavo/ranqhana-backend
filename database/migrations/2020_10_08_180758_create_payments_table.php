@@ -15,8 +15,8 @@ class CreatePaymentsTable extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->decimal('amount',7,2)->default(0);
-            $table->decimal('money',7,2)->default(0)->nullable();
+            $table->decimal('amount',12,2)->default(0);
+            $table->decimal('money',12,2)->default(0)->nullable();
             $table->dateTime('payment_date',0);
             // $table->timestamp('payment_date')->useCurrent();
             $table->dateTime('real_payment_date',0)->nullable();

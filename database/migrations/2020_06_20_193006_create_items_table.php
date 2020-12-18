@@ -18,7 +18,7 @@ class CreateItemsTable extends Migration
             $table->string('name',45);
             $table->string('description',200)->nullable();
             $table->integer('stock')->default(0);
-            $table->decimal('price',7,2)->default(0);
+            $table->decimal('price',8,2)->default(0);
             $table->boolean('stocked')->default(true);
 
             //FK for UNITS table
