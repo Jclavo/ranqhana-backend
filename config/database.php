@@ -65,23 +65,18 @@ return [
 
         # Taapaq DB
         'taapaq_DB' => [
-            'driver' => env('DB_CONNECTION_TAAPAQ'),
+            'driver' => 'pgsql',
             'url' => env('DATABASE_URL_TAAPAQ'),
             'host' => env('DB_HOST_TAAPAQ', '127.0.0.1'),
-            'port' => env('DB_PORT_TAAPAQ', '3306'),
+            'port' => env('DB_PORT_TAAPAQ', '5432'),
             'database' => env('DB_DATABASE_TAAPAQ', 'forge'),
             'username' => env('DB_USERNAME_TAAPAQ', 'forge'),
             'password' => env('DB_PASSWORD_TAAPAQ', ''),
-            'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8',
-            // 'collation' => 'utf8mb4_unicode_ci',
             'prefix' => '',
             'prefix_indexes' => true,
-            'strict' => true,
-            'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'schema' => 'public',
+            'sslmode' => 'prefer',
         ],
 
         'pgsql' => [
