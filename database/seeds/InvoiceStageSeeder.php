@@ -25,12 +25,12 @@ class InvoiceStageSeeder extends Seeder
                 (object) array('code' => 1, 'name' => 'Paid',
                                 'translations' => [
                                         (object) array('value' => 'Pagado', 'locale' => 'es'),
-                                        (object) array('value' => 'Pagado', 'locale' => 'pt')]
+                                        (object) array('value' => 'Pago', 'locale' => 'pt')]
                                 ),
                                 (object) array('code' => 2, 'name' => 'Annulled',
                                 'translations' => [
                                         (object) array('value' => 'Anulado', 'locale' => 'es'),
-                                        (object) array('value' => 'Anulado', 'locale' => 'pt')]
+                                        (object) array('value' => 'Cancelada', 'locale' => 'pt')]
                                 ),
                                 (object) array('code' => 3, 'name' => 'Draft',
                                 'translations' => [
@@ -40,12 +40,12 @@ class InvoiceStageSeeder extends Seeder
                                 (object) array('code' => 4, 'name' => 'By installment',
                                 'translations' => [
                                         (object) array('value' => 'Por cuotas', 'locale' => 'es'),
-                                        (object) array('value' => 'No juros', 'locale' => 'pt')]
+                                        (object) array('value' => 'Parcelado', 'locale' => 'pt')]
                                 ),
                                 (object) array('code' => 5, 'name' => 'Waiting for payment',
                                 'translations' => [
                                         (object) array('value' => 'Esperando pago', 'locale' => 'es'),
-                                        (object) array('value' => 'Aguardando pago', 'locale' => 'pt')]
+                                        (object) array('value' => 'Aguardando pagamento', 'locale' => 'pt')]
                                 ),
             ];
 
