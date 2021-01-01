@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\Item;
 use App\Models\InvoiceType;
 use App\Models\OrderStage;
+use App\Models\InvoiceStage;
 
 use App\Actions\Item\ItemHasStock;
 use App\Actions\Item\ItemIsStocked;
@@ -20,9 +21,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule; 
+use Carbon\Carbon;
 
 //Services
 use App\Services\LanguageService;
+
+//Utils
+use App\Utils\MoreUtils;
 
 class InvoiceDetailController extends ResponseController
 {
@@ -72,20 +77,45 @@ class InvoiceDetailController extends ResponseController
     {
         $validator = Validator::make($request->all(), [
             'quantity'   => 'required|numeric|gt:0',
-            'item_id'    => 'required|exists:items,id',
-            'invoice_id' => 'required|exists:invoices,id',
+            'item_id'    => 'required|exists:items,id'
         ]);
 
-        $validator->sometimes('price', 'required|numeric|regex:/^[0-9]{1,6}+(?:\.[0-9]{1,2})?$/', function ($input) {
-            return $input->price > 0;
+        $validator->sometimes('price', 'required|numeric|regex:/^[0-9]{1,6}+(?:\.[0-9]{1,2})?$/', function ($request) {
+            return $request->price > 0;
+        });
+
+        $validator->sometimes('invoice_id', 'required|exists:invoices,id', function ($request) {
+            return $request->invoice_id > 0;
+        });
+
+        $validator->sometimes('type_id', 'required|exists:invoice_types,id', function ($request) {
+            return !isset($request->invoice_id);
         });
 
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
         }
 
+        //check if INVOICE ID exist
+        if(isset($request->invoice_id) && $request->invoice_id > 0){
+            $invoice = Invoice::findOrFail($request->invoice_id);
+        }else{
+            //create the new invoice
+            $invoice = new Invoice();
+            //set initial values
+            $invoice->type_id  = $request->type_id;
+            $invoice->user_id = Auth::user()->id;
+            $invoice->stage_id = InvoiceStage::getForDraft();
+            $invoice->subtotal = 0;
+            $invoice->serie = MoreUtils::generateInvoiceCorrelativeSerie(Invoice::class, $invoice->type_id );
+            $invoice->save();
+    
+            $invoice->order()->create(['stage_id' => 1, 'delivery_date' => Carbon::now(), 'serie' => $invoice->serie]); 
+            
+            $invoice = Invoice::findOrFail($invoice->id);
+        }
+
         $item = Item::findOrFail($request->item_id);
-        $invoice = Invoice::findOrFail($request->invoice_id);
         $invoiceType = $invoice->getType();
         $order = $invoice->order;
 
@@ -113,7 +143,7 @@ class InvoiceDetailController extends ResponseController
 
         $invoiceDetail = InvoiceDetail::select('invoice_details.*')
                                         ->where('item_id',$request->item_id)
-                                        ->where('invoice_id',$request->invoice_id)
+                                        ->where('invoice_id',$invoice->id)
                                         ->first();
 
         if(is_null($invoiceDetail)){
@@ -121,7 +151,7 @@ class InvoiceDetailController extends ResponseController
             $invoiceDetail->item_id    = $request->item_id;
             $invoiceDetail->quantity   = $request->quantity;
             $invoiceDetail->price      = $price;
-            $invoiceDetail->invoice_id = $request->invoice_id;
+            $invoiceDetail->invoice_id = $invoice->id;
         }else{
             $invoiceDetail->quantity   = $invoiceDetail->quantity + $request->quantity;
             $invoiceDetail->price      = $price;
@@ -130,82 +160,11 @@ class InvoiceDetailController extends ResponseController
         $invoiceDetail->calculateTotal();
         $invoiceDetail->save();
 
-        return $this->sendResponse($invoiceDetail->toArray(),$this->languageService->getSystemMessage('crud.create'));
+        $invoice->load(['order','details.item.unit']);
+
+        return $this->sendResponse($invoice->toArray(),$this->languageService->getSystemMessage('crud.create'));
     
     }
-
-    // public function store(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'quantity'   => 'required|numeric|gt:0|regex:/^[0-9]{1,5}+(?:\.[0-9]{1,2})?$/',
-    //         'price'    =>   'numeric|gt:0|regex:/^[0-9]{1,5}+(?:\.[0-9]{1,2})?$/',
-    //         'item_id'    => 'required|exists:items,id',
-    //         'invoice_id' => 'required|exists:invoices,id',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return $this->sendError($validator->errors()->first());
-    //     }
-
-    //     $item = Item::findOrFail($request->item_id);
-
-    //     $invoice = Invoice::findOrFail($request->invoice_id);
-    //     $invoiceType = $invoice->getType();
-    //     $typeSell = $invoice->getForSell();
-    //     $typePurchase = $invoice->getForPurchase();
-
-    //     //Validation only for a Sell Invoice
-    //     if($invoiceType == $typeSell){
-    //         $this->businessValidations([
-    //             new ItemHasStock($item , $request->quantity),
-    //         ], [ new InvoiceAnull($invoice)]);
-    //     }
-    //     else if($invoiceType == $typePurchase){
-    //         $this->businessValidations([
-    //             new ItemIsStocked($item),
-    //         ], [ new InvoiceAnull($invoice)]);
-    //     }
-
-
-    //     $this->businessValidations([
-    //         new InvoiceIsOpened($invoice),
-    //         new BelongsToStore(Auth::user(), [$item , $invoice ]),
-    //     ], [ new InvoiceAnull($invoice)]);
-       
-
-    //     //Set price according to invoice type
-    //     $price = 0;
-    //     if($invoiceType == $typeSell){
-    //         $price    = $item->price;
-    //     }else if($invoiceType == $typePurchase){
-    //         $price   = $request->price;
-    //     }
-
-    //     $invoiceDetail = new InvoiceDetail();
-    //     $invoiceDetail->item_id    = $request->item_id;
-    //     $invoiceDetail->quantity   = $request->quantity;
-    //     $invoiceDetail->price      = $price;
-    //     $invoiceDetail->invoice_id = $request->invoice_id;
-    //     $invoiceDetail->calculateTotal();
-
-    //     $this->businessValidations([ new InvoiceHasEnoughSubtotal($invoice, $invoiceDetail)], 
-    //                                [ new InvoiceAnull($invoice)]
-    //     );
-
-    //     $invoiceDetail->save();
-
-    //     //Update stock
-    //     //Set price according to invoice type
-    //     if($invoiceType == $typeSell){
-    //         $item->decreaseStock($invoiceDetail->quantity);
-    //     }else if($invoiceType == $typePurchase){
-    //         $item->increaseStock($invoiceDetail->quantity);
-    //     }
-    //     $item->save();
-
-    //     return $this->sendResponse($invoiceDetail->toArray(),$this->languageService->getSystemMessage('crud.create'));
-    
-    // }
 
     /**
      * Display the specified resource.
@@ -222,16 +181,6 @@ class InvoiceDetailController extends ResponseController
         ->select(['invoice_details.*'])
         ->with(['item.unit'])
         ->get();
-
-
-        // $invoiceDetails = InvoiceDetail::select('invoice_details.*', 'items.name as item', 'units.code as unit')
-        //                 ->join('invoices', function ($join) use($invoice_id){
-        //                     $join->on('invoice_details.invoice_id', '=', 'invoices.id')
-        //                         ->where('invoices.id', '=', $invoice_id);
-        //                 })
-        //                 ->join('items', 'invoice_details.item_id', '=', 'items.id')
-        //                 ->join('units', 'items.unit_id', '=', 'units.id')
-        //                 ->get();
 
         if($invoiceDetails->isEmpty()){
             return $this->sendError($this->languageService->getSystemMessage('invoice.detail-not-found'));

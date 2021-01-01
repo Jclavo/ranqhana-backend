@@ -330,8 +330,12 @@ class InvoiceController extends ResponseController
     {
         $validator = Validator::make($request->all(), [
             'id' => 'required|exists:invoices,id',
-            'discount' => 'numeric|gte:0'
+            // 'discount' => 'numeric|gte:0'
         ]);
+
+        $validator->sometimes('discount', 'numeric|gte:0', function ($request) {
+            return $request->discount >= 0;
+        });
 
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
@@ -384,7 +388,7 @@ class InvoiceController extends ResponseController
             
         }
 
-        $invoice->discount = $request->discount;
+        $invoice->discount = $request->discount ?? 0;
         $invoice->total    = $invoice->calculateTotal();
         $invoice->taxes    = $invoice->total * ( Auth::user()->getCountryTax() / 100 );
 
