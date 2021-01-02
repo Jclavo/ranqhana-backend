@@ -63,9 +63,9 @@ class InvoiceAnull
                     
                     //Validate if it has stock is missing
     
-                    // $checkStock = new ItemHasStock($item, $result->quantity);
+                    $checkStock = new ItemHasStock($item, $result->quantity);
     
-                    if($item->isStocked()){
+                    if($checkStock->passes()){
                         $item->decreaseStock($result->quantity);
                     }
                     else{
