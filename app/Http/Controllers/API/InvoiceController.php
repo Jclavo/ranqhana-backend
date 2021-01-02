@@ -340,7 +340,7 @@ class InvoiceController extends ResponseController
         if($request->discount_percent){
 
             $validator->sometimes('discount', 'numeric|between:1,100', function ($request) {
-                return $request->discount >= 0;
+                return $request->discount > 0;
             });
 
         }else{
