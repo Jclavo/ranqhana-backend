@@ -408,7 +408,7 @@ class InvoiceController extends ResponseController
         //validate discount
         if(!$invoice->discount_percent){
             if($invoice->discount > $invoice->subtotal){
-                return $this->sendError([],  'The discount is greather than the subtotal');
+                return $this->sendError($this->languageService->getSystemMessage('invoice.discount-incorrect'));   
             }
         }
 
@@ -417,12 +417,7 @@ class InvoiceController extends ResponseController
 
         //Validate that total is not negative
         if($invoice->total < 0){
-            return $this->sendError([],  $this->languageService->getSystemMessage('invoice.total-negative'));       
-        }
-
-        //Validate that total is not negative
-        if($invoice->discount > $invoice->total){
-            return $this->sendError([],  $this->languageService->getSystemMessage('invoice.discount-incorrect'));       
+            return $this->sendError($this->languageService->getSystemMessage('invoice.total-negative'));       
         }
 
         $invoice->setStageWaitingPayment();
