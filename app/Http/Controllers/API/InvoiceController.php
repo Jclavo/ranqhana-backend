@@ -330,8 +330,24 @@ class InvoiceController extends ResponseController
     {
         $validator = Validator::make($request->all(), [
             'id' => 'required|exists:invoices,id',
-            'discount' => 'numeric|gte:0'
         ]);
+
+        $validator->sometimes('discount_percent', 'required|boolean', function ($request) {
+            return isset($request->discount_percent);
+        });
+
+        //Validate the value of the discount
+        if($request->discount_percent){
+
+            $validator->sometimes('discount', 'numeric|between:1,100', function ($request) {
+                return $request->discount > 0;
+            });
+
+        }else{
+            $validator->sometimes('discount', 'numeric|gte:0', function ($request) {
+                return $request->discount >= 0;
+            });
+        }
 
         if ($validator->fails()) {
             return $this->sendError($validator->errors()->first());
@@ -347,6 +363,7 @@ class InvoiceController extends ResponseController
         if(count($invoice->details) == 0){
             return $this->sendError('The invoice has no items.');
         }
+
 
         $details = $invoice->details;
         $invoice->subtotal = 0;
@@ -384,18 +401,23 @@ class InvoiceController extends ResponseController
             
         }
 
-        $invoice->discount = $request->discount;
+        //calculate discount
+        $invoice->discount_percent = $request->discount_percent ?? false; 
+        $invoice->discount = $request->discount ?? 0;
+
+        //validate discount
+        if(!$invoice->discount_percent){
+            if($invoice->discount > $invoice->subtotal){
+                return $this->sendError($this->languageService->getSystemMessage('invoice.discount-incorrect'));   
+            }
+        }
+
         $invoice->total    = $invoice->calculateTotal();
         $invoice->taxes    = $invoice->total * ( Auth::user()->getCountryTax() / 100 );
 
         //Validate that total is not negative
         if($invoice->total < 0){
-            return $this->sendError([],  $this->languageService->getSystemMessage('invoice.total-negative'));       
-        }
-
-        //Validate that total is not negative
-        if($invoice->discount > $invoice->total){
-            return $this->sendError([],  $this->languageService->getSystemMessage('invoice.discount-incorrect'));       
+            return $this->sendError($this->languageService->getSystemMessage('invoice.total-negative'));       
         }
 
         $invoice->setStageWaitingPayment();

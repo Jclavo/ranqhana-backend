@@ -63,8 +63,12 @@ class ItemController extends ResponseController
      */
     public function destroy(int $id)
     {
-        $item = Item::findOrFail($id);
-        
+        $item = Item::with('invoice_details')->findOrFail($id);
+
+        if(count($item->invoice_details) > 0){
+            return $this->sendError($this->languageService->getSystemMessage('item.is-in-used'));
+        }
+
         $item->delete();
 
         return $this->sendResponse($item->toArray(), $this->languageService->getSystemMessage('crud.delete'));

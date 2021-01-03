@@ -42,10 +42,10 @@ class InvoiceStageSeeder extends Seeder
                                         (object) array('value' => 'Por cuotas', 'locale' => 'es'),
                                         (object) array('value' => 'Parcelado', 'locale' => 'pt')]
                                 ),
-                                (object) array('code' => 5, 'name' => 'Waiting for payment',
+                                (object) array('code' => 5, 'name' => 'No paid',
                                 'translations' => [
-                                        (object) array('value' => 'Esperando pago', 'locale' => 'es'),
-                                        (object) array('value' => 'Aguardando pagamento', 'locale' => 'pt')]
+                                        (object) array('value' => 'Sin pago', 'locale' => 'es'),
+                                        (object) array('value' => 'Sem pagamento', 'locale' => 'pt')]
                                 ),
             ];
 

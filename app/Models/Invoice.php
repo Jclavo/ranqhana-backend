@@ -106,7 +106,14 @@ class Invoice extends BaseModel
     //Custom functions
     public function calculateTotal(){
         // return (($this->subtotal + $this->taxes) - $this->discount);
-        return ($this->subtotal - $this->discount);
+        $discount = $this->discount;
+        if($discount > 0){
+            if($this->discount_percent){
+                $discount = ( $this->subtotal / 100 ) * $discount;
+            }
+        }
+
+        return ($this->subtotal - $discount);
     }
     
     //Getter 
