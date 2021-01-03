@@ -10,6 +10,7 @@ use App\Models\Image;
 use App\Models\StockType;
 use App\Models\Unit;
 use App\Models\ItemStockType;
+use App\Models\InvoiceDetail;
 
 use App\Scopes\Belongs2CompanyScope;
 use App\Traits\LanguageTrait;
@@ -92,6 +93,14 @@ class Item extends BaseModel
     public function images()
     {
         return $this->morphMany('App\Models\Image', 'imageable');
+    }
+
+    /**
+     * Get the invoice details for the item.
+     */
+    public function invoice_details()
+    {
+        return $this->hasMany(InvoiceDetail::class);
     }
     
 
