@@ -401,6 +401,10 @@ class InvoiceController extends ResponseController
             
         }
 
+        if($invoice->subtotal <= 0){
+            return $this->sendError('The subtotal can not be 0.');
+        }
+
         //calculate discount
         $invoice->discount_percent = $request->discount_percent ?? false; 
         $invoice->discount = $request->discount ?? 0;

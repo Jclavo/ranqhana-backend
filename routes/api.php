@@ -100,9 +100,8 @@ Route::middleware(['auth:api'])->group(function () {
     //Invoice Stage
     Route::resource('invoice-stages', 'API\InvoiceStageController');
 
-    //Services
-    // Route::post('services/pagination', 'API\ServiceController@pagination');
-    // Route::resource('services', 'API\ServiceController');
-  
+    //Prices
+    Route::get('prices/sellPriceByItem/{item_id}', 'API\PriceController@sellPriceByItem');
+    Route::get('prices/purchasePriceByItem/{item_id}', 'API\PriceController@purchasePriceByItem');
 });
 

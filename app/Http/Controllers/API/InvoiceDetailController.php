@@ -96,6 +96,8 @@ class InvoiceDetailController extends ResponseController
             return $this->sendError($validator->errors()->first());
         }
 
+        $item = Item::findOrFail($request->item_id);
+
         //check if INVOICE ID exist
         if(isset($request->invoice_id) && $request->invoice_id > 0){
             $invoice = Invoice::findOrFail($request->invoice_id);
@@ -115,9 +117,12 @@ class InvoiceDetailController extends ResponseController
             $invoice = Invoice::findOrFail($invoice->id);
         }
 
-        $item = Item::findOrFail($request->item_id);
         $invoiceType = $invoice->getType();
         $order = $invoice->order;
+
+        if($item->price <= 0 && $invoiceType == InvoiceType::getForSell()){
+            return $this->sendError('Can not be added an item with price $0.');    
+        }
 
         if($order->stage_id != OrderStage::getForNew()){
             return $this->sendError('There is not possible to add more items to this order.');
