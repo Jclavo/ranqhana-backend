@@ -59,7 +59,6 @@ class User extends Authenticatable
     //     return $carbonInstance->toISOString();
     // }
 
-
     /**
      * Get the company_project that owns the user.
      */
@@ -100,22 +99,18 @@ class User extends Authenticatable
     //                 ->first();
     // }
 
-
     /**
-     * Get the country thay owns the company from user.
+     * Get ID from Local User table
      */
-    public function country(){
-        return User::select('countries.*')
-                    ->join('company_project', function ($join){
-                        $join->on('users.company_project_id','=','company_project.id')
-                              ->where('users.company_project_id','=',$this->company_project_id);
-                    })
-                    ->join('companies','company_project.company_id','=','companies.id')
-                    ->join('universal_people','companies.universal_person_id','=','universal_people.id')
-                    ->join('countries','universal_people.country_code','=','countries.code')
-                    ->distinct()
-                    ->first();
-    }
+    // public function getLocalUserID(){
+    //     $RanqhanaUserResult = RanqhanaUser::
+    //                             where('external_user_id','=',$this->id)
+    //                             ->where('company_project_id','=',$this->company_project_id)
+    //                             ->pluck('id');
+
+    //     if($RanqhanaUserResult == null) return null;
+    //     return $RanqhanaUserResult[0];
+    // }
 
     /**
      * Get country's timezone
@@ -133,18 +128,34 @@ class User extends Authenticatable
         return $country->tax;
     }
 
-
-
     /**
-     * Get ID from Local User table
+     * Get the country thay owns the company from user.
      */
-    // public function getLocalUserID(){
-    //     $RanqhanaUserResult = RanqhanaUser::
-    //                             where('external_user_id','=',$this->id)
-    //                             ->where('company_project_id','=',$this->company_project_id)
-    //                             ->pluck('id');
+    public function country(){
+        return User::select('countries.*')
+                    ->join('company_project', function ($join){
+                        $join->on('users.company_project_id','=','company_project.id')
+                              ->where('users.company_project_id','=',$this->company_project_id);
+                    })
+                    ->join('companies','company_project.company_id','=','companies.id')
+                    ->join('universal_people','companies.universal_person_id','=','universal_people.id')
+                    ->join('countries','universal_people.country_code','=','countries.code')
+                    ->distinct()
+                    ->first();
+    }
 
-    //     if($RanqhanaUserResult == null) return null;
-    //     return $RanqhanaUserResult[0];
-    // }
+    public function isAdminByToken($token){
+
+        $isAdmin = User::join('model_has_roles','users.id','=','model_has_roles.model_id')
+                    ->join('roles','model_has_roles.role_id','=','roles.id')  
+                    ->where('users.api_token','=',$token)
+                    ->where('roles.name','like','%ADMIN%')
+                    ->count();
+
+        if ($isAdmin > 0) {
+            return 1;
+        }
+        return 0;
+    }
+
 }

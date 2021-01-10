@@ -353,6 +353,15 @@ class InvoiceController extends ResponseController
             return $this->sendError($validator->errors()->first());
         }
 
+        //validate that the discount is set by an ADMIN
+        if($request->discount > 0){
+            $api_token = $request->api_token ?? Auth::user()->api_token;
+
+            if(!Auth::user()->isAdminByToken($api_token)){
+                return $this->sendError('The user is not allowed to make a discount.');
+            }
+        }
+
         $invoice = Invoice::with(['details'])->findOrFail($request->id);
         $invoiceType = $invoice->getType();
 
