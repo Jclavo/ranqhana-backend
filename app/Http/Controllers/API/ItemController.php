@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 //Utils
 use App\Utils\PaginationUtils;
+use App\Utils\MoreUtils;
 
 //Services
 use App\Services\LanguageService;
@@ -195,6 +196,10 @@ class ItemController extends ResponseController
         $item->type_id = ItemType::getForProduct();
         $item->save();
 
+        //generate Barcode EAN8
+        $item->barcode = MoreUtils::generateEAN8Code($item->id); 
+        $item->save();
+
         //Add price
         $item->prices()->create(['price' => $request->price]);
 
@@ -283,6 +288,10 @@ class ItemController extends ResponseController
         $service->stocked = true;
         $service->user_id = Auth::user()->id;
         $service->type_id = ItemType::getForService();
+        $service->save();
+
+        //generate Barcode EAN8
+        $service->barcode = MoreUtils::generateEAN8Code($service->id); 
         $service->save();
 
         //Add price

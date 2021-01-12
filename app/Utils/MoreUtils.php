@@ -45,4 +45,28 @@ class MoreUtils
         return $newSerie;
 
     }
+
+    static function generateEAN8Code($value){
+
+        $valueLength = strlen($value);
+        if($valueLength < 7 ){
+            $value = str_pad($value, 7, '0', STR_PAD_LEFT);
+        }else if ($valueLength > 7){
+            $value = substr($value,-7);
+        }
+
+        $sumOdd = $value[1] + $value[3] + $value[5];
+        $sumEven = 3 * ($value[0] + $value[2] + $value[4] + $value[6]);
+
+        $checksum = $sumOdd + $sumEven;
+        $checksumDigit = 10 - ($checksum % 10);
+        if ($checksumDigit == 10){
+            $checksumDigit = 0;
+        } 
+
+        $value = $value . $checksumDigit;
+        return $value;
+
+    }
+
 }
