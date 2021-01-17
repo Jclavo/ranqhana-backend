@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 //Utils
 use App\Utils\PaginationUtils;
+use App\Utils\MoreUtils;
 
 //Services
 use App\Services\LanguageService;
@@ -82,15 +83,20 @@ class ItemController extends ResponseController
     {
         
         $validator = Validator::make($request->all(), [
-            'pageSize' => 'numeric|gt:0'
+            'pageSize' => 'numeric|gt:0',
+            'barcode' => 'nullable|boolean',
         ]);
 
-        $validator->sometimes('stock_type_id', 'required|exists:stock_types,id', function ($input) {
-            return $input->stock_type_id > 0;
+        $validator->sometimes('stock_type_id', 'required|exists:stock_types,id', function ($request) {
+            return $request->stock_type_id > 0;
         });
 
-        $validator->sometimes('type_id', 'required|exists:item_types,id', function ($input) {
-            return $input->type_id > 0;
+        $validator->sometimes('type_id', 'required|exists:item_types,id', function ($request) {
+            return $request->type_id > 0;
+        });
+
+        $validator->sometimes('searchValue', 'required|numeric', function ($request) {
+            return $request->barcode;
         });
 
         if ($validator->fails()) {
@@ -104,6 +110,7 @@ class ItemController extends ResponseController
         $searchValue   = $request->searchValue;
         $stock_type_id = $request->stock_type_id;
         $type_id       = $request->type_id;
+        $barcode       = $request->barcode;
             
         $query = Item::query();
         $query->select('items.*', 'units.abbreviation as unit', 'units.fractioned')
@@ -111,12 +118,17 @@ class ItemController extends ResponseController
                     $join->on('units.code', '=', 'items.unit_id');
                 });
 
-        $query->where(function($q) use ($searchValue){
-            $q->where('items.name', 'like', '%'. $searchValue .'%')
-              ->orWhere('items.description', 'like', '%'. $searchValue .'%')
-              ->orWhere('items.price', 'like', $searchValue .'%')
-              ->orWhere('items.stock', 'like', $searchValue .'%');
-        });
+        if($barcode){
+            $query->where('items.barcode', $searchValue);
+        }
+        else{
+            $query->where(function($q) use ($searchValue){
+                $q->where('items.name', 'like', '%'. $searchValue .'%')
+                  ->orWhere('items.description', 'like', '%'. $searchValue .'%')
+                  ->orWhere('items.price', 'like', $searchValue .'%')
+                  ->orWhere('items.stock', 'like', $searchValue .'%');
+            });
+        }
 
         //Filter by types
         $query->when(( $type_id > 0 ), function ($q) use($type_id) {
@@ -193,6 +205,10 @@ class ItemController extends ResponseController
         $item->unit_id = $request->unit_id;
         $item->user_id = Auth::user()->id;
         $item->type_id = ItemType::getForProduct();
+        $item->save();
+
+        //generate Barcode EAN8
+        $item->barcode = MoreUtils::generateEAN8Code($item->id); 
         $item->save();
 
         //Add price
@@ -283,6 +299,10 @@ class ItemController extends ResponseController
         $service->stocked = true;
         $service->user_id = Auth::user()->id;
         $service->type_id = ItemType::getForService();
+        $service->save();
+
+        //generate Barcode EAN8
+        $service->barcode = MoreUtils::generateEAN8Code($service->id); 
         $service->save();
 
         //Add price
