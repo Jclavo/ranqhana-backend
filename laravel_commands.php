@@ -10,7 +10,7 @@ php artisan make:model Models/modelName -a
 
 - CREATE MODEL (& migration)
 
-php artisan make:model Flight -m
+php artisan make:model Models/UniversalPerson -m
 
 - CREATE MIGRATION
 
