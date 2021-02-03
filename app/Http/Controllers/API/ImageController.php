@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Models\Image;
 use App\Models\Item;
+use App\Models\UniversalPerson;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ResponseController;
 use Illuminate\Support\Facades\Validator;
@@ -50,7 +51,7 @@ class ImageController extends ResponseController
      */
     public function store(Request $request)
     {
-        $this->modelsAllowed = array('ITEM', 'USER');
+        $this->modelsAllowed = array('ITEM');
 
         $validator = Validator::make($request->all(), [
             'name' => 'required',
@@ -65,18 +66,21 @@ class ImageController extends ResponseController
             return $this->sendError($validator->errors()->first());
         }
 
-        $newImage = array('name' => $request->name);
         switch ($request->model) {
             case 'ITEM':
-                # code...
-                $item = Item::findOrFail($request->model_id); 
-                $item->images()->updateOrCreate($newImage);
+                Item::findOrFail($request->model_id); 
+                $model = Item::class;
                 break;
             
             default:
-                # code...
                 break;
         }
+
+        $newImage = new Image();
+        $newImage->name = $request->name;
+        $newImage->imageable_id = $request->model_id;
+        $newImage->imageable_type = $model;
+        $newImage->save();
 
         return $this->sendResponse([],$this->languageService->getSystemMessage('crud.create'));
 
